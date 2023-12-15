@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kentico.Xperience.AzureAISearch", "src\Kentico.Xperience.AzureAISearch\Kentico.Xperience.AzureAISearch.csproj", "{52F11256-9F81-4FC1-A2EF-37B113A8F242}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A94EE676-9ABE-44EA-BF9E-22004E9D54C9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{E7008400-7002-49CA-AB2A-2D85177AAC42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DancingGoat", "examples\DancingGoat\DancingGoat.csproj", "{786F6997-CBF5-45F5-81E5-31EFBB0E90CF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BC7BB5A1-450D-420B-BC7D-3F194E3D8522}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kentico.Xperience.AzureAISearch.Tests", "tests\Kentico.Xperience.AzureAISearch.Tests\Kentico.Xperience.AzureAISearch.Tests.csproj", "{2AD7FFD5-0383-4747-82D5-7461A29DBE3E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{52F11256-9F81-4FC1-A2EF-37B113A8F242}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52F11256-9F81-4FC1-A2EF-37B113A8F242}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52F11256-9F81-4FC1-A2EF-37B113A8F242}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52F11256-9F81-4FC1-A2EF-37B113A8F242}.Release|Any CPU.Build.0 = Release|Any CPU
+		{786F6997-CBF5-45F5-81E5-31EFBB0E90CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{786F6997-CBF5-45F5-81E5-31EFBB0E90CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{786F6997-CBF5-45F5-81E5-31EFBB0E90CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{786F6997-CBF5-45F5-81E5-31EFBB0E90CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AD7FFD5-0383-4747-82D5-7461A29DBE3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AD7FFD5-0383-4747-82D5-7461A29DBE3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AD7FFD5-0383-4747-82D5-7461A29DBE3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AD7FFD5-0383-4747-82D5-7461A29DBE3E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{52F11256-9F81-4FC1-A2EF-37B113A8F242} = {A94EE676-9ABE-44EA-BF9E-22004E9D54C9}
+		{786F6997-CBF5-45F5-81E5-31EFBB0E90CF} = {E7008400-7002-49CA-AB2A-2D85177AAC42}
+		{2AD7FFD5-0383-4747-82D5-7461A29DBE3E} = {BC7BB5A1-450D-420B-BC7D-3F194E3D8522}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1B2A20BC-F57B-4AAE-B1C2-E4DC52EFCAC5}
+	EndGlobalSection
+EndGlobal
