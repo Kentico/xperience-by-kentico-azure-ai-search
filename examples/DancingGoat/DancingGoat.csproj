@@ -21,11 +21,12 @@
     <DefineConstants>$(DefineConstants);SEPARATED_ADMIN</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="kentico.xperience.admin" Condition="'$(SeparatedAdmin)' == 'false'" />
     <PackageReference Include="kentico.xperience.azurestorage" />
     <PackageReference Include="kentico.xperience.imageprocessing" />
     <PackageReference Include="kentico.xperience.webapp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Kentico.Xperience.AzureSearch\Kentico.Xperience.AzureSearch.csproj" />
   </ItemGroup>
 </Project>
