@@ -44,12 +44,16 @@ public static class AzureSearchStartupExtensions
                 var options = x.GetRequiredService<IOptions<AzureSearchOptions>>();
                 return new SearchIndexClient(new Uri(options.Value.SearchServiceEndPoint), new AzureKeyCredential(options.Value.SearchServiceAdminApiKey));
             })
+            .AddSingleton<IAzureSearchQueryClientService>(x =>
+            {
+                var options = x.GetRequiredService<IOptions<AzureSearchOptions>>();
+                return new AzureSearchQueryClientService(new AzureSearchQueryClientOptions(options.Value.SearchServiceEndPoint, options.Value.SearchServiceQueryApiKey));
+            })
             .AddSingleton<IAzureSearchClient, DefaultAzureSearchClient>()
             .AddSingleton<IAzureSearchTaskLogger, DefaultAzureSearchTaskLogger>()
             .AddSingleton<IAzureSearchTaskProcessor, DefaultAzureSearchTaskProcessor>()
             .AddSingleton<IAzureSearchConfigurationStorageService, DefaultAzureSearchConfigurationStorageService>()
-            .AddSingleton<IAzureSearchIndexClientService, DefaultAzureSearchIndexClientService>()
-            .AddSingleton<IAzureSearchSearchService, DefaultAzureSearchSearchService>();
+            .AddSingleton<IAzureSearchIndexClientService, AzureSearchIndexClientService>();
 }
 
 public interface IAzureSearchBuilder

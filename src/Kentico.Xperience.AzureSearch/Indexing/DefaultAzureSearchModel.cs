@@ -14,21 +14,21 @@ public interface IAzureSearchModel
 
 public class DefaultAzureSearchModel : IAzureSearchModel
 {
-    [SearchableField(IsSortable = true)]
+    [SearchableField(IsSortable = true, IsFilterable = true, IsFacetable = true)]
     public string? Url { get; set; } = "";
 
-    [SearchableField(IsSortable = true, IsFacetable = true, IsFilterable = true)]
+    [SearchableField(IsFacetable = true, IsFilterable = true)]
     public string ContentTypeName { get; set; } = "";
 
     [SearchableField(IsSortable = true, IsFacetable = true, IsFilterable = true)]
     public string LanguageName { get; set; } = "";
 
-    [SearchableField(IsSortable = true, IsFacetable = true, IsFilterable = true)]
+    [SimpleField(IsKey = false)]
     public string ItemGuid { get; set; } = "";
 
     [SearchableField(IsKey = true)]
     public string ObjectID { get; set; } = "";
 
-    [SearchableField(IsSortable = true, IsFacetable = true, IsFilterable = true)]
+    [SimpleField(IsKey = false)]
     public string Name { get; set; } = "";
 }

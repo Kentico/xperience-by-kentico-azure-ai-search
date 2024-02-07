@@ -5,12 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kentico.Xperience.AzureSearch.Indexing;
 
-public class DefaultAzureSearchIndexClientService : IAzureSearchIndexClientService
+public class AzureSearchIndexClientService : IAzureSearchIndexClientService
 {
     private readonly SearchIndexClient indexClient;
     private readonly IServiceProvider serviceProvider;
 
-    public DefaultAzureSearchIndexClientService(SearchIndexClient indexClient, IServiceProvider serviceProvider)
+    public AzureSearchIndexClientService(SearchIndexClient indexClient, IServiceProvider serviceProvider)
     {
         this.indexClient = indexClient;
         this.serviceProvider = serviceProvider;
@@ -33,6 +33,4 @@ public class DefaultAzureSearchIndexClientService : IAzureSearchIndexClientServi
         await indexClient.CreateOrUpdateIndexAsync(definition, cancellationToken: cancellationToken);
         return indexClient.GetSearchClient(indexName);
     }
-
-    //Clien service shall be created in a Search/Service
 }

@@ -4,15 +4,15 @@ using CMS.Modules;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
 
-internal class AzureSearchModuleInstaller(IResourceInfoProvider resourceProvider)
+internal class AzureSearchModuleInstaller
 {
     private readonly IResourceInfoProvider resourceProvider;
+
+    public AzureSearchModuleInstaller(IResourceInfoProvider resourceProvider) => this.resourceProvider = resourceProvider;
 
     public void Install()
     {
         var resource = resourceProvider.Get("CMS.Integration.AzureSearch")
-            // Handle v4.0.0 resource name manually until migrations are enabled
-            ?? resourceProvider.Get("Kentico.Xperience.AzureSearch")
             ?? new ResourceInfo();
 
         InitializeResource(resource);

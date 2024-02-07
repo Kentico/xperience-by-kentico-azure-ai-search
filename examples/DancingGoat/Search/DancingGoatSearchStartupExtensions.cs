@@ -8,6 +8,8 @@ public static class DancingGoatSearchStartupExtensions
     {
         services.AddKenticoAzureSearch(builder =>
         {
+            builder.RegisterStrategy<SimpleSearchIndexingStrategy>("Simple");
+            builder.RegisterStrategy<AdvancedSearchIndexingStrategy>("Advnaced");
         }, configuration);
 
         services.AddHttpClient<WebCrawlerService>();
