@@ -70,7 +70,7 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
                         deleteTasks.Add(queueItem);
                     }
                 }
-                deleteIds.AddRange(GetIdsToDelete(deleteTasks ?? new List<AzureSearchQueueItem>()).Where(x => x is not null).Select(x => x ?? ""));
+                deleteIds.AddRange(GetIdsToDelete(deleteTasks ?? []).Where(x => x is not null).Select(x => x ?? ""));
                 if (AzureSearchIndexStore.Instance.GetIndex(group.Key) is { } index)
                 {
                     previousBatchResults.SuccessfulOperations += await azuresearchClient.DeleteRecords(deleteIds, group.Key, cancellationToken);

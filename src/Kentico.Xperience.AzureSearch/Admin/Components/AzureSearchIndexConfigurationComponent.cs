@@ -35,7 +35,7 @@ public class AzureSearchIndexConfigurationComponent : FormComponent<AzureSearchI
 
     public override string ClientComponentName => "@kentico/xperience-integrations-azuresearch/AzureSearchIndexConfiguration";
 
-    public override IEnumerable<AzureSearchIndexIncludedPath> GetValue() => Value ?? new();
+    public override IEnumerable<AzureSearchIndexIncludedPath> GetValue() => Value ?? [];
     public override void SetValue(IEnumerable<AzureSearchIndexIncludedPath> value) => Value = value.ToList();
 
     [FormComponentCommand]
@@ -87,7 +87,7 @@ public class AzureSearchIndexConfigurationComponent : FormComponent<AzureSearchI
             .Columns(nameof(DataClassInfo.ClassName))
             .GetEnumerableTypedResultAsync();
 
-        properties.Value = Value ?? new();
+        properties.Value = Value ?? [];
         properties.PossibleItems = allWebsiteContentTypes.Select(x => x.ClassName).ToList();
 
         await base.ConfigureClientProperties(properties);

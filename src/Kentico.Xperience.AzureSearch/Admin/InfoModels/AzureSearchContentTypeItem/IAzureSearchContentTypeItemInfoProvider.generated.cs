@@ -1,11 +1,10 @@
 using CMS.DataEngine;
 
-namespace Kentico.Xperience.AzureSearch.Admin
+namespace Kentico.Xperience.AzureSearch.Admin;
+
+/// <summary>
+/// Declares members for <see cref="AzureSearchContentTypeItemInfo"/> management.
+/// </summary>
+public partial interface IAzureSearchContentTypeItemInfoProvider : IInfoProvider<AzureSearchContentTypeItemInfo>, IInfoByIdProvider<AzureSearchContentTypeItemInfo>, IInfoByNameProvider<AzureSearchContentTypeItemInfo>
 {
-    /// <summary>
-    /// Declares members for <see cref="AzureSearchContentTypeItemInfo"/> management.
-    /// </summary>
-    public partial interface IAzureSearchContentTypeItemInfoProvider : IInfoProvider<AzureSearchContentTypeItemInfo>, IInfoByIdProvider<AzureSearchContentTypeItemInfo>, IInfoByNameProvider<AzureSearchContentTypeItemInfo>
-    {
-    }
 }

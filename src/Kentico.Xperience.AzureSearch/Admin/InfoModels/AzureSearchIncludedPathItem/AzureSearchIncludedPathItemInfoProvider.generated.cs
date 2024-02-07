@@ -1,19 +1,18 @@
 using CMS.DataEngine;
 
-namespace Kentico.Xperience.AzureSearch.Admin
+namespace Kentico.Xperience.AzureSearch.Admin;
+
+/// <summary>
+/// Class providing <see cref="AzureSearchIncludedPathItemInfo"/> management.
+/// </summary>
+[ProviderInterface(typeof(IAzureSearchIncludedPathItemInfoProvider))]
+public partial class AzureSearchIncludedPathItemInfoProvider : AbstractInfoProvider<AzureSearchIncludedPathItemInfo, AzureSearchIncludedPathItemInfoProvider>, IAzureSearchIncludedPathItemInfoProvider
 {
     /// <summary>
-    /// Class providing <see cref="AzureSearchIncludedPathItemInfo"/> management.
+    /// Initializes a new instance of the <see cref="AzureSearchIncludedPathItemInfoProvider"/> class.
     /// </summary>
-    [ProviderInterface(typeof(IAzureSearchIncludedPathItemInfoProvider))]
-    public partial class AzureSearchIncludedPathItemInfoProvider : AbstractInfoProvider<AzureSearchIncludedPathItemInfo, AzureSearchIncludedPathItemInfoProvider>, IAzureSearchIncludedPathItemInfoProvider
+    public AzureSearchIncludedPathItemInfoProvider()
+        : base(AzureSearchIncludedPathItemInfo.TYPEINFO)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AzureSearchIncludedPathItemInfoProvider"/> class.
-        /// </summary>
-        public AzureSearchIncludedPathItemInfoProvider()
-            : base(AzureSearchIncludedPathItemInfo.TYPEINFO)
-        {
-        }
     }
 }

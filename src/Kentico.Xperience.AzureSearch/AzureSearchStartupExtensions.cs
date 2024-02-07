@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Azure;
+using Azure.Search.Documents.Indexes;
 using Kentico.Xperience.AzureSearch.Admin;
 using Kentico.Xperience.AzureSearch.Indexing;
 using Kentico.Xperience.AzureSearch.Search;
-using Azure.Search.Documents.Indexes;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Azure;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
