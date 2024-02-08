@@ -18,14 +18,14 @@ public class SearchController : Controller
 
     public async Task<IActionResult> Index(string query, int pageSize = 10, int page = 1, string indexName = null)
     {
-        var results = await advancedSearchService.GlobalSearch(indexName ?? "Advanced", query, page, pageSize);
+        var results = await advancedSearchService.GlobalSearch(indexName ?? "advanced", query, page, pageSize);
         return View(results);
     }
 
     [HttpGet("Simple")]
     public async Task<IActionResult> Simple(string query, int pageSize = 10, int page = 1)
     {
-        var results = await simpleSearchService.GlobalSearch("Simple", query, page, pageSize);
+        var results = await simpleSearchService.GlobalSearch("simple", query, page, pageSize);
 
         return View(results);
     }

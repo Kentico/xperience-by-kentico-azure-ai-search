@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace DancingGoat.Search;
 
-public class SimpleSearchIndexingStrategy : DefaultAzureSearchIndexingStrategy<DancingGoatSimpleSearchModel>
+public class SimpleSearchIndexingStrategy : BaseAzureSearchIndexingStrategy<DancingGoatSimpleSearchModel>
 {
     private readonly IWebPageQueryResultMapper webPageMapper;
     private readonly IContentQueryExecutor queryExecutor;

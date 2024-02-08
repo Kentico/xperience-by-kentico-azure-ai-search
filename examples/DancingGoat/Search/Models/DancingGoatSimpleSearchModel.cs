@@ -3,7 +3,7 @@ using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace DancingGoat.Search.Models;
 
-public class DancingGoatSimpleSearchModel : DefaultAzureSearchModel
+public class DancingGoatSimpleSearchModel : BaseAzureSearchModel
 {
     [SearchableField]
     public string Title { get; set; }

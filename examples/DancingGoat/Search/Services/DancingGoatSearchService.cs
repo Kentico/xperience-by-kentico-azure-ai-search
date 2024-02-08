@@ -6,9 +6,9 @@ namespace DancingGoat.Search.Services;
 
 public class DancingGoatSearchService
 {
-    private readonly AzureSearchQueryClientService searchClientService;
+    private readonly IAzureSearchQueryClientService searchClientService;
 
-    public DancingGoatSearchService(AzureSearchQueryClientService searchClientService) => this.searchClientService = searchClientService;
+    public DancingGoatSearchService(IAzureSearchQueryClientService searchClientService) => this.searchClientService = searchClientService;
 
     public async Task<DancingGoatSearchViewModel> GlobalSearch(
         string indexName,
