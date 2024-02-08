@@ -1,4 +1,5 @@
-﻿using Azure;
+﻿using System.Reflection;
+using Azure;
 using Azure.Search.Documents.Indexes;
 using Kentico.Xperience.AzureSearch.Admin;
 using Kentico.Xperience.AzureSearch.Indexing;
@@ -28,8 +29,8 @@ public static class AzureSearchStartupExtensions
 
         if (builder.IncludeDefaultStrategy)
         {
-            serviceCollection.AddTransient<DefaultAzureSearchIndexingStrategy<DefaultAzureSearchModel>>();
-            builder.RegisterStrategy<DefaultAzureSearchIndexingStrategy<DefaultAzureSearchModel>>("Default");
+            serviceCollection.AddTransient<BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>>();
+            builder.RegisterStrategy<BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>, BaseAzureSearchModel>("Default");
         }
 
         return serviceCollection;
@@ -67,7 +68,7 @@ public interface IAzureSearchBuilder
     ///     Thrown if an strategy has already been registered with the given <paramref name="strategyName"/>
     /// </exception>
     /// <returns></returns>
-    IAzureSearchBuilder RegisterStrategy<TStrategy>(string strategyName) where TStrategy : class, IAzureSearchIndexingStrategy;
+    IAzureSearchBuilder RegisterStrategy<TStrategy, TSearchModel>(string strategyName) where TStrategy : BaseAzureSearchIndexingStrategy<TSearchModel> where TSearchModel : IAzureSearchModel, new();
 }
 
 internal class AzureSearchBuilder : IAzureSearchBuilder
@@ -89,11 +90,36 @@ internal class AzureSearchBuilder : IAzureSearchBuilder
     /// <typeparam name="TStrategy"></typeparam>
     /// <param name="strategyName"></param>
     /// <returns></returns>
-    public IAzureSearchBuilder RegisterStrategy<TStrategy>(string strategyName) where TStrategy : class, IAzureSearchIndexingStrategy
+    public IAzureSearchBuilder RegisterStrategy<TStrategy, TSearchModel>(string strategyName) where TStrategy : BaseAzureSearchIndexingStrategy<TSearchModel> where TSearchModel : IAzureSearchModel, new()
     {
+        ValidateIndexSearchModelProperties<TSearchModel>();
+
         StrategyStorage.AddStrategy<TStrategy>(strategyName);
         serviceCollection.AddTransient<TStrategy>();
 
         return this;
+    }
+
+    private void ValidateIndexSearchModelProperties<TSearchModel>() where TSearchModel : IAzureSearchModel, new()
+    {
+        string errorMessage = "Exactly one field in your index must serve as the document key (IsKey = true). It must be a string, and it must uniquely identify each document. It's also required to have IsHidden = false.";
+
+        var type = typeof(TSearchModel)
+            ?? throw new InvalidOperationException(errorMessage);
+
+        var propertiesWithAttributes = type.GetProperties().Select(x => new
+        {
+            Attribute = x.GetCustomAttributes<SimpleFieldAttribute>().SingleOrDefault()
+                ?? throw new InvalidOperationException(errorMessage),
+            Type = x.PropertyType
+        });
+
+        var keyAttribute = propertiesWithAttributes.SingleOrDefault(x => x.Attribute.IsKey)
+            ?? throw new InvalidOperationException(errorMessage);
+
+        if (keyAttribute.Type != typeof(string) || keyAttribute.Attribute.IsHidden)
+        {
+            throw new InvalidOperationException(errorMessage);
+        }
     }
 }

@@ -11,5 +11,5 @@ internal static class StrategyStorage
     public static Type GetOrDefault(string strategyName) =>
         Strategies.TryGetValue(strategyName, out var type)
             ? type
-            : typeof(DefaultAzureSearchIndexingStrategy<DefaultAzureSearchModel>);
+            : typeof(BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>);
 }

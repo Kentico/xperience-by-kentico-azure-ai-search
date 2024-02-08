@@ -33,7 +33,7 @@ public interface IAzureSearchIndexingStrategy
     /// </summary>
     /// The type for which fields will be created, based on its properties.
     /// <returns>A collection of fields.</returns>
-    IList<SearchField> GetSearchFields();
+    public IList<SearchField> GetSearchFields();
 
-    Task<int> UploadDocuments(IEnumerable<IAzureSearchModel> models, SearchClient searchClient);
+    public Task<int> UploadDocuments(IEnumerable<IAzureSearchModel> models, SearchClient searchClient);
 }

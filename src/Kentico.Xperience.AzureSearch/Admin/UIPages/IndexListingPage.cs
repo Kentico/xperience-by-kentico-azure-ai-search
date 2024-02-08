@@ -155,16 +155,39 @@ internal class IndexListingPage : ListingPage
     }
 
     [PageCommand(Permission = SystemPermissions.DELETE)]
-    public Task<ICommandResponse> Delete(int id, CancellationToken _)
+    public async Task<INavigateResponse> Delete(int id, CancellationToken cancellationToken)
     {
-        bool res = configurationStorageService.TryDeleteIndex(id);
-        if (res)
-        {
-            AzureSearchIndexStore.SetIndicies(configurationStorageService);
-        }
         var response = NavigateTo(pageUrlGenerator.GenerateUrl<IndexListingPage>());
+        var index = AzureSearchIndexStore.Instance.GetIndex(id);
+        if (index == null)
+        {
+            return response
+                .AddErrorMessage(string.Format("Error deleting AzureSearch index with identifier {0}.", id));
+        }
+        try
+        {
+            bool res = configurationStorageService.TryDeleteIndex(id);
 
-        return Task.FromResult<ICommandResponse>(response);
+            if (res)
+            {
+                AzureSearchIndexStore.SetIndicies(configurationStorageService);
+
+                await azuresearchClient.DeleteIndex(index.IndexName, cancellationToken);
+            }
+            else
+            {
+                return response
+                    .AddErrorMessage(string.Format("Error deleting AzureSearch index with identifier {0}.", id));
+            }
+
+            return response.AddSuccessMessage("Index deletion in progress. Visit your Azure dashboard for details about your indexes.");
+        }
+        catch (Exception ex)
+        {
+            EventLogService.LogException(nameof(IndexListingPage), nameof(Delete), ex);
+            return response
+               .AddErrorMessage(string.Format("Errors occurred while deleting the '{0}' index. Please check the Event Log for more details.", index.IndexName));
+        }
     }
 
     private static void AddMissingStatistics(ref ICollection<AzureSearchIndexStatisticsViewModel> statistics)

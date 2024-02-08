@@ -12,13 +12,13 @@ internal static class ServiceProviderExtensions
     /// <param name="index"></param>
     /// <exception cref="InvalidOperationException">
     ///     Thrown if the assigned <see cref="IAzureSearchIndexingStrategy"/> cannot be instantiated.
-    ///     This shouldn't normally occur because we fallback to <see cref="DefaultAzureSearchIndexingStrategy{DefaultAzureSearchModel}" /> if not custom strategy is specified.
+    ///     This shouldn't normally occur because we fallback to <see cref="BaseAzureSearchIndexingStrategy{DefaultAzureSearchModel}" /> if not custom strategy is specified.
     ///     However, incorrect dependency management in user-code could cause issues.
     /// </exception>
     /// <returns></returns>
     public static IAzureSearchIndexingStrategy GetRequiredStrategy(this IServiceProvider serviceProvider, AzureSearchIndex index)
     {
-        var strategy = serviceProvider.GetRequiredService(index.AzureSearchIndexingStrategyType) as DefaultAzureSearchIndexingStrategy<DefaultAzureSearchModel>;
+        var strategy = serviceProvider.GetRequiredService(index.AzureSearchIndexingStrategyType) as IAzureSearchIndexingStrategy;
 
         return strategy!;
     }

@@ -8,15 +8,15 @@ namespace Kentico.Xperience.AzureSearch.Indexing;
 /// <summary>
 /// Default indexing strategy that provides simple indexing.
 /// </summary>
-public class DefaultAzureSearchIndexingStrategy<TSearchModel> : IAzureSearchIndexingStrategy where TSearchModel : IAzureSearchModel, new()
+public class BaseAzureSearchIndexingStrategy<TSearchModel> : IAzureSearchIndexingStrategy where TSearchModel : IAzureSearchModel, new()
 {
     private readonly FieldBuilder fieldBuilder;
 
-    public DefaultAzureSearchIndexingStrategy() => fieldBuilder = new FieldBuilder();
+    public BaseAzureSearchIndexingStrategy() => fieldBuilder = new FieldBuilder();
 
     /// <summary>
     /// Called when indexing a search model. Enables overriding of multiple fields with custom data.
-    /// By default, no custom content item fields or secured items are indexed, only the contents of <see cref="IIndexEventItemModel"/> and fields defined in <see cref="DefaultAzureSearchModel"/>
+    /// By default, no custom content item fields or secured items are indexed, only the contents of <see cref="IIndexEventItemModel"/> and fields defined in <see cref="BaseAzureSearchModel"/>
     /// </summary>
     /// <param name="item">The <see cref="IIndexEventItemModel"/> currently being indexed.</param>
     /// <returns>Modified AzureSearch document.</returns>
@@ -42,7 +42,7 @@ public class DefaultAzureSearchIndexingStrategy<TSearchModel> : IAzureSearchInde
     public virtual async Task<IEnumerable<IIndexEventItemModel>> FindItemsToReindex(IndexEventReusableItemModel changedItem) => await Task.FromResult(new List<IIndexEventItemModel>());
 
     /// <inheritdoc />
-    public virtual IList<SearchField> GetSearchFields() => fieldBuilder.Build(typeof(TSearchModel));
+    public IList<SearchField> GetSearchFields() => fieldBuilder.Build(typeof(TSearchModel));
 
     public async Task<int> UploadDocuments(IEnumerable<IAzureSearchModel> models, SearchClient searchClient)
     {

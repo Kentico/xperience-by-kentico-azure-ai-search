@@ -22,15 +22,12 @@ public class AzureSearchIndexClientService : IAzureSearchIndexClientService
             throw new InvalidOperationException($"Registered index with name '{indexName}' doesn't exist.");
 
         var algoliaStrategy = serviceProvider.GetRequiredStrategy(azureSearchIndex);
-        var searchFields = algoliaStrategy.GetSearchFields() ?? new List<SearchField>();
+        var searchFields = algoliaStrategy.GetSearchFields();
 
-        var fieldBuilder = new FieldBuilder();
-        var baseSearchFields = fieldBuilder.Build(typeof(DefaultAzureSearchModel));
-
-        var allSearchFields = searchFields.Union(baseSearchFields);
-        var definition = new SearchIndex(indexName, allSearchFields);
+        var definition = new SearchIndex(indexName, searchFields);
 
         await indexClient.CreateOrUpdateIndexAsync(definition, cancellationToken: cancellationToken);
+
         return indexClient.GetSearchClient(indexName);
     }
 }

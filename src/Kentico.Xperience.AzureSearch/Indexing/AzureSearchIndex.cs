@@ -42,7 +42,7 @@ public sealed class AzureSearchIndex
         LanguageNames = indexConfiguration.LanguageNames.ToList();
         IncludedPaths = indexConfiguration.Paths;
 
-        var strategy = typeof(DefaultAzureSearchIndexingStrategy<DefaultAzureSearchModel>);
+        var strategy = typeof(BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>);
 
         if (strategies.ContainsKey(indexConfiguration.StrategyName))
         {

@@ -12,7 +12,7 @@ public interface IAzureSearchModel
     public string Name { get; set; }
 }
 
-public class DefaultAzureSearchModel : IAzureSearchModel
+public class BaseAzureSearchModel : IAzureSearchModel
 {
     [SearchableField(IsSortable = true, IsFilterable = true, IsFacetable = true)]
     public string? Url { get; set; } = "";
@@ -26,7 +26,7 @@ public class DefaultAzureSearchModel : IAzureSearchModel
     [SimpleField(IsKey = false)]
     public string ItemGuid { get; set; } = "";
 
-    [SearchableField(IsKey = true)]
+    [SimpleField(IsKey = true)]
     public string ObjectID { get; set; } = "";
 
     [SimpleField(IsKey = false)]

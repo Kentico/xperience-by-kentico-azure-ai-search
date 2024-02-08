@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
 using DancingGoat;
 using DancingGoat.Models;
 
@@ -16,7 +13,6 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc;
 using DancingGoat.Search;
-using Kentico.Xperience.AzureSearch.Indexing;
 
 
 var builder = WebApplication.CreateBuilder(args);

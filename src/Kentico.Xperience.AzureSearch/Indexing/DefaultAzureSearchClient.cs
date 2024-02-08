@@ -1,3 +1,4 @@
+using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Models;
 using CMS.ContentEngine;
 using CMS.Core;
@@ -22,6 +23,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
     private readonly IConversionService conversionService;
     private readonly IProgressiveCache cache;
     private readonly IEventLogService log;
+    private readonly SearchIndexClient searchIndexClient;
 
     public DefaultAzureSearchClient(
         IAzureSearchIndexClientService azuresearchIndexService,
@@ -31,7 +33,8 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         IInfoProvider<ChannelInfo> channelProvider,
         IConversionService conversionService,
         IProgressiveCache cache,
-        IEventLogService log)
+        IEventLogService log,
+        SearchIndexClient searchIndexClient)
     {
         this.azuresearchIndexService = azuresearchIndexService;
         this.executor = executor;
@@ -41,6 +44,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         this.conversionService = conversionService;
         this.cache = cache;
         this.log = log;
+        this.searchIndexClient = searchIndexClient;
     }
 
     /// <inheritdoc />
@@ -93,6 +97,17 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
     }
 
     /// <inheritdoc />
+    public async Task DeleteIndex(string indexName, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(indexName))
+        {
+            throw new ArgumentNullException(nameof(indexName));
+        }
+
+        await searchIndexClient.DeleteIndexAsync(indexName, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public Task<int> UpsertRecords(IEnumerable<IAzureSearchModel> models, string indexName, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(indexName))
@@ -112,7 +127,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
     {
         var searchClient = await azuresearchIndexService.InitializeIndexClient(indexName, cancellationToken);
 
-        var batch = IndexDocumentsBatch.Delete(nameof(DefaultAzureSearchModel.ObjectID), itemGuids);
+        var batch = IndexDocumentsBatch.Delete(nameof(BaseAzureSearchModel.ObjectID), itemGuids);
 
         var result = await searchClient.IndexDocumentsAsync(batch);
 
