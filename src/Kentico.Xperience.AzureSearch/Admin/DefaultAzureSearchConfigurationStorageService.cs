@@ -1,26 +1,34 @@
 ﻿using System.Text;
+using CMS.ContactManagement;
 using CMS.DataEngine;
+using CMS.OnlineForms;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
 
 internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfigurationStorageService
 {
     private readonly IAzureSearchIndexItemInfoProvider indexProvider;
+    private readonly IAzureSearchIndexAliasItemInfoProvider indexAliasProvider;
+    private readonly IAzureSearchIndexAliasIndexItemInfoProvider indexAliasIndexProvider;
     private readonly IAzureSearchIncludedPathItemInfoProvider pathProvider;
     private readonly IAzureSearchContentTypeItemInfoProvider contentTypeProvider;
     private readonly IAzureSearchIndexLanguageItemInfoProvider languageProvider;
 
     public DefaultAzureSearchConfigurationStorageService(
         IAzureSearchIndexItemInfoProvider indexProvider,
+        IAzureSearchIndexAliasItemInfoProvider indexAliasProvider,
+        IAzureSearchIndexAliasIndexItemInfoProvider indexAliasIndexProvider,
         IAzureSearchIncludedPathItemInfoProvider pathProvider,
         IAzureSearchContentTypeItemInfoProvider contentTypeProvider,
         IAzureSearchIndexLanguageItemInfoProvider languageProvider
     )
     {
         this.indexProvider = indexProvider;
+        this.indexAliasProvider = indexAliasProvider;
         this.pathProvider = pathProvider;
         this.contentTypeProvider = contentTypeProvider;
         this.languageProvider = languageProvider;
+        this.indexAliasIndexProvider = indexAliasIndexProvider;
     }
 
     private static string RemoveWhitespacesUsingStringBuilder(string source)
@@ -36,6 +44,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         }
         return source.Length == builder.Length ? source : builder.ToString();
     }
+
     public bool TryCreateIndex(AzureSearchConfigurationModel configuration)
     {
         var existingIndex = indexProvider.Get()
@@ -104,6 +113,50 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         return true;
     }
 
+    public bool TryCreateAlias(AzureSearchAliasConfigurationModel configuration)
+    {
+        var existingAliases = indexAliasProvider.Get()
+            .WhereEquals(nameof(AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemIndexAliasName), configuration.AliasName)
+            .TopN(1)
+            .FirstOrDefault();
+
+        if (existingAliases is not null)
+        {
+            return false;
+        }
+
+        var aliasInfo = new AzureSearchIndexAliasItemInfo()
+        {
+            AzureSearchIndexAliasItemIndexAliasName = configuration.AliasName ?? "",
+        };
+
+        var indexIds = indexProvider
+            .Get()
+            .GetEnumerableTypedResult()
+            .Where(index => configuration.IndexNames.Any(name => index.AzureSearchIndexItemIndexName == name))
+            .Select(index => index.AzureSearchIndexItemId);
+
+        indexAliasProvider.Set(aliasInfo);
+
+        if (configuration.IndexNames is not null)
+        {
+            foreach (int indexId in indexIds)
+            {
+                var indexAliasIndexInfo = new AzureSearchIndexAliasIndexItemInfo()
+                {
+                    AzureSearchIndexAliasIndexItemIndexAliasId = aliasInfo.AzureSearchIndexAliasItemId,
+                    AzureSearchIndexAliasIndexItemIndexItemId = indexId
+                };
+
+                indexAliasIndexInfo.Insert();
+            }
+        }
+
+        configuration.Id = aliasInfo.AzureSearchIndexAliasItemId;
+
+        return true;
+    }
+
     public AzureSearchConfigurationModel? GetIndexDataOrNull(int indexId)
     {
         var indexInfo = indexProvider.Get().WithID(indexId).FirstOrDefault();
@@ -119,9 +172,34 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         return new AzureSearchConfigurationModel(indexInfo, languages, paths, contentTypes);
     }
 
+    public AzureSearchAliasConfigurationModel? GetAliasDataOrNull(int aliasId)
+    {
+        var aliasInfo = indexAliasProvider.Get().WithID(aliasId).FirstOrDefault();
+        if (aliasInfo == default)
+        {
+            return default;
+        }
+
+        var indexAliasIndexIndexInfoIds = indexAliasIndexProvider.Get()
+            .WhereEquals(nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexAliasId), aliasId)
+            .GetEnumerableTypedResult()
+            .Select(indexAliasIndex => indexAliasIndex.AzureSearchIndexAliasIndexItemIndexItemId);
+
+        var indexNames = indexProvider.Get()
+            .WhereIn(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemId), indexAliasIndexIndexInfoIds.ToList())
+            .GetEnumerableTypedResult()
+            .Select(index => index.AzureSearchIndexItemIndexName);
+
+        return new AzureSearchAliasConfigurationModel(aliasInfo, indexNames);
+    }
+
     public List<string> GetExistingIndexNames() => indexProvider.Get().Select(x => x.AzureSearchIndexItemIndexName).ToList();
 
+    public List<string> GetExistingAliasNames() => indexAliasProvider.Get().Select(x => x.AzureSearchIndexAliasItemIndexAliasName).ToList();
+
     public List<int> GetIndexIds() => indexProvider.Get().Select(x => x.AzureSearchIndexItemId).ToList();
+
+    public List<int> GetAliasIds() => indexAliasProvider.Get().Select(x => x.AzureSearchIndexAliasItemId).ToList();
 
     public IEnumerable<AzureSearchConfigurationModel> GetAllIndexData()
     {
@@ -136,6 +214,34 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         var languages = languageProvider.Get().ToList();
 
         return indexInfos.Select(index => new AzureSearchConfigurationModel(index, languages, paths, contentTypes));
+    }
+
+    public IEnumerable<AzureSearchAliasConfigurationModel> GetAllAliasData()
+    {
+        var aliasInfos = indexAliasProvider.Get().GetEnumerableTypedResult().ToList();
+        if (aliasInfos.Count == 0)
+        {
+            return [];
+        }
+
+        var aliasIdsJoinedWithIndexNames = indexAliasIndexProvider.Get()
+            .Source(sourceItem => sourceItem
+                .Join<AzureSearchIndexItemInfo>(
+                    nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexItemId),
+                    nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemId)
+                    )
+                )
+            .Columns(nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexItemId), nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemIndexName))
+            .GetEnumerableResult()
+            .Distinct();
+
+        return aliasInfos.Select(index =>
+            new AzureSearchAliasConfigurationModel(index, aliasIdsJoinedWithIndexNames
+                .Where(x => x.GetInt32(0) == index.AzureSearchIndexAliasItemId)
+                .Select(x => x.GetString(1)
+                )
+            )
+        );
     }
 
     public bool TryEditIndex(AzureSearchConfigurationModel configuration)
@@ -155,6 +261,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         pathProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIncludedPathItemInfo.AzureSearchIncludedPathItemIndexItemId)} = {configuration.Id}"));
         languageProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexLanguageItemInfo.AzureSearchIndexLanguageItemIndexItemId)} = {configuration.Id}"));
         contentTypeProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchContentTypeItemInfo.AzureSearchContentTypeItemIndexItemId)} = {configuration.Id}"));
+        indexAliasIndexProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexItemId)} = {configuration.Id}"));
 
         indexInfo.AzureSearchIndexItemRebuildHook = configuration.RebuildHook ?? "";
         indexInfo.AzureSearchIndexItemStrategyName = configuration.StrategyName ?? "";
@@ -207,12 +314,56 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         return true;
     }
 
+    public bool TryEditAlias(AzureSearchAliasConfigurationModel configuration)
+    {
+        configuration.AliasName = RemoveWhitespacesUsingStringBuilder(configuration.AliasName ?? "");
+
+        var aliasInfo = indexAliasProvider.Get()
+            .WhereEquals(nameof(AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemId), configuration.Id)
+            .TopN(1)
+            .FirstOrDefault();
+
+        indexAliasIndexProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexItemId)} = {configuration.Id}"));
+
+        if (aliasInfo is null)
+        {
+            return false;
+        }
+
+        aliasInfo.AzureSearchIndexAliasItemIndexAliasName = configuration.AliasName ?? "";
+
+        var indexIds = indexProvider
+            .Get()
+            .GetEnumerableTypedResult()
+            .Where(index => configuration.IndexNames.Any(name => index.AzureSearchIndexItemIndexName == name))
+            .Select(index => index.AzureSearchIndexItemId);
+
+        if (configuration.IndexNames is not null)
+        {
+            foreach (int indexId in indexIds)
+            {
+                var indexAliasIndexInfo = new AzureSearchIndexAliasIndexItemInfo()
+                {
+                    AzureSearchIndexAliasIndexItemIndexAliasId = aliasInfo.AzureSearchIndexAliasItemId,
+                    AzureSearchIndexAliasIndexItemIndexItemId = indexId
+                };
+
+                indexAliasIndexInfo.Insert();
+            }
+        }
+
+        indexAliasProvider.Set(aliasInfo);
+
+        return true;
+    }
+
     public bool TryDeleteIndex(int id)
     {
         indexProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemId)} = {id}"));
         pathProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIncludedPathItemInfo.AzureSearchIncludedPathItemIndexItemId)} = {id}"));
         languageProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexLanguageItemInfo.AzureSearchIndexLanguageItemIndexItemId)} = {id}"));
         contentTypeProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchContentTypeItemInfo.AzureSearchContentTypeItemIndexItemId)} = {id}"));
+        indexAliasIndexProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexItemId)} = {id}"));
 
         return true;
     }
@@ -223,6 +374,23 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         pathProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIncludedPathItemInfo.AzureSearchIncludedPathItemIndexItemId)} = {configuration.Id}"));
         languageProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexLanguageItemInfo.AzureSearchIndexLanguageItemIndexItemId)} = {configuration.Id}"));
         contentTypeProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchContentTypeItemInfo.AzureSearchContentTypeItemIndexItemId)} = {configuration.Id}"));
+        indexAliasIndexProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexItemId)} = {configuration.Id}"));
+
+        return true;
+    }
+
+    public bool TryDeleteAlias(int id)
+    {
+        indexAliasProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemId)} = {id}"));
+        indexAliasIndexProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexAliasId)} = {id}"));
+
+        return true;
+    }
+
+    public bool TryDeleteAlias(AzureSearchAliasConfigurationModel configuration)
+    {
+        indexAliasProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemId)} = {configuration.Id}"));
+        indexAliasIndexProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexAliasId)} = {configuration.Id}"));
 
         return true;
     }

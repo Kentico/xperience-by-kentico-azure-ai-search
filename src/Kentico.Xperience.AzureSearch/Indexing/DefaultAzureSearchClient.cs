@@ -15,7 +15,7 @@ namespace Kentico.Xperience.AzureSearch.Indexing;
 /// </summary>
 internal class DefaultAzureSearchClient : IAzureSearchClient
 {
-    private readonly IAzureSearchIndexClientService azuresearchIndexService;
+    private readonly IAzureSearchIndexClientService azureSearchIndexClientService;
     private readonly IContentQueryExecutor executor;
     private readonly IServiceProvider serviceProvider;
     private readonly IInfoProvider<ContentLanguageInfo> languageProvider;
@@ -26,7 +26,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
     private readonly SearchIndexClient searchIndexClient;
 
     public DefaultAzureSearchClient(
-        IAzureSearchIndexClientService azuresearchIndexService,
+        IAzureSearchIndexClientService azureSearchIndexClientService,
         IContentQueryExecutor executor,
         IServiceProvider serviceProvider,
         IInfoProvider<ContentLanguageInfo> languageProvider,
@@ -36,7 +36,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         IEventLogService log,
         SearchIndexClient searchIndexClient)
     {
-        this.azuresearchIndexService = azuresearchIndexService;
+        this.azureSearchIndexClientService = azureSearchIndexClientService;
         this.executor = executor;
         this.serviceProvider = serviceProvider;
         this.languageProvider = languageProvider;
@@ -73,7 +73,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
         foreach (var index in indices)
         {
-            var indexClient = await azuresearchIndexService.InitializeIndexClient(index.IndexName, cancellationToken);
+            var indexClient = await azureSearchIndexClientService.InitializeIndexClient(index.IndexName, cancellationToken);
             stats.Add(new AzureSearchIndexStatisticsViewModel()
             {
                 Name = index.IndexName,
@@ -125,7 +125,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
     private async Task<int> DeleteRecordsInternal(IEnumerable<string> itemGuids, string indexName, CancellationToken cancellationToken)
     {
-        var searchClient = await azuresearchIndexService.InitializeIndexClient(indexName, cancellationToken);
+        var searchClient = await azureSearchIndexClientService.InitializeIndexClient(indexName, cancellationToken);
 
         var batch = IndexDocumentsBatch.Delete(nameof(BaseAzureSearchModel.ObjectID), itemGuids);
 
@@ -200,7 +200,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
     private async Task<int> UpsertRecordsInternal(IEnumerable<IAzureSearchModel> models, string indexName, CancellationToken cancellationToken)
     {
         int upsertedCount = 0;
-        var searchClient = await azuresearchIndexService.InitializeIndexClient(indexName, cancellationToken);
+        var searchClient = await azureSearchIndexClientService.InitializeIndexClient(indexName, cancellationToken);
 
         var azureIndex = AzureSearchIndexStore.Instance.GetIndex(indexName) ??
             throw new InvalidOperationException($"Registered index with name '{indexName}' doesn't exist.");

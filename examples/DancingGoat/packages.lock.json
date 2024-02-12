@@ -53,6 +53,12 @@
           "System.Runtime.Caching": "8.0.0"
         }
       },
+      "Microsoft.Spatial": {
+        "type": "Direct",
+        "requested": "[7.20.0, )",
+        "resolved": "7.20.0",
+        "contentHash": "nJLDCOv3qemN0XI5kmUN9h38Qw+ZQBoYtWwSGhPkDEiiZSDcAwLMgqbGNKmK3myhVWASCqXtOqrj5jUnGZrH/Q=="
+      },
       "SonarAnalyzer.CSharp": {
         "type": "Direct",
         "requested": "[9.6.0.74858, )",

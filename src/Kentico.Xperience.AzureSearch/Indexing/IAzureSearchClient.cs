@@ -57,7 +57,7 @@ public interface IAzureSearchClient
     Task Rebuild(string indexName, CancellationToken? cancellationToken);
 
     /// <summary>
-    /// Deletes the AzureSearch index by removing existing index data from Algolia.
+    /// Deletes the AzureSearch index by removing existing index data from Azure.
     /// </summary>
     /// <param name="indexName">The index to delete.</param>
     /// <param name="cancellationToken">The cancellation token for the task.</param>

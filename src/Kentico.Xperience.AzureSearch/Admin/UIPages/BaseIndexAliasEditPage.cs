@@ -1,25 +1,33 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.AzureSearch.Indexing;
+using Azure.Search.Documents.Indexes.Models;
 using IFormItemCollectionProvider = Kentico.Xperience.Admin.Base.Forms.Internal.IFormItemCollectionProvider;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
 
-internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurationModel>
+internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasConfigurationModel>
 {
     protected readonly IAzureSearchConfigurationStorageService StorageService;
+    private readonly IAzureSearchIndexClientService azureSearchIndexClientService;
 
-    protected BaseIndexEditPage(
+    protected BaseIndexAliasEditPage(
         IFormItemCollectionProvider formItemCollectionProvider,
         IFormDataBinder formDataBinder,
-        IAzureSearchConfigurationStorageService storageService)
-        : base(formItemCollectionProvider, formDataBinder) => StorageService = storageService;
-
-    protected ModificationResponse ValidateAndProcess(AzureSearchConfigurationModel configuration)
+        IAzureSearchConfigurationStorageService storageService,
+        IAzureSearchIndexClientService azureSearchIndexClientService)
+        : base(formItemCollectionProvider, formDataBinder)
     {
-        configuration.IndexName = RemoveWhitespacesUsingStringBuilder(configuration.IndexName ?? "");
+        StorageService = storageService;
+        this.azureSearchIndexClientService = azureSearchIndexClientService;
+    }
+
+    protected async Task<ModificationResponse> ValidateAndProcess(AzureSearchAliasConfigurationModel configuration)
+    {
+        configuration.AliasName = RemoveWhitespacesUsingStringBuilder(configuration.AliasName ?? "");
 
         var context = new ValidationContext(configuration, null, null);
         var validationResults = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
@@ -35,13 +43,16 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
             );
         }
 
-        if (StorageService.GetIndexIds().Exists(x => x == configuration.Id))
+        if (StorageService.GetAliasIds().Exists(x => x == configuration.Id))
         {
-            bool edited = StorageService.TryEditIndex(configuration);
+            string oldAliasName = StorageService.GetAliasDataOrNull(configuration.Id)!.AliasName;
+
+            bool edited = StorageService.TryEditAlias(configuration);
 
             if (edited)
             {
-                AzureSearchIndexStore.SetIndicies(StorageService);
+                AzureSearchIndexAliasStore.SetAliases(StorageService);
+                await azureSearchIndexClientService.EditAlias(oldAliasName, new SearchAlias(configuration.AliasName, configuration.IndexNames), default);
 
                 return new ModificationResponse(ModificationResult.Success);
             }
@@ -50,11 +61,11 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
         }
         else
         {
-            bool created = !string.IsNullOrWhiteSpace(configuration.IndexName) && StorageService.TryCreateIndex(configuration);
+            bool created = !configuration.IndexNames.IsNullOrEmpty() && StorageService.TryCreateAlias(configuration);
 
             if (created)
             {
-                AzureSearchIndexStore.Instance.AddIndex(new AzureSearchIndex(configuration, StrategyStorage.Strategies));
+                AzureSearchIndexAliasStore.Instance.AddAlias(new AzureSearchIndexAlias(configuration));
 
                 return new ModificationResponse(ModificationResult.Success);
             }
@@ -75,23 +86,5 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
             }
         }
         return source.Length == builder.Length ? source : builder.ToString();
-    }
-}
-
-internal enum ModificationResult
-{
-    Success,
-    Failure
-}
-
-internal class ModificationResponse
-{
-    public ModificationResult ModificationResult { get; set; }
-    public List<string>? ErrorMessages { get; set; }
-
-    public ModificationResponse(ModificationResult result, List<string>? errorMessage = null)
-    {
-        ModificationResult = result;
-        ErrorMessages = errorMessage;
     }
 }

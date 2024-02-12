@@ -17,6 +17,8 @@ internal class AzureSearchModuleInstaller
 
         InitializeResource(resource);
         InstallAzureSearchItemInfo(resource);
+        InstallAzureSearchIndexAliasItemInfo(resource);
+        InstallAzureSearchIndexAliasIndexItemInfo(resource);
         InstallAzureSearchLanguageInfo(resource);
         InstallAzureSearchIndexPathItemInfo(resource);
         InstallAzureSearchContentTypeItemInfo(resource);
@@ -106,6 +108,104 @@ internal class AzureSearchModuleInstaller
             Precision = 0,
             Size = 100,
             DataType = "text",
+            Enabled = true
+        };
+        formInfo.AddFormItem(formItem);
+
+        SetFormDefinition(info, formInfo);
+
+        if (info.HasChanged)
+        {
+            DataClassInfoProvider.SetDataClassInfo(info);
+        }
+    }
+
+    public void InstallAzureSearchIndexAliasItemInfo(ResourceInfo resource)
+    {
+        var info = DataClassInfoProvider.GetDataClassInfo(AzureSearchIndexAliasItemInfo.OBJECT_TYPE) ?? DataClassInfo.New(AzureSearchIndexAliasItemInfo.OBJECT_TYPE);
+
+        info.ClassName = AzureSearchIndexAliasItemInfo.TYPEINFO.ObjectClassName;
+        info.ClassTableName = AzureSearchIndexAliasItemInfo.TYPEINFO.ObjectClassName.Replace(".", "_");
+        info.ClassDisplayName = "AzureSearch Index Item";
+        info.ClassType = ClassType.OTHER;
+        info.ClassResourceID = resource.ResourceID;
+
+        var formInfo = FormHelper.GetBasicFormDefinition(nameof(AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemId));
+
+        var formItem = new FormFieldInfo
+        {
+            Name = nameof(AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemGuid),
+            AllowEmpty = false,
+            Visible = true,
+            Precision = 0,
+            DataType = "guid",
+            Enabled = true,
+        };
+        formInfo.AddFormItem(formItem);
+
+        formItem = new FormFieldInfo
+        {
+            Name = nameof(AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemIndexAliasName),
+            AllowEmpty = false,
+            Visible = true,
+            Precision = 0,
+            Size = 100,
+            DataType = "text",
+            Enabled = true
+        };
+        formInfo.AddFormItem(formItem);
+
+        SetFormDefinition(info, formInfo);
+
+        if (info.HasChanged)
+        {
+            DataClassInfoProvider.SetDataClassInfo(info);
+        }
+    }
+
+    public void InstallAzureSearchIndexAliasIndexItemInfo(ResourceInfo resource)
+    {
+        var info = DataClassInfoProvider.GetDataClassInfo(AzureSearchIndexAliasIndexItemInfo.OBJECT_TYPE) ?? DataClassInfo.New(AzureSearchIndexAliasIndexItemInfo.OBJECT_TYPE);
+
+        info.ClassName = AzureSearchIndexAliasIndexItemInfo.TYPEINFO.ObjectClassName;
+        info.ClassTableName = AzureSearchIndexAliasIndexItemInfo.TYPEINFO.ObjectClassName.Replace(".", "_");
+        info.ClassDisplayName = "AzureSearch Index Item";
+        info.ClassType = ClassType.OTHER;
+        info.ClassResourceID = resource.ResourceID;
+
+        var formInfo = FormHelper.GetBasicFormDefinition(nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemId));
+
+        var formItem = new FormFieldInfo
+        {
+            Name = nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemGuid),
+            AllowEmpty = false,
+            Visible = true,
+            Precision = 0,
+            DataType = "guid",
+            Enabled = true,
+        };
+        formInfo.AddFormItem(formItem);
+
+        formItem = new FormFieldInfo
+        {
+            Name = nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexAliasId),
+            AllowEmpty = false,
+            Visible = true,
+            Precision = 0,
+            Size = 100,
+            DataType = "integer",
+            Enabled = true
+        };
+        formInfo.AddFormItem(formItem);
+
+        formItem = new FormFieldInfo
+        {
+            Name = nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexItemId),
+            AllowEmpty = false,
+            Visible = true,
+            Precision = 0,
+            Size = 100,
+            DataType = "integer",
             Enabled = true
         };
         formInfo.AddFormItem(formItem);

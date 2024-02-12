@@ -2,6 +2,7 @@
 using CMS.Membership;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.AzureSearch.Admin;
+using Kentico.Xperience.AzureSearch.Admin.UIPages;
 using Kentico.Xperience.AzureSearch.Indexing;
 
 [assembly: UIPage(
@@ -72,6 +73,7 @@ internal class IndexListingPage : ListingPage
         PageConfiguration.TableActions.AddCommand("Rebuild", nameof(Rebuild), icon: Icons.RotateRight);
         PageConfiguration.TableActions.AddDeleteAction(nameof(Delete), "Delete");
         PageConfiguration.HeaderActions.AddLink<IndexCreatePage>("Create");
+        PageConfiguration.HeaderActions.AddLink<IndexAliasListingPage>("Index Aliases");
 
         await base.ConfigurePage();
     }

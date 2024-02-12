@@ -41,11 +41,11 @@ internal class IndexEditPage : BaseIndexEditPage
         var result = ValidateAndProcess(model);
 
         var response = ResponseFrom(new FormSubmissionResult(
-            result.IndexModificationResult == IndexModificationResult.Success
+            result.ModificationResult == ModificationResult.Success
                 ? FormSubmissionStatus.ValidationSuccess
                 : FormSubmissionStatus.ValidationFailure));
 
-        if (result.IndexModificationResult == IndexModificationResult.Failure)
+        if (result.ModificationResult == ModificationResult.Failure)
         {
             if (result.ErrorMessages is not null)
             {

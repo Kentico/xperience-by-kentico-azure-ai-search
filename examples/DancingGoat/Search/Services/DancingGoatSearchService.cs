@@ -26,8 +26,8 @@ public class DancingGoatSearchService
             IncludeTotalCount = true,
             Size = pageSize,
             Skip = (page - 1) * pageSize
+            //Filter = $"geo.distance({nameof(DancingGoatSearchModel.Point)}, geography'POINT(-122.12 47.67)') le 5"
         };
-
         options.Select.Add(nameof(DancingGoatSearchModel.Title));
         options.Select.Add(nameof(DancingGoatSearchModel.Url));
 
