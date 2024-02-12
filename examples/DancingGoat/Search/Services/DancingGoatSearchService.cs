@@ -29,7 +29,7 @@ public class DancingGoatSearchService
         };
 
         options.Select.Add(nameof(DancingGoatSearchModel.Title));
-        options.Select.Add(nameof(DancingGoatSearchModel.Content));
+        options.Select.Add(nameof(DancingGoatSearchModel.Url));
 
         var response = await index.SearchAsync<DancingGoatSearchModel>(searchText, options);
 
