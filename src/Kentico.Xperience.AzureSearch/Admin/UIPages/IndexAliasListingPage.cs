@@ -72,6 +72,7 @@ internal class IndexAliasListingPage : ListingPage
         PageConfiguration.TableActions.AddCommand("Rebuild Aliased Index", nameof(Rebuild), icon: Icons.RotateRight);
         PageConfiguration.TableActions.AddDeleteAction(nameof(Delete), "Delete Alias");
         PageConfiguration.HeaderActions.AddLink<IndexAliasCreatePage>("Create Alias");
+        PageConfiguration.HeaderActions.AddLink<IndexListingPage>("Indexes");
 
         await base.ConfigurePage();
     }

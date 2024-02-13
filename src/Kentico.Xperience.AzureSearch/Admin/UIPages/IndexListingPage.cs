@@ -72,7 +72,7 @@ internal class IndexListingPage : ListingPage
         PageConfiguration.AddEditRowAction<IndexEditPage>();
         PageConfiguration.TableActions.AddCommand("Rebuild", nameof(Rebuild), icon: Icons.RotateRight);
         PageConfiguration.TableActions.AddDeleteAction(nameof(Delete), "Delete");
-        PageConfiguration.HeaderActions.AddLink<IndexCreatePage>("Create");
+        PageConfiguration.HeaderActions.AddLink<IndexCreatePage>("Create Index");
         PageConfiguration.HeaderActions.AddLink<IndexAliasListingPage>("Index Aliases");
 
         await base.ConfigurePage();

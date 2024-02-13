@@ -1,7 +1,6 @@
-﻿using System.Text;
-using CMS.ContactManagement;
+﻿using System.Data;
+using System.Text;
 using CMS.DataEngine;
-using CMS.OnlineForms;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
 
@@ -218,30 +217,25 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
     public IEnumerable<AzureSearchAliasConfigurationModel> GetAllAliasData()
     {
-        var aliasInfos = indexAliasProvider.Get().GetEnumerableTypedResult().ToList();
-        if (aliasInfos.Count == 0)
+        var aliasInfoIds = indexAliasProvider.Get().GetEnumerableTypedResult().Select(x => x.AzureSearchIndexAliasItemId).ToList();
+        if (aliasInfoIds.Count == 0)
         {
             return [];
         }
 
-        var aliasIdsJoinedWithIndexNames = indexAliasIndexProvider.Get()
-            .Source(sourceItem => sourceItem
-                .Join<AzureSearchIndexItemInfo>(
-                    nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexItemId),
-                    nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemId)
-                    )
-                )
-            .Columns(nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexItemId), nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemIndexName))
-            .GetEnumerableResult()
-            .Distinct();
+        var result = new List<AzureSearchAliasConfigurationModel>();
 
-        return aliasInfos.Select(index =>
-            new AzureSearchAliasConfigurationModel(index, aliasIdsJoinedWithIndexNames
-                .Where(x => x.GetInt32(0) == index.AzureSearchIndexAliasItemId)
-                .Select(x => x.GetString(1)
-                )
-            )
-        );
+        foreach (int aliasInfoId in aliasInfoIds)
+        {
+            var aliasData = GetAliasDataOrNull(aliasInfoId);
+
+            if (aliasData is not null)
+            {
+                result.Add(aliasData);
+            }
+        }
+
+        return result;
     }
 
     public bool TryEditIndex(AzureSearchConfigurationModel configuration)
@@ -334,9 +328,9 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
         var indexIds = indexProvider
             .Get()
-            .GetEnumerableTypedResult()
             .Where(index => configuration.IndexNames.Any(name => index.AzureSearchIndexItemIndexName == name))
-            .Select(index => index.AzureSearchIndexItemId);
+            .Select(index => index.AzureSearchIndexItemId)
+            .ToList();
 
         if (configuration.IndexNames is not null)
         {
@@ -348,7 +342,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
                     AzureSearchIndexAliasIndexItemIndexItemId = indexId
                 };
 
-                indexAliasIndexInfo.Insert();
+                indexAliasIndexProvider.Set(indexAliasIndexInfo);
             }
         }
 
