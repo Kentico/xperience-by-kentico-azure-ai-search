@@ -23,7 +23,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{C8B03174
 		nuget.config = nuget.config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kentico.Xperience.AzureSearch.Tests", "tests\Kentico.Xperience.AzureSearch.Tests\Kentico.Xperience.AzureSearch.Tests.csproj", "{C38152A1-F0E3-4489-8982-13835942B413}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kentico.Xperience.AzureSearch.Tests", "tests\Kentico.Xperience.AzureSearch.Tests\Kentico.Xperience.AzureSearch.Tests.csproj", "{C38152A1-F0E3-4489-8982-13835942B413}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{62236186-35B5-4B35-8BC6-46833792BB0B}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		.markdownlint.json = .markdownlint.json
+		LICENSE.md = LICENSE.md
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
