@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<kenticoazuresearch.azuresearchindexlanguageitem>
+  <AzureSearchIndexLanguageItemGuid>2fb5b4a3-fe18-4be3-a0c1-ad419c0d32e3</AzureSearchIndexLanguageItemGuid>
+  <AzureSearchIndexLanguageItemIndexItemId>
+    <CodeName>advanced</CodeName>
+    <GUID>90a802c7-2d37-416b-91d9-4abbc453b107</GUID>
+    <ObjectType>kenticoazuresearch.azuresearchindexitem</ObjectType>
+  </AzureSearchIndexLanguageItemIndexItemId>
+  <AzureSearchIndexLanguageItemName>es</AzureSearchIndexLanguageItemName>
+</kenticoazuresearch.azuresearchindexlanguageitem>

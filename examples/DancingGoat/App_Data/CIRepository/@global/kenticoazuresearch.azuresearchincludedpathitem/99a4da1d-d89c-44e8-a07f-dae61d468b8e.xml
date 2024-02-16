@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<kenticoazuresearch.azuresearchincludedpathitem>
+  <AzureSearchIncludedPathItemAliasPath>/</AzureSearchIncludedPathItemAliasPath>
+  <AzureSearchIncludedPathItemGuid>99a4da1d-d89c-44e8-a07f-dae61d468b8e</AzureSearchIncludedPathItemGuid>
+  <AzureSearchIncludedPathItemIndexItemId>
+    <CodeName>geo</CodeName>
+    <GUID>73cd374e-296f-4fae-a4cd-54856ca41630</GUID>
+    <ObjectType>kenticoazuresearch.azuresearchindexitem</ObjectType>
+  </AzureSearchIncludedPathItemIndexItemId>
+</kenticoazuresearch.azuresearchincludedpathitem>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<kenticoazuresearch.azuresearchcontenttypeitem>
+  <AzureSearchContentTypeItemContentTypeName>DancingGoat.ContactsPage</AzureSearchContentTypeItemContentTypeName>
+  <AzureSearchContentTypeItemGuid>b454ca06-f8e8-4d34-9478-c33d4bd5efb0</AzureSearchContentTypeItemGuid>
+  <AzureSearchContentTypeItemIncludedPathItemId>
+    <GUID>2428c1d3-df89-404b-a507-f40e750fd1ef</GUID>
+    <ObjectType>kenticoazuresearch.azuresearchincludedpathitem</ObjectType>
+  </AzureSearchContentTypeItemIncludedPathItemId>
+  <AzureSearchContentTypeItemIndexItemId>
+    <CodeName>simple</CodeName>
+    <GUID>0292c867-6df7-4378-9ac8-2d66f373e94b</GUID>
+    <ObjectType>kenticoazuresearch.azuresearchindexitem</ObjectType>
+  </AzureSearchContentTypeItemIndexItemId>
+</kenticoazuresearch.azuresearchcontenttypeitem>

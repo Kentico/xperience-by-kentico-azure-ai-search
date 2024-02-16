@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<kenticoazuresearch.azuresearchindexlanguageitem>
+  <AzureSearchIndexLanguageItemGuid>62ed6182-6d99-4aed-bb63-914394ed534b</AzureSearchIndexLanguageItemGuid>
+  <AzureSearchIndexLanguageItemIndexItemId>
+    <CodeName>geo</CodeName>
+    <GUID>73cd374e-296f-4fae-a4cd-54856ca41630</GUID>
+    <ObjectType>kenticoazuresearch.azuresearchindexitem</ObjectType>
+  </AzureSearchIndexLanguageItemIndexItemId>
+  <AzureSearchIndexLanguageItemName>en</AzureSearchIndexLanguageItemName>
+</kenticoazuresearch.azuresearchindexlanguageitem>

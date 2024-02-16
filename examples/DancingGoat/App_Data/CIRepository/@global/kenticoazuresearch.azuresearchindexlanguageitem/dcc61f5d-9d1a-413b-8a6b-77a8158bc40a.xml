@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<kenticoazuresearch.azuresearchindexlanguageitem>
+  <AzureSearchIndexLanguageItemGuid>dcc61f5d-9d1a-413b-8a6b-77a8158bc40a</AzureSearchIndexLanguageItemGuid>
+  <AzureSearchIndexLanguageItemIndexItemId>
+    <CodeName>semantic</CodeName>
+    <GUID>61542776-0054-45db-b822-06307d291998</GUID>
+    <ObjectType>kenticoazuresearch.azuresearchindexitem</ObjectType>
+  </AzureSearchIndexLanguageItemIndexItemId>
+  <AzureSearchIndexLanguageItemName>en</AzureSearchIndexLanguageItemName>
+</kenticoazuresearch.azuresearchindexlanguageitem>

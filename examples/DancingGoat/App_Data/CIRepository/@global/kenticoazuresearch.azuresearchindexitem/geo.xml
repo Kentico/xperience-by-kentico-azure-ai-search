@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<kenticoazuresearch.azuresearchindexitem>
+  <AzureSearchIndexItemChannelName>DancingGoatPages</AzureSearchIndexItemChannelName>
+  <AzureSearchIndexItemGuid>73cd374e-296f-4fae-a4cd-54856ca41630</AzureSearchIndexItemGuid>
+  <AzureSearchIndexItemIndexName>geo</AzureSearchIndexItemIndexName>
+  <AzureSearchIndexItemStrategyName>GeoLocationSearchStrategy</AzureSearchIndexItemStrategyName>
+</kenticoazuresearch.azuresearchindexitem>

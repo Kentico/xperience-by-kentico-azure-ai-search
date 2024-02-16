@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<kenticoazuresearch.azuresearchindexitem>
+  <AzureSearchIndexItemChannelName>DancingGoatPages</AzureSearchIndexItemChannelName>
+  <AzureSearchIndexItemGuid>61542776-0054-45db-b822-06307d291998</AzureSearchIndexItemGuid>
+  <AzureSearchIndexItemIndexName>semantic</AzureSearchIndexItemIndexName>
+  <AzureSearchIndexItemStrategyName>SemanticRankingSearchStrategy</AzureSearchIndexItemStrategyName>
+</kenticoazuresearch.azuresearchindexitem>

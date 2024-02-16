@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<kenticoazuresearch.azuresearchincludedpathitem>
+  <AzureSearchIncludedPathItemAliasPath>/</AzureSearchIncludedPathItemAliasPath>
+  <AzureSearchIncludedPathItemGuid>3c1aaf9e-b05c-4abc-94a4-34938596d052</AzureSearchIncludedPathItemGuid>
+  <AzureSearchIncludedPathItemIndexItemId>
+    <CodeName>advanced</CodeName>
+    <GUID>90a802c7-2d37-416b-91d9-4abbc453b107</GUID>
+    <ObjectType>kenticoazuresearch.azuresearchindexitem</ObjectType>
+  </AzureSearchIncludedPathItemIndexItemId>
+</kenticoazuresearch.azuresearchincludedpathitem>

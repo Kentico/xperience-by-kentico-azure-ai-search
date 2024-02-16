@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<kenticoazuresearch.azuresearchcontenttypeitem>
+  <AzureSearchContentTypeItemContentTypeName>DancingGoat.LandingPage</AzureSearchContentTypeItemContentTypeName>
+  <AzureSearchContentTypeItemGuid>f373ab6d-d99e-42a9-af81-f3fc8a87028b</AzureSearchContentTypeItemGuid>
+  <AzureSearchContentTypeItemIncludedPathItemId>
+    <GUID>3c1aaf9e-b05c-4abc-94a4-34938596d052</GUID>
+    <ObjectType>kenticoazuresearch.azuresearchincludedpathitem</ObjectType>
+  </AzureSearchContentTypeItemIncludedPathItemId>
+  <AzureSearchContentTypeItemIndexItemId>
+    <CodeName>advanced</CodeName>
+    <GUID>90a802c7-2d37-416b-91d9-4abbc453b107</GUID>
+    <ObjectType>kenticoazuresearch.azuresearchindexitem</ObjectType>
+  </AzureSearchContentTypeItemIndexItemId>
+</kenticoazuresearch.azuresearchcontenttypeitem>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<kenticoazuresearch.azuresearchcontenttypeitem>
+  <AzureSearchContentTypeItemContentTypeName>DancingGoat.ArticlesSection</AzureSearchContentTypeItemContentTypeName>
+  <AzureSearchContentTypeItemGuid>670bddef-6f60-4c6b-bb6e-cf35d5d3e6a7</AzureSearchContentTypeItemGuid>
+  <AzureSearchContentTypeItemIncludedPathItemId>
+    <GUID>94ee8d7f-7580-4d47-8ad2-21018d578a3c</GUID>
+    <ObjectType>kenticoazuresearch.azuresearchincludedpathitem</ObjectType>
+  </AzureSearchContentTypeItemIncludedPathItemId>
+  <AzureSearchContentTypeItemIndexItemId>
+    <CodeName>semantic</CodeName>
+    <GUID>61542776-0054-45db-b822-06307d291998</GUID>
+    <ObjectType>kenticoazuresearch.azuresearchindexitem</ObjectType>
+  </AzureSearchContentTypeItemIndexItemId>
+</kenticoazuresearch.azuresearchcontenttypeitem>
