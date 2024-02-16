@@ -61,7 +61,7 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
 
                 foreach (var queueItem in updateTasks)
                 {
-                    var document = await GetDocument(queueItem);
+                    var document = await GetSearchModel(queueItem);
                     if (document is not null)
                     {
                         upsertData.Add(document);
@@ -98,7 +98,7 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
 
     private static IEnumerable<string?> GetIdsToDelete(IEnumerable<AzureSearchQueueItem> deleteTasks) => deleteTasks.Select(queueItem => queueItem.ItemToIndex.ItemGuid.ToString());
 
-    private async Task<IAzureSearchModel?> GetDocument(AzureSearchQueueItem queueItem)
+    private async Task<IAzureSearchModel?> GetSearchModel(AzureSearchQueueItem queueItem)
     {
         var azureSearchIndex = AzureSearchIndexStore.Instance.GetRequiredIndex(queueItem.IndexName);
 
