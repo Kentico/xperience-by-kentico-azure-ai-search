@@ -25,7 +25,7 @@ public partial class AzureSearchIndexAliasIndexItemInfo : AbstractInfo<AzureSear
     /// <summary>
     /// Type information.
     /// </summary>
-    public static readonly ObjectTypeInfo TYPEINFO = new(typeof(AzureSearchIndexAliasIndexItemInfoProvider), OBJECT_TYPE, "KenticoAzureSearch.AzureSearchIndexAliasIndexItem", nameof(AzureSearchIndexAliasIndexItemId), null, nameof(AzureSearchIndexAliasIndexItemGuid), nameof(AzureSearchIndexAliasIndexItemIndexAliasId), null, null, null, null)
+    public static readonly ObjectTypeInfo TYPEINFO = new(typeof(AzureSearchIndexAliasIndexItemInfoProvider), OBJECT_TYPE, "KenticoAzureSearch.AzureSearchIndexAliasIndexItem", nameof(AzureSearchIndexAliasIndexItemId), null, nameof(AzureSearchIndexAliasIndexItemGuid), null, null, null, null, null)
     {
         TouchCacheDependencies = true,
         DependsOn = new List<ObjectDependency>()

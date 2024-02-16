@@ -3,6 +3,7 @@ using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.AzureSearch.Admin;
 using Kentico.Xperience.AzureSearch.Admin.UIPages;
+using Kentico.Xperience.AzureSearch.Aliasing;
 using Kentico.Xperience.AzureSearch.Indexing;
 using IFormItemCollectionProvider = Kentico.Xperience.Admin.Base.Forms.Internal.IFormItemCollectionProvider;
 
@@ -25,10 +26,10 @@ internal class IndexAliasCreatePage : BaseIndexAliasEditPage
     public IndexAliasCreatePage(
         IFormItemCollectionProvider formItemCollectionProvider,
         IFormDataBinder formDataBinder,
+        IAzureSearchIndexAliasService azureSearchIndexAliasService,
         IAzureSearchConfigurationStorageService storageService,
-        IAzureSearchIndexClientService azureSearchClient,
         IPageUrlGenerator pageUrlGenerator)
-        : base(formItemCollectionProvider, formDataBinder, storageService, azureSearchClient) => this.pageUrlGenerator = pageUrlGenerator;
+        : base(formItemCollectionProvider, formDataBinder, azureSearchIndexAliasService, storageService) => this.pageUrlGenerator = pageUrlGenerator;
 
     protected override AzureSearchAliasConfigurationModel Model
     {

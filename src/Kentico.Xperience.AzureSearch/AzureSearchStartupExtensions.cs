@@ -2,6 +2,7 @@
 using Azure;
 using Azure.Search.Documents.Indexes;
 using Kentico.Xperience.AzureSearch.Admin;
+using Kentico.Xperience.AzureSearch.Aliasing;
 using Kentico.Xperience.AzureSearch.Indexing;
 using Kentico.Xperience.AzureSearch.Search;
 using Microsoft.Extensions.Configuration;
@@ -54,7 +55,8 @@ public static class AzureSearchStartupExtensions
             .AddSingleton<IAzureSearchTaskLogger, DefaultAzureSearchTaskLogger>()
             .AddSingleton<IAzureSearchTaskProcessor, DefaultAzureSearchTaskProcessor>()
             .AddSingleton<IAzureSearchConfigurationStorageService, DefaultAzureSearchConfigurationStorageService>()
-            .AddSingleton<IAzureSearchIndexClientService, AzureSearchIndexClientService>();
+            .AddSingleton<IAzureSearchIndexClientService, AzureSearchIndexClientService>()
+            .AddSingleton<IAzureSearchIndexAliasService, AzureSearchIndexAliasService>();
 }
 
 public interface IAzureSearchBuilder

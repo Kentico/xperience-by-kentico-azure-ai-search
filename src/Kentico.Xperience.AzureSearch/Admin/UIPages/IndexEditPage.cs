@@ -2,6 +2,7 @@
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.AzureSearch.Admin;
+using Kentico.Xperience.AzureSearch.Indexing;
 
 [assembly: UIPage(
    parentType: typeof(IndexListingPage),
@@ -21,10 +22,12 @@ internal class IndexEditPage : BaseIndexEditPage
     [PageParameter(typeof(IntPageModelBinder))]
     public int IndexIdentifier { get; set; }
 
-    public IndexEditPage(Xperience.Admin.Base.Forms.Internal.IFormItemCollectionProvider formItemCollectionProvider,
-                 IFormDataBinder formDataBinder,
-                 IAzureSearchConfigurationStorageService storageService)
-        : base(formItemCollectionProvider, formDataBinder, storageService) { }
+    public IndexEditPage(
+        Xperience.Admin.Base.Forms.Internal.IFormItemCollectionProvider formItemCollectionProvider,
+        IFormDataBinder formDataBinder,
+        IAzureSearchConfigurationStorageService storageService,
+        IAzureSearchIndexClientService indexClientService)
+        : base(formItemCollectionProvider, formDataBinder, storageService, indexClientService) { }
 
     protected override AzureSearchConfigurationModel Model
     {
@@ -36,9 +39,9 @@ internal class IndexEditPage : BaseIndexEditPage
         }
     }
 
-    protected override Task<ICommandResponse> ProcessFormData(AzureSearchConfigurationModel model, ICollection<IFormItem> formItems)
+    protected override async Task<ICommandResponse> ProcessFormData(AzureSearchConfigurationModel model, ICollection<IFormItem> formItems)
     {
-        var result = ValidateAndProcess(model);
+        var result = await ValidateAndProcess(model);
 
         var response = ResponseFrom(new FormSubmissionResult(
             result.ModificationResult == ModificationResult.Success
@@ -61,6 +64,6 @@ internal class IndexEditPage : BaseIndexEditPage
             response.AddSuccessMessage("Index edited");
         }
 
-        return Task.FromResult<ICommandResponse>(response);
+        return response;
     }
 }

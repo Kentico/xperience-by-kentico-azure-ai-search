@@ -3,6 +3,7 @@ using CMS.Membership;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.AzureSearch.Admin;
 using Kentico.Xperience.AzureSearch.Admin.UIPages;
+using Kentico.Xperience.AzureSearch.Aliasing;
 using Kentico.Xperience.AzureSearch.Indexing;
 
 [assembly: UIPage(
@@ -24,6 +25,7 @@ internal class IndexAliasListingPage : ListingPage
     private readonly IAzureSearchClient azureSearchClient;
     private readonly IPageUrlGenerator pageUrlGenerator;
     private readonly IAzureSearchIndexClientService azureSearchIndexClientService;
+    private readonly IAzureSearchIndexAliasService azureSearchIndexAliasService;
     private readonly IAzureSearchConfigurationStorageService configurationStorageService;
     private readonly IConversionService conversionService;
 
@@ -35,12 +37,14 @@ internal class IndexAliasListingPage : ListingPage
     public IndexAliasListingPage(
         IAzureSearchClient azureSearchClient,
         IAzureSearchIndexClientService azureSearchIndexClientService,
+        IAzureSearchIndexAliasService azureSearchIndexAliasService,
         IPageUrlGenerator pageUrlGenerator,
         IAzureSearchConfigurationStorageService configurationStorageService,
         IConversionService conversionService)
     {
         this.azureSearchClient = azureSearchClient;
         this.pageUrlGenerator = pageUrlGenerator;
+        this.azureSearchIndexAliasService = azureSearchIndexAliasService;
         this.configurationStorageService = configurationStorageService;
         this.conversionService = conversionService;
         this.azureSearchIndexClientService = azureSearchIndexClientService;
@@ -138,7 +142,7 @@ internal class IndexAliasListingPage : ListingPage
             {
                 AzureSearchIndexAliasStore.SetAliases(configurationStorageService);
 
-                await azureSearchIndexClientService.DeleteAlias(alias.AliasName, cancellationToken);
+                await azureSearchIndexAliasService.DeleteAlias(alias.AliasName, cancellationToken);
             }
             else
             {

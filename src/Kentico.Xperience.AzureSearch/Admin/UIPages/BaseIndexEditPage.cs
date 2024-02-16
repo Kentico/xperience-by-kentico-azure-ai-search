@@ -10,14 +10,20 @@ namespace Kentico.Xperience.AzureSearch.Admin;
 internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurationModel>
 {
     protected readonly IAzureSearchConfigurationStorageService StorageService;
+    private readonly IAzureSearchIndexClientService indexClientService;
 
     protected BaseIndexEditPage(
         IFormItemCollectionProvider formItemCollectionProvider,
         IFormDataBinder formDataBinder,
-        IAzureSearchConfigurationStorageService storageService)
-        : base(formItemCollectionProvider, formDataBinder) => StorageService = storageService;
+        IAzureSearchConfigurationStorageService storageService,
+        IAzureSearchIndexClientService indexClientService)
+        : base(formItemCollectionProvider, formDataBinder)
+    {
+        this.indexClientService = indexClientService;
+        StorageService = storageService;
+    }
 
-    protected ModificationResponse ValidateAndProcess(AzureSearchConfigurationModel configuration)
+    protected async Task<ModificationResponse> ValidateAndProcess(AzureSearchConfigurationModel configuration)
     {
         configuration.IndexName = RemoveWhitespacesUsingStringBuilder(configuration.IndexName ?? "");
 
@@ -37,11 +43,13 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
 
         if (StorageService.GetIndexIds().Exists(x => x == configuration.Id))
         {
+            var oldIndex = StorageService.GetIndexDataOrNull(configuration.Id);
             bool edited = StorageService.TryEditIndex(configuration);
 
             if (edited)
             {
                 AzureSearchIndexStore.SetIndicies(StorageService);
+                await indexClientService.EditIndex(oldIndex!.IndexName, configuration, default);
 
                 return new ModificationResponse(ModificationResult.Success);
             }
@@ -78,13 +86,13 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
     }
 }
 
-internal enum ModificationResult
+public enum ModificationResult
 {
     Success,
     Failure
 }
 
-internal class ModificationResponse
+public class ModificationResponse
 {
     public ModificationResult ModificationResult { get; set; }
     public List<string>? ErrorMessages { get; set; }

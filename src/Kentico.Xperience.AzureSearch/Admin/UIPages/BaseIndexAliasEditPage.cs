@@ -2,27 +2,27 @@
 using System.Text;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
-using Kentico.Xperience.AzureSearch.Indexing;
 using Azure.Search.Documents.Indexes.Models;
 using IFormItemCollectionProvider = Kentico.Xperience.Admin.Base.Forms.Internal.IFormItemCollectionProvider;
 using Microsoft.IdentityModel.Tokens;
+using Kentico.Xperience.AzureSearch.Aliasing;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
 
 internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasConfigurationModel>
 {
     protected readonly IAzureSearchConfigurationStorageService StorageService;
-    private readonly IAzureSearchIndexClientService azureSearchIndexClientService;
+    private readonly IAzureSearchIndexAliasService azureSearchIndexAliasService;
 
     protected BaseIndexAliasEditPage(
         IFormItemCollectionProvider formItemCollectionProvider,
         IFormDataBinder formDataBinder,
-        IAzureSearchConfigurationStorageService storageService,
-        IAzureSearchIndexClientService azureSearchIndexClientService)
+        IAzureSearchIndexAliasService azureSearchIndexAliasService,
+        IAzureSearchConfigurationStorageService storageService)
         : base(formItemCollectionProvider, formDataBinder)
     {
         StorageService = storageService;
-        this.azureSearchIndexClientService = azureSearchIndexClientService;
+        this.azureSearchIndexAliasService = azureSearchIndexAliasService;
     }
 
     protected async Task<ModificationResponse> ValidateAndProcess(AzureSearchAliasConfigurationModel configuration)
@@ -52,7 +52,7 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
             if (edited)
             {
                 AzureSearchIndexAliasStore.SetAliases(StorageService);
-                await azureSearchIndexClientService.EditAlias(oldAliasName, new SearchAlias(configuration.AliasName, configuration.IndexNames), default);
+                await azureSearchIndexAliasService.EditAlias(oldAliasName, new SearchAlias(configuration.AliasName, configuration.IndexNames), default);
 
                 return new ModificationResponse(ModificationResult.Success);
             }

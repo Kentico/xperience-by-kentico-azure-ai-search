@@ -10,7 +10,6 @@ public class AzureSearchConfigurationModel
 
     [TextInputComponent(
         Label = "Index Name",
-        ExplanationText = "Changing this value on an existing index without changing application code will cause the search experience to stop working. ",
         Order = 1)]
     [Required]
     [MinLength(1)]
@@ -24,7 +23,7 @@ public class AzureSearchConfigurationModel
     [DropDownComponent(Label = "Channel Name", DataProviderType = typeof(ChannelOptionsProvider), Order = 3)]
     public string ChannelName { get; set; } = "";
 
-    [DropDownComponent(Label = "Indexing Strategy", DataProviderType = typeof(IndexingStrategyOptionsProvider), Order = 4)]
+    [DropDownComponent(Label = "Indexing Strategy", DataProviderType = typeof(IndexingStrategyOptionsProvider), Order = 4, ExplanationText = "Changing strategy which has an incompatible configuration will result in deleting indexed items.")]
     public string StrategyName { get; set; } = "";
 
     [TextInputComponent(Label = "Rebuild Hook")]

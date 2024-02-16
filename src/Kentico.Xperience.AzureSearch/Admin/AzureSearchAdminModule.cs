@@ -3,6 +3,7 @@ using CMS.Base;
 using CMS.Core;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.AzureSearch.Admin;
+using Kentico.Xperience.AzureSearch.Aliasing;
 using Kentico.Xperience.AzureSearch.Indexing;
 using Microsoft.Extensions.DependencyInjection;
 

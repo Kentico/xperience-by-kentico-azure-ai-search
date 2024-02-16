@@ -131,9 +131,9 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
         var indexIds = indexProvider
             .Get()
-            .GetEnumerableTypedResult()
             .Where(index => configuration.IndexNames.Any(name => index.AzureSearchIndexItemIndexName == name))
-            .Select(index => index.AzureSearchIndexItemId);
+            .Select(index => index.AzureSearchIndexItemId)
+            .ToList();
 
         indexAliasProvider.Set(aliasInfo);
 
@@ -147,7 +147,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
                     AzureSearchIndexAliasIndexItemIndexItemId = indexId
                 };
 
-                indexAliasIndexInfo.Insert();
+                indexAliasIndexProvider.Set(indexAliasIndexInfo);
             }
         }
 

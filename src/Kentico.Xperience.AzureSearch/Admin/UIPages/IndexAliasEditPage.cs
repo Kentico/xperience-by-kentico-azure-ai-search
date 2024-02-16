@@ -3,6 +3,7 @@ using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.AzureSearch.Admin;
 using Kentico.Xperience.AzureSearch.Admin.UIPages;
+using Kentico.Xperience.AzureSearch.Aliasing;
 using Kentico.Xperience.AzureSearch.Indexing;
 
 [assembly: UIPage(
@@ -27,8 +28,8 @@ internal class IndexAliasEditPage : BaseIndexAliasEditPage
     public IndexAliasEditPage(Xperience.Admin.Base.Forms.Internal.IFormItemCollectionProvider formItemCollectionProvider,
                  IFormDataBinder formDataBinder,
                  IAzureSearchConfigurationStorageService storageService,
-                 IAzureSearchIndexClientService azureSearchIndexClientService)
-        : base(formItemCollectionProvider, formDataBinder, storageService, azureSearchIndexClientService) { }
+                 IAzureSearchIndexAliasService azureSearchIndexAliasService)
+        : base(formItemCollectionProvider, formDataBinder, azureSearchIndexAliasService, storageService) { }
 
     protected override AzureSearchAliasConfigurationModel Model
     {

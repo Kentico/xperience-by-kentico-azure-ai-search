@@ -2,7 +2,6 @@
 using CMS.Membership;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.AzureSearch.Admin;
-using Kentico.Xperience.AzureSearch.Admin.UIPages;
 using Kentico.Xperience.AzureSearch.Indexing;
 
 [assembly: UIPage(
@@ -66,7 +65,6 @@ internal class IndexListingPage : ListingPage
             .AddColumn(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemIndexName), "Name", sortable: true, searchable: true)
             .AddColumn(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemChannelName), "Channel", searchable: true, sortable: true)
             .AddColumn(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemStrategyName), "Index Strategy", searchable: true, sortable: true)
-            // Placeholder field which will be replaced with a customized value
             .AddColumn(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemId), "Entries", sortable: true);
 
         PageConfiguration.AddEditRowAction<IndexEditPage>();
@@ -168,13 +166,11 @@ internal class IndexListingPage : ListingPage
         }
         try
         {
+            await azuresearchClient.DeleteIndex(index.IndexName, cancellationToken);
             bool res = configurationStorageService.TryDeleteIndex(id);
-
             if (res)
             {
                 AzureSearchIndexStore.SetIndicies(configurationStorageService);
-
-                await azuresearchClient.DeleteIndex(index.IndexName, cancellationToken);
             }
             else
             {

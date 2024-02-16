@@ -25,8 +25,9 @@ internal class IndexCreatePage : BaseIndexEditPage
         IFormItemCollectionProvider formItemCollectionProvider,
         IFormDataBinder formDataBinder,
         IAzureSearchConfigurationStorageService storageService,
-        IPageUrlGenerator pageUrlGenerator)
-        : base(formItemCollectionProvider, formDataBinder, storageService) => this.pageUrlGenerator = pageUrlGenerator;
+        IPageUrlGenerator pageUrlGenerator,
+        IAzureSearchIndexClientService searchClientService)
+        : base(formItemCollectionProvider, formDataBinder, storageService, searchClientService) => this.pageUrlGenerator = pageUrlGenerator;
 
     protected override AzureSearchConfigurationModel Model
     {
@@ -38,9 +39,9 @@ internal class IndexCreatePage : BaseIndexEditPage
         }
     }
 
-    protected override Task<ICommandResponse> ProcessFormData(AzureSearchConfigurationModel model, ICollection<IFormItem> formItems)
+    protected override async Task<ICommandResponse> ProcessFormData(AzureSearchConfigurationModel model, ICollection<IFormItem> formItems)
     {
-        var result = ValidateAndProcess(model);
+        var result = await ValidateAndProcess(model);
 
         if (result.ModificationResult == ModificationResult.Success)
         {
@@ -49,7 +50,7 @@ internal class IndexCreatePage : BaseIndexEditPage
             var successResponse = NavigateTo(pageUrlGenerator.GenerateUrl<IndexEditPage>(index.Identifier.ToString()))
                 .AddSuccessMessage("Index created.");
 
-            return Task.FromResult<ICommandResponse>(successResponse);
+            return successResponse;
         }
 
         var errorResponse = ResponseFrom(new FormSubmissionResult(FormSubmissionStatus.ValidationFailure));
@@ -63,6 +64,6 @@ internal class IndexCreatePage : BaseIndexEditPage
             errorResponse.AddErrorMessage("Could not create index.");
         }
 
-        return Task.FromResult<ICommandResponse>(errorResponse);
+        return errorResponse;
     }
 }
