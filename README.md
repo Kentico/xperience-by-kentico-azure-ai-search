@@ -20,7 +20,7 @@
 
 | Xperience Version | Library Version |
 | ----------------- | --------------- |
-| >= 28.1.0         | 1.0.0           |
+| >= 28.2.0         | 1.0.0           |
 
 ### Dependencies
 
