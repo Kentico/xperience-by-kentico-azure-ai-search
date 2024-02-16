@@ -14,7 +14,6 @@ using Kentico.Xperience.AzureSearch.Aliasing;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
 
-
 [UIEvaluatePermission(SystemPermissions.UPDATE)]
 internal class IndexAliasEditPage : BaseIndexAliasEditPage
 {

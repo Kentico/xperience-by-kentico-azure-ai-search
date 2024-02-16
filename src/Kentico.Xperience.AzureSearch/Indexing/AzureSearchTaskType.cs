@@ -3,17 +3,17 @@
 namespace Kentico.Xperience.AzureSearch;
 
 /// <summary>
-/// Represents the type of a <see cref="AzureSearchQueueItem"/>.
+/// Represents the type of a <see cref="AzureSearchQueueItem"/>
 /// </summary>
 public enum AzureSearchTaskType
 {
     /// <summary>
-    /// Unsupported task type.
+    /// Unsupported task type
     /// </summary>
     UNKNOWN,
 
     /// <summary>
-    /// A task for a page which should be removed from the index.
+    /// A task for a page which should be removed from the index
     /// </summary>
     DELETE,
 
@@ -22,5 +22,8 @@ public enum AzureSearchTaskType
     /// </summary>
     PUBLISH_INDEX,
 
+    /// <summary>
+    /// A task for a page which should be updated
+    /// </summary>
     UPDATE
 }

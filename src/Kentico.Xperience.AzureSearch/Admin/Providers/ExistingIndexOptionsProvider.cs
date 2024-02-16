@@ -3,16 +3,17 @@ using Kentico.Xperience.Admin.Base.Forms;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
 
-internal class ExisitingIndexOptionsProvider : IGeneralSelectorDataProvider
+internal class ExistingIndexOptionsProvider : IGeneralSelectorDataProvider
 {
     private readonly IAzureSearchIndexItemInfoProvider indexProvider;
 
-    public ExisitingIndexOptionsProvider(IAzureSearchIndexItemInfoProvider indexProvider) => this.indexProvider = indexProvider;
+    public ExistingIndexOptionsProvider(IAzureSearchIndexItemInfoProvider indexProvider) => this.indexProvider = indexProvider;
 
     public async Task<PagedSelectListItems<string>> GetItemsAsync(string searchTerm, int pageIndex, CancellationToken cancellationToken)
     {
         // Prepares a query for retrieving index objects
         var itemQuery = indexProvider.Get();
+
         // If a search term is entered, only loads indexes whose indexName starts with the term
         if (!string.IsNullOrEmpty(searchTerm))
         {
@@ -49,6 +50,7 @@ internal class ExisitingIndexOptionsProvider : IGeneralSelectorDataProvider
         });
 
         var selectedItems = new List<ObjectSelectorListItem<string>>();
+
         if (selectedValues is not null)
         {
             foreach (string? value in selectedValues)
@@ -61,6 +63,7 @@ internal class ExisitingIndexOptionsProvider : IGeneralSelectorDataProvider
                 }
             }
         }
+
         return selectedItems;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Kentico.Xperience.AzureSearch.Admin;
-using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace Kentico.Xperience.AzureSearch.Aliasing;
 
@@ -20,23 +19,6 @@ public sealed class AzureSearchIndexAliasStore
     /// Gets all registered aliases.
     /// </summary>
     public IEnumerable<AzureSearchIndexAlias> GetAllAliases() => registeredAliases;
-
-    /// <summary>
-    /// Gets a registered <see cref="AzureSearchIndex"/> with the specified <paramref name="aliasName"/>,
-    /// or <c>null</c>.
-    /// </summary>
-    /// <param name="aliasName">The name of the alias to retrieve.</param>
-    /// <exception cref="ArgumentNullException" />
-    /// <exception cref="InvalidOperationException" />
-    public AzureSearchIndexAlias? GetAlias(string aliasName)
-    {
-        if (string.IsNullOrEmpty(aliasName))
-        {
-            return null;
-        }
-
-        return registeredAliases.SingleOrDefault(i => i.AliasName.Equals(aliasName, StringComparison.OrdinalIgnoreCase));
-    }
 
     /// <summary>
     /// Gets a registered <see cref="AzureSearchIndexAlias"/> with the specified <paramref name="identifier"/>,
@@ -79,7 +61,7 @@ public sealed class AzureSearchIndexAliasStore
 
         if (registeredAliases.Exists(i => i.AliasName.Equals(alias.AliasName, StringComparison.OrdinalIgnoreCase) || alias.Identifier == i.Identifier))
         {
-            throw new InvalidOperationException($"Attempted to register AzureSearch index alias with identifer [{alias.Identifier}] and name [{alias.AliasName}] but it is already registered.");
+            throw new InvalidOperationException($"Attempted to register AzureSearch index alias with identifier [{alias.Identifier}] and name [{alias.AliasName}] but it is already registered.");
         }
 
         registeredAliases.Add(alias);

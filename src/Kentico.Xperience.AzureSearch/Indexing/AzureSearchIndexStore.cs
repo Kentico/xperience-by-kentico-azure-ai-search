@@ -27,15 +27,8 @@ public sealed class AzureSearchIndexStore
     /// <param name="indexName">The name of the index to retrieve.</param>
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="InvalidOperationException" />
-    public AzureSearchIndex? GetIndex(string indexName)
-    {
-        if (string.IsNullOrEmpty(indexName))
-        {
-            return null;
-        }
-
-        return registeredIndexes.SingleOrDefault(i => i.IndexName.Equals(indexName, StringComparison.OrdinalIgnoreCase));
-    }
+    public AzureSearchIndex? GetIndex(string indexName) => string.IsNullOrEmpty(indexName) ? null
+        : registeredIndexes.SingleOrDefault(i => i.IndexName.Equals(indexName, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
     /// Gets a registered <see cref="AzureSearchIndex"/> with the specified <paramref name="identifier"/>,
@@ -78,7 +71,7 @@ public sealed class AzureSearchIndexStore
 
         if (registeredIndexes.Exists(i => i.IndexName.Equals(index.IndexName, StringComparison.OrdinalIgnoreCase) || index.Identifier == i.Identifier))
         {
-            throw new InvalidOperationException($"Attempted to register AzureSearch index with identifer [{index.Identifier}] and name [{index.IndexName}] but it is already registered.");
+            throw new InvalidOperationException($"Attempted to register AzureSearch index with identifier [{index.Identifier}] and name [{index.IndexName}] but it is already registered.");
         }
 
         registeredIndexes.Add(index);
@@ -91,6 +84,7 @@ public sealed class AzureSearchIndexStore
     internal void SetIndicies(IEnumerable<AzureSearchConfigurationModel> models)
     {
         registeredIndexes.Clear();
+
         foreach (var index in models)
         {
             Instance.AddIndex(new AzureSearchIndex(index, StrategyStorage.Strategies));

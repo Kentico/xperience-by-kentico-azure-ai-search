@@ -16,7 +16,7 @@ public class AzureSearchAliasConfigurationModel
     [RegularExpression("^(?!-)[a-z0-9-]+(?<!-)$", ErrorMessage = "Alias name must only contain lowercase letters, digits or dashes, cannot start or end with dashes and is limited to 128 characters.")]
     public string AliasName { get; set; } = "";
 
-    [GeneralSelectorComponent(dataProviderType: typeof(ExisitingIndexOptionsProvider), Label = "Index Names", Order = 2)]
+    [GeneralSelectorComponent(dataProviderType: typeof(ExistingIndexOptionsProvider), Label = "Index Names", Order = 2)]
     public IEnumerable<string> IndexNames { get; set; } = Enumerable.Empty<string>();
 
     public AzureSearchAliasConfigurationModel()

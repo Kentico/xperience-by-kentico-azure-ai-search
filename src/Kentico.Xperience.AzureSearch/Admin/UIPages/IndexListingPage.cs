@@ -20,7 +20,7 @@ namespace Kentico.Xperience.AzureSearch.Admin;
 [UIEvaluatePermission(SystemPermissions.VIEW)]
 internal class IndexListingPage : ListingPage
 {
-    private readonly IAzureSearchClient azuresearchClient;
+    private readonly IAzureSearchClient azureSearchClient;
     private readonly IPageUrlGenerator pageUrlGenerator;
     private readonly IAzureSearchConfigurationStorageService configurationStorageService;
     private readonly IConversionService conversionService;
@@ -31,12 +31,12 @@ internal class IndexListingPage : ListingPage
     /// Initializes a new instance of the <see cref="IndexListingPage"/> class.
     /// </summary>
     public IndexListingPage(
-        IAzureSearchClient azuresearchClient,
+        IAzureSearchClient azureSearchClient,
         IPageUrlGenerator pageUrlGenerator,
         IAzureSearchConfigurationStorageService configurationStorageService,
         IConversionService conversionService)
     {
-        this.azuresearchClient = azuresearchClient;
+        this.azureSearchClient = azureSearchClient;
         this.pageUrlGenerator = pageUrlGenerator;
         this.configurationStorageService = configurationStorageService;
         this.conversionService = conversionService;
@@ -80,7 +80,7 @@ internal class IndexListingPage : ListingPage
     {
         var result = await base.LoadData(settings, cancellationToken);
 
-        var statistics = await azuresearchClient.GetStatistics(default);
+        var statistics = await azureSearchClient.GetStatistics(default);
         // Add statistics for indexes that are registered but not created in AzureSearch
         AddMissingStatistics(ref statistics);
 
@@ -116,8 +116,8 @@ internal class IndexListingPage : ListingPage
 
     private AzureSearchIndexStatisticsViewModel? GetStatistic(Row row, ICollection<AzureSearchIndexStatisticsViewModel> statistics)
     {
-        int indexID = conversionService.GetInteger(row.Identifier, 0);
-        string indexName = AzureSearchIndexStore.Instance.GetIndex(indexID) is AzureSearchIndex index
+        int indexId = conversionService.GetInteger(row.Identifier, 0);
+        string indexName = AzureSearchIndexStore.Instance.GetIndex(indexId) is AzureSearchIndex index
             ? index.IndexName
             : "";
 
@@ -135,6 +135,7 @@ internal class IndexListingPage : ListingPage
     {
         var result = new RowActionResult(false);
         var index = AzureSearchIndexStore.Instance.GetIndex(id);
+
         if (index is null)
         {
             return ResponseFrom(result)
@@ -142,13 +143,15 @@ internal class IndexListingPage : ListingPage
         }
         try
         {
-            await azuresearchClient.Rebuild(index.IndexName, cancellationToken);
+            await azureSearchClient.Rebuild(index.IndexName, cancellationToken);
+
             return ResponseFrom(result)
                 .AddSuccessMessage("Indexing in progress. Visit your AzureSearch dashboard for details about the indexing process.");
         }
         catch (Exception ex)
         {
             EventLogService.LogException(nameof(IndexListingPage), nameof(Rebuild), ex);
+
             return ResponseFrom(result)
                .AddErrorMessage(string.Format("Errors occurred while rebuilding the '{0}' index. Please check the Event Log for more details.", index.IndexName));
         }
@@ -166,7 +169,7 @@ internal class IndexListingPage : ListingPage
         }
         try
         {
-            await azuresearchClient.DeleteIndex(index.IndexName, cancellationToken);
+            await azureSearchClient.DeleteIndex(index.IndexName, cancellationToken);
             bool res = configurationStorageService.TryDeleteIndex(id);
             if (res)
             {

@@ -42,11 +42,13 @@ public class AzureSearchIndexConfigurationComponent : FormComponent<AzureSearchI
     public Task<ICommandResponse<RowActionResult>> DeletePath(string path)
     {
         var toRemove = Value?.Find(x => Equals(x.AliasPath == path, StringComparison.OrdinalIgnoreCase));
+        
         if (toRemove != null)
         {
             Value?.Remove(toRemove);
             return Task.FromResult(ResponseFrom(new RowActionResult(false)));
         }
+
         return Task.FromResult(ResponseFrom(new RowActionResult(false)));
     }
 
@@ -72,11 +74,10 @@ public class AzureSearchIndexConfigurationComponent : FormComponent<AzureSearchI
         {
             return Task.FromResult(ResponseFrom(new RowActionResult(false)));
         }
-        else
-        {
-            Value?.Add(new AzureSearchIndexIncludedPath(path));
-            return Task.FromResult(ResponseFrom(new RowActionResult(false)));
-        }
+
+        Value?.Add(new AzureSearchIndexIncludedPath(path));
+
+        return Task.FromResult(ResponseFrom(new RowActionResult(false)));
     }
 
     protected override async Task ConfigureClientProperties(AzureSearchIndexConfigurationComponentClientProperties properties)

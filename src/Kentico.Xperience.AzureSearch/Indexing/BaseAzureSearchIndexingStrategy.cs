@@ -11,9 +11,7 @@ namespace Kentico.Xperience.AzureSearch.Indexing;
 /// </summary>
 public class BaseAzureSearchIndexingStrategy<TSearchModel> : IAzureSearchIndexingStrategy where TSearchModel : IAzureSearchModel, new()
 {
-    private readonly FieldBuilder fieldBuilder;
-
-    public BaseAzureSearchIndexingStrategy() => fieldBuilder = new FieldBuilder();
+    private readonly FieldBuilder fieldBuilder = new();
 
     /// <inheritdoc />
     public virtual Task<IAzureSearchModel?> MapToAzureSearchModelOrNull(IIndexEventItemModel item)

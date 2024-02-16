@@ -23,24 +23,27 @@ internal static class IndexedItemModelExtensions
         {
             throw new ArgumentNullException(nameof(indexName));
         }
+
         if (item is null)
         {
             throw new ArgumentNullException(nameof(item));
         }
 
-        var azuresearchIndex = AzureSearchIndexStore.Instance.GetIndex(indexName);
-        if (azuresearchIndex is null)
+        var azureSearchIndex = AzureSearchIndexStore.Instance.GetIndex(indexName);
+
+        if (azureSearchIndex is null)
         {
             log.LogError(nameof(IndexedItemModelExtensions), nameof(IsIndexedByIndex), $"Error loading registered AzureSearch index '{indexName}' for event [{eventName}].");
+            
             return false;
         }
 
-        if (!azuresearchIndex.LanguageNames.Exists(x => x == item.LanguageName))
+        if (!azureSearchIndex.LanguageNames.Exists(x => x == item.LanguageName))
         {
             return false;
         }
 
-        return azuresearchIndex.IncludedPaths.Any(path =>
+        return azureSearchIndex.IncludedPaths.Any(path =>
         {
             bool matchesContentType = path.ContentTypes.Contains(item.ContentTypeName, StringComparer.OrdinalIgnoreCase);
 
@@ -77,23 +80,21 @@ internal static class IndexedItemModelExtensions
         {
             throw new ArgumentNullException(nameof(indexName));
         }
+
         if (item is null)
         {
             throw new ArgumentNullException(nameof(item));
         }
 
-        var azuresearchIndex = AzureSearchIndexStore.Instance.GetIndex(indexName);
-        if (azuresearchIndex is null)
+        var azureSearchIndex = AzureSearchIndexStore.Instance.GetIndex(indexName);
+
+        if (azureSearchIndex is null)
         {
             log.LogError(nameof(IndexedItemModelExtensions), nameof(IsIndexedByIndex), $"Error loading registered AzureSearch index '{indexName}' for event [{eventName}].");
+            
             return false;
         }
 
-        if (azuresearchIndex.LanguageNames.Exists(x => x == item.LanguageName))
-        {
-            return true;
-        }
-
-        return false;
+        return azureSearchIndex.LanguageNames.Exists(x => x == item.LanguageName);
     }
 }

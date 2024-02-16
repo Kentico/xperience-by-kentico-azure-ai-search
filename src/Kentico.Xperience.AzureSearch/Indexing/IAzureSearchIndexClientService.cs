@@ -28,15 +28,4 @@ public interface IAzureSearchIndexClientService
     /// <exception cref="OperationCanceledException" />
     /// <exception cref="Azure.RequestFailedException">Thrown when a failure is returned by the Search service.</exception>
     Task EditIndex(string oldIndexName, AzureSearchConfigurationModel newIndexConfiguration, CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Deletes the AzureSearch index by removing existing index data from Azure.
-    /// </summary>
-    /// <param name="indexName">The index to delete.</param>
-    /// <param name="cancellationToken">The cancellation token for the task.</param>
-    /// <exception cref="InvalidOperationException" />
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="indexName"/> is null.</exception>
-    /// <exception cref="OperationCanceledException" />
-    /// <exception cref="Azure.RequestFailedException">Thrown when a failure is returned by the Search service.</exception>
-    Task DeleteIndex(string indexName, CancellationToken cancellationToken);
 }

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using DancingGoat.Models;
+﻿using DancingGoat.Models;
 using DancingGoat.Search;
 using Kentico.Content.Web.Mvc.Routing;
 

@@ -93,6 +93,7 @@ public interface IAzureSearchBuilder
 internal class AzureSearchBuilder : IAzureSearchBuilder
 {
     private readonly IServiceCollection serviceCollection;
+    private const string ErrorMessage = "Exactly one field in your index must serve as the document key (IsKey = true). It must be a string, and it must uniquely identify each document. It's also required to have IsHidden = false.";
 
     /// <summary>
     /// If true, the <see cref="BaseAzureSearchIndexingStrategy{BaseAzureSearchModel}" /> will be available as an explicitly selectable indexing strategy
@@ -122,24 +123,22 @@ internal class AzureSearchBuilder : IAzureSearchBuilder
 
     private void ValidateIndexSearchModelProperties<TSearchModel>() where TSearchModel : IAzureSearchModel, new()
     {
-        string errorMessage = "Exactly one field in your index must serve as the document key (IsKey = true). It must be a string, and it must uniquely identify each document. It's also required to have IsHidden = false.";
-
         var type = typeof(TSearchModel)
-            ?? throw new InvalidOperationException(errorMessage);
+            ?? throw new InvalidOperationException(ErrorMessage);
 
         var propertiesWithAttributes = type.GetProperties().Select(x => new
         {
             Attribute = x.GetCustomAttributes<SimpleFieldAttribute>().SingleOrDefault()
-                ?? throw new InvalidOperationException(errorMessage),
+                ?? throw new InvalidOperationException(ErrorMessage),
             Type = x.PropertyType
         });
 
         var keyAttribute = propertiesWithAttributes.SingleOrDefault(x => x.Attribute.IsKey)
-            ?? throw new InvalidOperationException(errorMessage);
+            ?? throw new InvalidOperationException(ErrorMessage);
 
         if (keyAttribute.Type != typeof(string) || keyAttribute.Attribute.IsHidden)
         {
-            throw new InvalidOperationException(errorMessage);
+            throw new InvalidOperationException(ErrorMessage);
         }
     }
 }

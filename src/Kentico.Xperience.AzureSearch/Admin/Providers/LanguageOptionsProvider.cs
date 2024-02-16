@@ -15,6 +15,7 @@ internal class LanguageOptionsProvider : IGeneralSelectorDataProvider
     {
         // Prepares a query for retrieving user objects
         var itemQuery = contentLanguageInfoProvider.Get();
+
         // If a search term is entered, only loads users users whose first name starts with the term
         if (!string.IsNullOrEmpty(searchTerm))
         {
@@ -51,6 +52,7 @@ internal class LanguageOptionsProvider : IGeneralSelectorDataProvider
         });
 
         var selectedItems = new List<ObjectSelectorListItem<string>>();
+
         if (selectedValues is not null)
         {
             foreach (string? value in selectedValues)
@@ -63,6 +65,7 @@ internal class LanguageOptionsProvider : IGeneralSelectorDataProvider
                 }
             }
         }
+
         return selectedItems;
     }
 }

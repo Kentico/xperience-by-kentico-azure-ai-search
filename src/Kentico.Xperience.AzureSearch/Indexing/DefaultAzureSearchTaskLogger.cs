@@ -26,30 +26,27 @@ internal class DefaultAzureSearchTaskLogger : IAzureSearchTaskLogger
     {
         var taskType = GetTaskType(eventName);
 
-        foreach (var azuresearchIndex in AzureSearchIndexStore.Instance.GetAllIndices())
+        foreach (var azureSearchIndex in AzureSearchIndexStore.Instance.GetAllIndices())
         {
-            if (!webpageItem.IsIndexedByIndex(eventLogService, azuresearchIndex.IndexName, eventName))
+            if (!webpageItem.IsIndexedByIndex(eventLogService, azureSearchIndex.IndexName, eventName))
             {
                 continue;
             }
 
-            var strategy = serviceProvider.GetRequiredStrategy(azuresearchIndex);
+            var strategy = serviceProvider.GetRequiredStrategy(azureSearchIndex);
             var toReindex = await strategy.FindItemsToReindex(webpageItem);
 
-            if (toReindex is not null)
+            foreach (var item in toReindex)
             {
-                foreach (var item in toReindex)
+                if (item.ItemGuid == webpageItem.ItemGuid)
                 {
-                    if (item.ItemGuid == webpageItem.ItemGuid)
+                    if (taskType == AzureSearchTaskType.DELETE)
                     {
-                        if (taskType == AzureSearchTaskType.DELETE)
-                        {
-                            LogIndexTask(new AzureSearchQueueItem(item, AzureSearchTaskType.DELETE, azuresearchIndex.IndexName));
-                        }
-                        else
-                        {
-                            LogIndexTask(new AzureSearchQueueItem(item, AzureSearchTaskType.UPDATE, azuresearchIndex.IndexName));
-                        }
+                        LogIndexTask(new AzureSearchQueueItem(item, AzureSearchTaskType.DELETE, azureSearchIndex.IndexName));
+                    }
+                    else
+                    {
+                        LogIndexTask(new AzureSearchQueueItem(item, AzureSearchTaskType.UPDATE, azureSearchIndex.IndexName));
                     }
                 }
             }
@@ -58,22 +55,19 @@ internal class DefaultAzureSearchTaskLogger : IAzureSearchTaskLogger
 
     public async Task HandleReusableItemEvent(IndexEventReusableItemModel reusableItem, string eventName)
     {
-        foreach (var azuresearchIndex in AzureSearchIndexStore.Instance.GetAllIndices())
+        foreach (var azureSearchIndex in AzureSearchIndexStore.Instance.GetAllIndices())
         {
-            if (!reusableItem.IsIndexedByIndex(eventLogService, azuresearchIndex.IndexName, eventName))
+            if (!reusableItem.IsIndexedByIndex(eventLogService, azureSearchIndex.IndexName, eventName))
             {
                 continue;
             }
 
-            var strategy = serviceProvider.GetRequiredStrategy(azuresearchIndex);
+            var strategy = serviceProvider.GetRequiredStrategy(azureSearchIndex);
             var toReindex = await strategy.FindItemsToReindex(reusableItem);
 
-            if (toReindex is not null)
+            foreach (var item in toReindex)
             {
-                foreach (var item in toReindex)
-                {
-                    LogIndexTask(new AzureSearchQueueItem(item, AzureSearchTaskType.UPDATE, azuresearchIndex.IndexName));
-                }
+                LogIndexTask(new AzureSearchQueueItem(item, AzureSearchTaskType.UPDATE, azureSearchIndex.IndexName));
             }
         }
     }

@@ -24,13 +24,13 @@ internal class AzureSearchIndexComparer : IEqualityComparer<SearchField>
             x!.IsSortable == y!.IsSortable &&
             x!.Type == y!.Type &&
             x!.AnalyzerName == y!.AnalyzerName &&
-            x!.Fields == y!.Fields &&
+            Equals(x!.Fields, y!.Fields) &&
             x!.IndexAnalyzerName == y!.IndexAnalyzerName &&
             x!.IsFacetable == y!.IsFacetable &&
             x!.IsFilterable == y!.IsFilterable &&
             x!.IsHidden == y!.IsHidden &&
             x!.SearchAnalyzerName == y!.SearchAnalyzerName &&
-            x!.SynonymMapNames == y!.SynonymMapNames &&
+            Equals(x!.SynonymMapNames, y!.SynonymMapNames) &&
             x!.VectorSearchDimensions == y!.VectorSearchDimensions &&
             x!.VectorSearchProfileName == y!.VectorSearchProfileName;
     }

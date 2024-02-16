@@ -14,5 +14,12 @@ public interface IAzureSearchTaskLogger
     /// <param name="eventName">The name of the Xperience event that was triggered.</param>
     Task HandleEvent(IndexEventWebPageItemModel webpageItem, string eventName);
 
+    /// <summary>
+    /// Logs an <see cref="AzureSearchQueueItem"/> for each registered crawler. Then, loops
+    /// through all registered AzureSearch indexes and logs a task if the passed <paramref name="reusableItem"/> is indexed.
+    /// </summary>
+    /// <param name="reusableItem"></param>
+    /// <param name="eventName"></param>
+    /// <returns></returns>
     Task HandleReusableItemEvent(IndexEventReusableItemModel reusableItem, string eventName);
 }

@@ -59,32 +59,33 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
 
             return new ModificationResponse(ModificationResult.Failure);
         }
-        else
+
+        bool created = !configuration.IndexNames.IsNullOrEmpty() && StorageService.TryCreateAlias(configuration);
+
+        if (created)
         {
-            bool created = !configuration.IndexNames.IsNullOrEmpty() && StorageService.TryCreateAlias(configuration);
+            AzureSearchIndexAliasStore.Instance.AddAlias(new AzureSearchIndexAlias(configuration));
 
-            if (created)
-            {
-                AzureSearchIndexAliasStore.Instance.AddAlias(new AzureSearchIndexAlias(configuration));
-
-                return new ModificationResponse(ModificationResult.Success);
-            }
-
-            return new ModificationResponse(ModificationResult.Failure);
+            return new ModificationResponse(ModificationResult.Success);
         }
+
+        return new ModificationResponse(ModificationResult.Failure);
     }
 
     protected static string RemoveWhitespacesUsingStringBuilder(string source)
     {
         var builder = new StringBuilder(source.Length);
+
         for (int i = 0; i < source.Length; i++)
         {
             char c = source[i];
+
             if (!char.IsWhiteSpace(c))
             {
                 builder.Append(c);
             }
         }
+
         return source.Length == builder.Length ? source : builder.ToString();
     }
 }

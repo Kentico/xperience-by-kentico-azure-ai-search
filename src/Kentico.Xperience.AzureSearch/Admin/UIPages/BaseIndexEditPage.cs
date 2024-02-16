@@ -56,24 +56,23 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
 
             return new ModificationResponse(ModificationResult.Failure);
         }
-        else
+
+        bool created = !string.IsNullOrWhiteSpace(configuration.IndexName) && StorageService.TryCreateIndex(configuration);
+
+        if (created)
         {
-            bool created = !string.IsNullOrWhiteSpace(configuration.IndexName) && StorageService.TryCreateIndex(configuration);
+            AzureSearchIndexStore.Instance.AddIndex(new AzureSearchIndex(configuration, StrategyStorage.Strategies));
 
-            if (created)
-            {
-                AzureSearchIndexStore.Instance.AddIndex(new AzureSearchIndex(configuration, StrategyStorage.Strategies));
-
-                return new ModificationResponse(ModificationResult.Success);
-            }
-
-            return new ModificationResponse(ModificationResult.Failure);
+            return new ModificationResponse(ModificationResult.Success);
         }
+
+        return new ModificationResponse(ModificationResult.Failure);
     }
 
     protected static string RemoveWhitespacesUsingStringBuilder(string source)
     {
         var builder = new StringBuilder(source.Length);
+        
         for (int i = 0; i < source.Length; i++)
         {
             char c = source[i];
@@ -82,24 +81,7 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
                 builder.Append(c);
             }
         }
+
         return source.Length == builder.Length ? source : builder.ToString();
-    }
-}
-
-public enum ModificationResult
-{
-    Success,
-    Failure
-}
-
-public class ModificationResponse
-{
-    public ModificationResult ModificationResult { get; set; }
-    public List<string>? ErrorMessages { get; set; }
-
-    public ModificationResponse(ModificationResult result, List<string>? errorMessage = null)
-    {
-        ModificationResult = result;
-        ErrorMessages = errorMessage;
     }
 }

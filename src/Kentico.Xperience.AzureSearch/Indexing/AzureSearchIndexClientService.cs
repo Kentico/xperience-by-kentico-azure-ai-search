@@ -48,11 +48,11 @@ public sealed class AzureSearchIndexClientService : IAzureSearchIndexClientServi
         {
             await DeleteIndex(oldIndexName, cancellationToken);
         }
+
         await CreateOrUpdateIndexInternal(newSearchFields, newStrategy, newIndex.IndexName, cancellationToken);
     }
 
-    /// <inheritdoc />
-    public async Task DeleteIndex(string indexName, CancellationToken cancellationToken)
+    private async Task DeleteIndex(string indexName, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(indexName))
         {
@@ -84,7 +84,7 @@ public sealed class AzureSearchIndexClientService : IAzureSearchIndexClientServi
         }
         catch
         {
-            await indexClient.DeleteIndexAsync(indexName);
+            await indexClient.DeleteIndexAsync(indexName, cancellationToken);
             await indexClient.CreateOrUpdateIndexAsync(definition, cancellationToken: cancellationToken);
         }
     }

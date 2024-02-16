@@ -109,6 +109,7 @@ internal class IndexAliasListingPage : ListingPage
             catch (Exception ex)
             {
                 EventLogService.LogException(nameof(IndexAliasListingPage), nameof(Rebuild), ex);
+
                 return ResponseFrom(result)
                    .AddErrorMessage(string.Format("Errors occurred while rebuilding the '{0}' index. Please check the Event Log for more details.", index.IndexName));
             }
@@ -148,6 +149,7 @@ internal class IndexAliasListingPage : ListingPage
         catch (Exception ex)
         {
             EventLogService.LogException(nameof(IndexListingPage), nameof(Delete), ex);
+
             return response
                .AddErrorMessage(string.Format("Errors occurred while deleting the '{0}' index. Please check the Event Log for more details.", alias.IndexNames));
         }

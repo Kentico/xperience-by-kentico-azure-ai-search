@@ -17,7 +17,7 @@ public sealed class AzureSearchOptions
     } = "";
 
     /// <summary>
-    /// Admin api key used for azure search service managment. see <see href="https://learn.microsoft.com/en-us/azure/search/search-manage"/> for more information. 
+    /// Admin api key used for azure search service management. see <see href="https://learn.microsoft.com/en-us/azure/search/search-manage"/> for more information. 
     /// </summary>
     public string SearchServiceAdminApiKey
     {

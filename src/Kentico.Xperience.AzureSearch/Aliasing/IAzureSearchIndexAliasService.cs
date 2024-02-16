@@ -8,19 +8,6 @@ namespace Kentico.Xperience.AzureSearch.Aliasing;
 public interface IAzureSearchIndexAliasService
 {
     /// <summary>
-    /// Creates the AzureSearch index alias in Azure.
-    /// </summary>
-    /// <param name="aliasName">The alias to create.</param>
-    /// <param name="indexNames">The index to alias.</param>
-    /// <param name="cancellationToken">The cancellation token for the task.</param>
-    /// <exception cref="InvalidOperationException" />
-    /// <exception cref="ArgumentNullException" />
-    /// <exception cref="OperationCanceledException" />
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="aliasName"/> is null.</exception>
-    /// <exception cref="Azure.RequestFailedException">Thrown when a failure is returned by the Search service.</exception>
-    Task CreateAlias(string aliasName, IEnumerable<string> indexNames, CancellationToken cancellationToken);
-
-    /// <summary>
     /// Edits the AzureSearch index alias in Azure.
     /// </summary>
     /// <param name="oldAliasName">The alias to edit.</param>

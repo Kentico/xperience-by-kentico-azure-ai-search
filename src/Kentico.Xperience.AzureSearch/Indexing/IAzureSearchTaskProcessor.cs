@@ -14,7 +14,5 @@ public interface IAzureSearchTaskProcessor
     /// <param name="cancellationToken">The cancellation token for the task.</param>
     /// <param name="maximumBatchSize"></param>
     /// <returns>The number of items processed.</returns>
-
     Task<int> ProcessAzureSearchTasks(IEnumerable<AzureSearchQueueItem> queueItems, CancellationToken cancellationToken, int maximumBatchSize = 100);
-
 }

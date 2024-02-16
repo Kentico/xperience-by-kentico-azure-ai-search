@@ -34,6 +34,7 @@ public sealed class AzureSearchQueueItem
         {
             throw new ArgumentNullException(nameof(indexName));
         }
+
         if (taskType != AzureSearchTaskType.PUBLISH_INDEX && itemToIndex == null)
         {
             throw new ArgumentNullException(nameof(itemToIndex));

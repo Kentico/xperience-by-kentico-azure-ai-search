@@ -17,7 +17,7 @@ namespace Kentico.Xperience.AzureSearch;
 /// </summary>
 internal class AzureSearchSearchModule : Module
 {
-    private IAzureSearchTaskLogger azuresearchTaskLogger = null!;
+    private IAzureSearchTaskLogger azureSearchTaskLogger = null!;
     private IAppSettingsService appSettingsService = null!;
     private IConversionService conversionService = null!;
 
@@ -31,6 +31,7 @@ internal class AzureSearchSearchModule : Module
             {
                 return conversionService.GetBoolean(value1, false);
             }
+
             return false;
         }
     }
@@ -47,7 +48,7 @@ internal class AzureSearchSearchModule : Module
 
         var services = parameters.Services;
 
-        azuresearchTaskLogger = services.GetRequiredService<IAzureSearchTaskLogger>();
+        azureSearchTaskLogger = services.GetRequiredService<IAzureSearchTaskLogger>();
         appSettingsService = services.GetRequiredService<IAppSettingsService>();
         conversionService = services.GetRequiredService<IConversionService>();
 
@@ -85,7 +86,7 @@ internal class AzureSearchSearchModule : Module
             publishedEvent.Order)
         { };
 
-        azuresearchTaskLogger?.HandleEvent(indexedItemModel, e.CurrentHandler.Name).GetAwaiter().GetResult();
+        azureSearchTaskLogger?.HandleEvent(indexedItemModel, e.CurrentHandler.Name).GetAwaiter().GetResult();
     }
 
     private void HandleContentItemEvent(object? sender, CMSEventArgs e)
@@ -106,6 +107,6 @@ internal class AzureSearchSearchModule : Module
             publishedEvent.ContentLanguageID
         );
 
-        azuresearchTaskLogger?.HandleReusableItemEvent(indexedContentItemModel, e.CurrentHandler.Name).GetAwaiter().GetResult();
+        azureSearchTaskLogger?.HandleReusableItemEvent(indexedContentItemModel, e.CurrentHandler.Name).GetAwaiter().GetResult();
     }
 }

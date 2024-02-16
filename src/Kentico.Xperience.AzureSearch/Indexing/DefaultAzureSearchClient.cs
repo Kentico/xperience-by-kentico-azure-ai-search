@@ -55,7 +55,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
             throw new ArgumentNullException(nameof(indexName));
         }
 
-        if (itemGuids == null || !itemGuids.Any())
+        if (!itemGuids.Any())
         {
             return await Task.FromResult(0);
         }
@@ -77,7 +77,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
             stats.Add(new AzureSearchIndexStatisticsViewModel()
             {
                 Name = index.IndexName,
-                Entries = await indexClient.GetDocumentCountAsync()
+                Entries = await indexClient.GetDocumentCountAsync(cancellationToken)
             });
         }
 
@@ -92,8 +92,8 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
             throw new ArgumentNullException(nameof(indexName));
         }
 
-        var azuresearchIndex = AzureSearchIndexStore.Instance.GetRequiredIndex(indexName);
-        return RebuildInternal(azuresearchIndex, cancellationToken);
+        var azureSearchIndex = AzureSearchIndexStore.Instance.GetRequiredIndex(indexName);
+        return RebuildInternal(azureSearchIndex, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -129,17 +129,18 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
         var batch = IndexDocumentsBatch.Delete(nameof(BaseAzureSearchModel.ObjectID), itemGuids);
 
-        var result = await searchClient.IndexDocumentsAsync(batch);
+        var result = await searchClient.IndexDocumentsAsync(batch, cancellationToken: cancellationToken);
 
         return result.Value.Results.Count(model => model.Succeeded);
     }
 
-    private async Task RebuildInternal(AzureSearchIndex azuresearchIndex, CancellationToken? cancellationToken)
+    private async Task RebuildInternal(AzureSearchIndex azureSearchIndex, CancellationToken? cancellationToken)
     {
         var indexedItems = new List<IndexEventWebPageItemModel>();
-        foreach (var includedPathAttribute in azuresearchIndex.IncludedPaths)
+
+        foreach (var includedPathAttribute in azureSearchIndex.IncludedPaths)
         {
-            foreach (string language in azuresearchIndex.LanguageNames)
+            foreach (string language in azureSearchIndex.LanguageNames)
             {
                 var queryBuilder = new ContentItemQueryBuilder();
 
@@ -147,9 +148,10 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
                 {
                     foreach (string contentType in includedPathAttribute.ContentTypes)
                     {
-                        queryBuilder.ForContentType(contentType, config => config.ForWebsite(azuresearchIndex.WebSiteChannelName, includeUrlPath: true));
+                        queryBuilder.ForContentType(contentType, config => config.ForWebsite(azureSearchIndex.WebSiteChannelName, includeUrlPath: true));
                     }
                 }
+
                 queryBuilder.InLanguage(language);
 
                 var webpages = await executor.GetWebPageResult(queryBuilder, container => container, cancellationToken: cancellationToken ?? default);
@@ -165,10 +167,10 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         log.LogInformation(
             "Kentico.Xperience.AzureSearch",
             "INDEX_REBUILD",
-            $"Rebuilding index [{azuresearchIndex.IndexName}]. {indexedItems.Count} web page items queued for re-indexing"
+            $"Rebuilding index [{azureSearchIndex.IndexName}]. {indexedItems.Count} web page items queued for re-indexing"
         );
 
-        indexedItems.ForEach(item => AzureSearchQueueWorker.EnqueueAzureSearchQueueItem(new AzureSearchQueueItem(item, AzureSearchTaskType.PUBLISH_INDEX, azuresearchIndex.IndexName)));
+        indexedItems.ForEach(item => AzureSearchQueueWorker.EnqueueAzureSearchQueueItem(new AzureSearchQueueItem(item, AzureSearchTaskType.PUBLISH_INDEX, azureSearchIndex.IndexName)));
     }
 
     private async Task<IndexEventWebPageItemModel> MapToEventItem(IWebPageContentQueryDataContainer content)

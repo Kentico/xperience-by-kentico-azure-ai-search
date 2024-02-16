@@ -15,16 +15,16 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
 {
     private readonly IWebPageUrlRetriever urlRetriever;
     private readonly IServiceProvider serviceProvider;
-    private readonly IAzureSearchClient azuresearchClient;
+    private readonly IAzureSearchClient azureSearchClient;
     private readonly IEventLogService eventLogService;
 
     public DefaultAzureSearchTaskProcessor(
-        IAzureSearchClient azuresearchClient,
+        IAzureSearchClient azureSearchClient,
         IEventLogService eventLogService,
         IWebPageUrlRetriever urlRetriever,
         IServiceProvider serviceProvider)
     {
-        this.azuresearchClient = azuresearchClient;
+        this.azureSearchClient = azureSearchClient;
         this.eventLogService = eventLogService;
         this.urlRetriever = urlRetriever;
         this.serviceProvider = serviceProvider;
@@ -41,12 +41,12 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
         {
             await ProcessAzureSearchBatch(batch, batchResults, cancellationToken);
         }
+
         return batchResults.SuccessfulOperations;
     }
 
     private async Task ProcessAzureSearchBatch(IEnumerable<AzureSearchQueueItem> queueItems, AzureSearchBatchResult previousBatchResults, CancellationToken cancellationToken)
     {
-
         var groups = queueItems.GroupBy(item => item.IndexName);
 
         foreach (var group in groups)
@@ -58,6 +58,7 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
 
                 var updateTasks = group.Where(queueItem => queueItem.TaskType is AzureSearchTaskType.PUBLISH_INDEX or AzureSearchTaskType.UPDATE);
                 var upsertData = new List<IAzureSearchModel>();
+
                 foreach (var queueItem in updateTasks)
                 {
                     var document = await GetDocument(queueItem);
@@ -70,11 +71,13 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
                         deleteTasks.Add(queueItem);
                     }
                 }
+                
                 deleteIds.AddRange(GetIdsToDelete(deleteTasks ?? new()).Where(x => x is not null).Select(x => x ?? ""));
+                
                 if (AzureSearchIndexStore.Instance.GetIndex(group.Key) is { } index)
                 {
-                    previousBatchResults.SuccessfulOperations += await azuresearchClient.DeleteRecords(deleteIds, group.Key, cancellationToken);
-                    previousBatchResults.SuccessfulOperations += await azuresearchClient.UpsertRecords(upsertData, group.Key, cancellationToken);
+                    previousBatchResults.SuccessfulOperations += await azureSearchClient.DeleteRecords(deleteIds, group.Key, cancellationToken);
+                    previousBatchResults.SuccessfulOperations += await azureSearchClient.UpsertRecords(upsertData, group.Key, cancellationToken);
 
                     if (group.Any(t => t.TaskType == AzureSearchTaskType.PUBLISH_INDEX) && !previousBatchResults.PublishedIndices.Any(x => x.IndexName == index.IndexName))
                     {
@@ -95,12 +98,11 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
 
     private static IEnumerable<string?> GetIdsToDelete(IEnumerable<AzureSearchQueueItem> deleteTasks) => deleteTasks.Select(queueItem => queueItem.ItemToIndex.ItemGuid.ToString());
 
-    /// <inheritdoc/>
-    public async Task<IAzureSearchModel?> GetDocument(AzureSearchQueueItem queueItem)
+    private async Task<IAzureSearchModel?> GetDocument(AzureSearchQueueItem queueItem)
     {
-        var azuresearchIndex = AzureSearchIndexStore.Instance.GetRequiredIndex(queueItem.IndexName);
+        var azureSearchIndex = AzureSearchIndexStore.Instance.GetRequiredIndex(queueItem.IndexName);
 
-        var strategy = serviceProvider.GetRequiredStrategy(azuresearchIndex);
+        var strategy = serviceProvider.GetRequiredStrategy(azureSearchIndex);
 
         var data = await strategy.MapToAzureSearchModelOrNull(queueItem.ItemToIndex);
 

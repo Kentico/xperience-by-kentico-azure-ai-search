@@ -10,20 +10,17 @@ namespace Kentico.Xperience.AzureSearch;
 /// </summary>
 internal class AzureSearchQueueWorker : ThreadQueueWorker<AzureSearchQueueItem, AzureSearchQueueWorker>
 {
-    private readonly IAzureSearchTaskProcessor azuresearchTaskProcessor;
-
+    private readonly IAzureSearchTaskProcessor azureSearchTaskProcessor;
 
     /// <inheritdoc />
     protected override int DefaultInterval => 10000;
-
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AzureSearchQueueWorker"/> class.
     /// Should not be called directly- the worker should be initialized during startup using
     /// <see cref="ThreadWorker{T}.EnsureRunningThread"/>.
     /// </summary>
-    public AzureSearchQueueWorker() => azuresearchTaskProcessor = Service.Resolve<IAzureSearchTaskProcessor>() ?? throw new InvalidOperationException($"{nameof(IAzureSearchTaskProcessor)} is not registered.");
-
+    public AzureSearchQueueWorker() => azureSearchTaskProcessor = Service.Resolve<IAzureSearchTaskProcessor>() ?? throw new InvalidOperationException($"{nameof(IAzureSearchTaskProcessor)} is not registered.");
 
     /// <summary>
     /// Adds an <see cref="AzureSearchQueueItem"/> to the worker queue to be processed.
@@ -32,7 +29,7 @@ internal class AzureSearchQueueWorker : ThreadQueueWorker<AzureSearchQueueItem, 
     /// <exception cref="InvalidOperationException" />
     public static void EnqueueAzureSearchQueueItem(AzureSearchQueueItem queueItem)
     {
-        if (queueItem == null || (queueItem.ItemToIndex == null && queueItem.TaskType != AzureSearchTaskType.PUBLISH_INDEX) || string.IsNullOrEmpty(queueItem.IndexName))
+        if ((queueItem.ItemToIndex == null && queueItem.TaskType != AzureSearchTaskType.PUBLISH_INDEX) || string.IsNullOrEmpty(queueItem.IndexName))
         {
             return;
         }
@@ -50,19 +47,16 @@ internal class AzureSearchQueueWorker : ThreadQueueWorker<AzureSearchQueueItem, 
         Current.Enqueue(queueItem, false);
     }
 
-
     /// <inheritdoc />
     protected override void Finish() => RunProcess();
-
 
     /// <inheritdoc/>
     protected override void ProcessItem(AzureSearchQueueItem item)
     {
     }
 
-
     /// <inheritdoc />
     protected override int ProcessItems(IEnumerable<AzureSearchQueueItem> items) =>
-         azuresearchTaskProcessor.ProcessAzureSearchTasks(items, CancellationToken.None).GetAwaiter().GetResult();
+         azureSearchTaskProcessor.ProcessAzureSearchTasks(items, CancellationToken.None).GetAwaiter().GetResult();
 
 }
