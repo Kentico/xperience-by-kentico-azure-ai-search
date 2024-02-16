@@ -129,7 +129,7 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
             }
             catch (Exception)
             {
-                // Retrieve can throw an exception when processing a page update AlgoliaQueueItem
+                // Retrieve can throw an exception when processing a page update AzureSearchQueueItem
                 // and the page was deleted before the update task has processed. In this case, upsert an
                 // empty URL
                 model.Url = string.Empty;

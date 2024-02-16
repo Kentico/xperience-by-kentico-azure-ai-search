@@ -1,6 +1,7 @@
 ﻿using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
+using Kentico.Xperience.AzureSearch.Admin;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Kentico.Xperience.AzureSearch.Indexing;
@@ -21,45 +22,109 @@ public class AzureSearchIndexClientService : IAzureSearchIndexClientService
         var azureSearchIndex = AzureSearchIndexStore.Instance.GetIndex(indexName) ??
             throw new InvalidOperationException($"Registered index with name '{indexName}' doesn't exist.");
 
-        var algoliaStrategy = serviceProvider.GetRequiredStrategy(azureSearchIndex);
-        var searchFields = algoliaStrategy.GetSearchFields();
+        var azureSearchStrategy = serviceProvider.GetRequiredStrategy(azureSearchIndex);
+        var searchFields = azureSearchStrategy.GetSearchFields();
 
-        var definition = new SearchIndex(indexName, searchFields);
-
-        await indexClient.CreateOrUpdateIndexAsync(definition, cancellationToken: cancellationToken);
+        await CreateOrUpdateIndexInternal(searchFields, azureSearchStrategy, indexName, cancellationToken);
 
         return indexClient.GetSearchClient(indexName);
     }
 
-    public async Task CreateAlias(string aliasName, IEnumerable<string> indexNames, CancellationToken cancellationToken)
+    public async Task EditIndex(string oldIndexName, AzureSearchConfigurationModel newIndexConfiguration, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(aliasName))
+        var oldIndex = AzureSearchIndexStore.Instance.GetIndex(oldIndexName) ??
+            throw new InvalidOperationException($"Registered index with name '{oldIndexName}' doesn't exist.");
+        var oldStrategy = serviceProvider.GetRequiredStrategy(oldIndex);
+        var oldSearchFields = oldStrategy.GetSearchFields();
+
+        var newIndex = AzureSearchIndexStore.Instance.GetIndex(newIndexConfiguration.IndexName) ??
+            throw new InvalidOperationException($"Registered index with name '{oldIndexName}' doesn't exist.");
+        var newStrategy = serviceProvider.GetRequiredStrategy(newIndex);
+        var newSearchFields = newStrategy.GetSearchFields();
+
+        if (Enumerable.SequenceEqual(oldSearchFields, newSearchFields, new SearchIndexComparer()))
         {
-            throw new ArgumentNullException(nameof(aliasName));
+            await DeleteIndex(oldIndexName, cancellationToken);
         }
-
-        await indexClient.CreateAliasAsync(new SearchAlias(aliasName, indexNames), cancellationToken);
-    }
-
-    public async Task EditAlias(string oldAliasName, SearchAlias newAlias, CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrEmpty(oldAliasName))
-        {
-            throw new ArgumentNullException(nameof(oldAliasName));
-        }
-
-        await DeleteAlias(oldAliasName, cancellationToken);
-        await indexClient.CreateOrUpdateAliasAsync(newAlias.Name, newAlias, cancellationToken: cancellationToken);
+        await CreateOrUpdateIndexInternal(newSearchFields, newStrategy, newIndex.IndexName, cancellationToken);
     }
 
     /// <inheritdoc />
-    public async Task DeleteAlias(string aliasName, CancellationToken cancellationToken)
+    public async Task DeleteIndex(string indexName, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(aliasName))
+        if (string.IsNullOrEmpty(indexName))
         {
-            throw new ArgumentNullException(nameof(aliasName));
+            throw new ArgumentNullException(nameof(indexName));
         }
 
-        await indexClient.DeleteAliasAsync(aliasName, cancellationToken);
+        await indexClient.DeleteIndexAsync(indexName, cancellationToken);
+    }
+
+    private async Task CreateOrUpdateIndexInternal(IList<SearchField>? searchFields, IAzureSearchIndexingStrategy strategy, string indexName, CancellationToken cancellationToken)
+    {
+        var semanticSearchConfiguration = strategy.CreateSemanticRankingConfigurationOrNull();
+
+        var definition = new SearchIndex(indexName, searchFields);
+
+        if (semanticSearchConfiguration is not null)
+        {
+            foreach (var suggester in semanticSearchConfiguration.Suggesters)
+            {
+                definition.Suggesters.Add(suggester);
+            }
+
+            definition.SemanticSearch = semanticSearchConfiguration.SemanticSearch;
+        }
+
+        try
+        {
+            await indexClient.CreateOrUpdateIndexAsync(definition, cancellationToken: cancellationToken);
+        }
+        catch
+        {
+            await indexClient.DeleteIndexAsync(indexName);
+            await indexClient.CreateOrUpdateIndexAsync(definition, cancellationToken: cancellationToken);
+        }
+    }
+}
+
+internal class SearchIndexComparer : IEqualityComparer<SearchField>
+{
+    public bool Equals(SearchField? x, SearchField? y)
+    {
+        if ((x is null && y is not null) || (x is not null && y is null))
+        {
+            return false;
+        }
+        if (x is null && y is null)
+        {
+            return true;
+        }
+
+        return x!.IsKey == y!.IsKey &&
+            x!.Name == y!.Name &&
+            x!.IsSearchable == y!.IsSearchable &&
+            x!.IsSortable == y!.IsSortable &&
+            x!.Type == y!.Type &&
+            x!.AnalyzerName == y!.AnalyzerName &&
+            x!.Fields == y!.Fields &&
+            x!.IndexAnalyzerName == y!.IndexAnalyzerName &&
+            x!.IsFacetable == y!.IsFacetable &&
+            x!.IsFilterable == y!.IsFilterable &&
+            x!.IsHidden == y!.IsHidden &&
+            x!.SearchAnalyzerName == y!.SearchAnalyzerName &&
+            x!.SynonymMapNames == y!.SynonymMapNames &&
+            x!.VectorSearchDimensions == y!.VectorSearchDimensions &&
+            x!.VectorSearchProfileName == y!.VectorSearchProfileName;
+    }
+
+    public int GetHashCode(SearchField obj)
+    {
+        if (obj == null)
+        {
+            return 0;
+        }
+
+        return obj.Name.GetHashCode();
     }
 }

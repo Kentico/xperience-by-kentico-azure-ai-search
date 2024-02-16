@@ -42,6 +42,9 @@ public class BaseAzureSearchIndexingStrategy<TSearchModel> : IAzureSearchIndexin
     public virtual async Task<IEnumerable<IIndexEventItemModel>> FindItemsToReindex(IndexEventReusableItemModel changedItem) => await Task.FromResult(new List<IIndexEventItemModel>());
 
     /// <inheritdoc />
+    public virtual SemanticRankingConfiguration? CreateSemanticRankingConfigurationOrNull() => null;
+
+    /// <inheritdoc />
     public IList<SearchField> GetSearchFields() => fieldBuilder.Build(typeof(TSearchModel));
 
     public async Task<int> UploadDocuments(IEnumerable<IAzureSearchModel> models, SearchClient searchClient)
