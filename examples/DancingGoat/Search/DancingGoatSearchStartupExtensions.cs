@@ -19,6 +19,8 @@ public static class DancingGoatSearchStartupExtensions
 
         services.AddTransient<DancingGoatSearchService>();
 
+        services.AddKenticoAzureSearch(configuration);
+
         services.AddHttpClient<WebCrawlerService>();
         services.AddSingleton<WebScraperHtmlSanitizer>();
         services.AddTransient<StrategyHelper>();

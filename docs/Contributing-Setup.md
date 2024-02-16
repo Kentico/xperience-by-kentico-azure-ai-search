@@ -52,7 +52,7 @@ To run the Sample app Admin customization in development mode, add the following
 
 ```json
 "CMSAdminClientModuleSettings": {
-  "kentico-xperience-integrations-azure-ai-search": {
+  "kentico-xperience-integrations-azuresearch": {
     "Mode": "Proxy",
     "Port": 3009
   }
@@ -67,7 +67,7 @@ To run the Sample app Admin customization in development mode, add the following
    - `refactor/` - for restructuring of existing features
    - `fix/` - for bugfixes
 
-1. Run `dotnet format` against the `src/Kentico.Xperience.AzureAISearch` project
+1. Run `dotnet format` against the `src/Kentico.Xperience.AzureSearch` project
 
    > use `dotnet: format` VS Code task.
 

@@ -22,9 +22,6 @@ public static class AzureSearchStartupExtensions
     {
         serviceCollection.AddAzureSearchServicesInternal(configuration);
 
-        serviceCollection.AddTransient<BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>>();
-        StrategyStorage.AddStrategy<BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>>("Default");
-
         return serviceCollection;
     }
 
