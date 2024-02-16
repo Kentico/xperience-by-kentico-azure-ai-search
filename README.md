@@ -57,6 +57,10 @@ dotnet add package Kentico.Xperience.AzureAISearch
 ![Administration search edit form](/images/xperience-administration-search-index-list.jpg)
 1. Display the results on your site with a Razor View 👍.
 
+## Use DancingGoat sample
+
+You can restore database with configured samples. View [DancingGoat Sample Database](./database/DancingGoat_AzureAISearch.bak).
+
 ## Full Instructions
 
 View the [Usage Guide](./docs/Usage-Guide.md) for more detailed instructions.
