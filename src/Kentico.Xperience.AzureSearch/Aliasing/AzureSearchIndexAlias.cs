@@ -5,7 +5,7 @@ namespace Kentico.Xperience.AzureSearch.Aliasing;
 /// <summary>
 /// Represents the configuration of an AzureSearch index alias.
 /// </summary>
-internal class AzureSearchIndexAlias
+public sealed class AzureSearchIndexAlias
 {
     /// <summary>
     /// An arbitrary ID used to identify the AzureSearch index in the admin UI.

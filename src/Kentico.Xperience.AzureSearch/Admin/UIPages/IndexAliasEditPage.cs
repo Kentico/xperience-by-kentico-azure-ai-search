@@ -2,9 +2,7 @@
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.AzureSearch.Admin;
-using Kentico.Xperience.AzureSearch.Admin.UIPages;
 using Kentico.Xperience.AzureSearch.Aliasing;
-using Kentico.Xperience.AzureSearch.Indexing;
 
 [assembly: UIPage(
    parentType: typeof(IndexAliasListingPage),
@@ -14,7 +12,7 @@ using Kentico.Xperience.AzureSearch.Indexing;
    templateName: TemplateNames.EDIT,
    order: UIPageOrder.NoOrder)]
 
-namespace Kentico.Xperience.AzureSearch.Admin.UIPages;
+namespace Kentico.Xperience.AzureSearch.Admin;
 
 
 [UIEvaluatePermission(SystemPermissions.UPDATE)]

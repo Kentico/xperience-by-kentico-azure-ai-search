@@ -13,7 +13,7 @@ public class AzureSearchIndexIncludedPath
     /// <summary>
     /// A list of content types under the specified <see cref="AliasPath"/> that will be indexed.
     /// </summary>
-    public List<string> ContentTypes { get; set; } = [];
+    public List<string> ContentTypes { get; set; } = new();
 
     /// <summary>
     /// The internal identifier of the included path.

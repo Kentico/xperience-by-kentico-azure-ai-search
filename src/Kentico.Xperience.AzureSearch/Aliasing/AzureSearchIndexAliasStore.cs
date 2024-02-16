@@ -3,10 +3,13 @@ using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace Kentico.Xperience.AzureSearch.Aliasing;
 
-internal class AzureSearchIndexAliasStore
+/// <summary>
+/// Represents a global singleton store of Azure Search index aliases
+/// </summary>
+public sealed class AzureSearchIndexAliasStore
 {
     private static readonly Lazy<AzureSearchIndexAliasStore> mInstance = new();
-    private readonly List<AzureSearchIndexAlias> registeredAliases = [];
+    private readonly List<AzureSearchIndexAlias> registeredAliases = new();
 
     /// <summary>
     /// Gets singleton instance of the <see cref="AzureSearchIndexAliasStore"/>

@@ -21,8 +21,6 @@ internal class AzureSearchSearchModule : Module
     private IAppSettingsService appSettingsService = null!;
     private IConversionService conversionService = null!;
 
-    [Obsolete("This setting will be replaced in the next major version. Use CMSAzureSearchSearchDisableIndexing instead.")]
-    private const string APP_SETTINGS_KEY_INDEXING_DISABLED_OLD = "AzureSearchSearchDisableIndexing";
     private const string APP_SETTINGS_KEY_INDEXING_DISABLED = "CMSAzureSearchSearchDisableIndexing";
 
     private bool IndexingDisabled
@@ -33,14 +31,6 @@ internal class AzureSearchSearchModule : Module
             {
                 return conversionService.GetBoolean(value1, false);
             }
-
-#pragma warning disable CS0618 // Type or member is obsolete
-            if (appSettingsService[APP_SETTINGS_KEY_INDEXING_DISABLED_OLD] is string value2)
-            {
-                return conversionService.GetBoolean(value2, false);
-            }
-#pragma warning restore CS0618 // Type or member is obsolete
-
             return false;
         }
     }

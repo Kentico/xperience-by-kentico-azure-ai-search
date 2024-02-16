@@ -8,7 +8,7 @@ public sealed class AzureSearchOptions
     public const string CMS_AZURE_SEARCH_SECTION_NAME = "CMSAzureSearch";
 
     /// <summary>
-    /// Azure 
+    /// Url of azure search provider see <see href="https://learn.microsoft.com/en-us/azure/search/search-manage"/> for more information.
     /// </summary>
     public string SearchServiceEndPoint
     {
@@ -17,7 +17,7 @@ public sealed class AzureSearchOptions
     } = "";
 
     /// <summary>
-    /// Azure 
+    /// Admin api key used for azure search service managment. see <see href="https://learn.microsoft.com/en-us/azure/search/search-manage"/> for more information. 
     /// </summary>
     public string SearchServiceAdminApiKey
     {
@@ -26,7 +26,7 @@ public sealed class AzureSearchOptions
     } = "";
 
     /// <summary>
-    /// Azure 
+    /// Client api key used to retrieve indexed data from azure search portal. see <see href="https://learn.microsoft.com/en-us/azure/search/search-manage"/> for more information.  
     /// </summary>
     public string SearchServiceQueryApiKey
     {

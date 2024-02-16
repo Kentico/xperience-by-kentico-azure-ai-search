@@ -2,16 +2,9 @@
 
 namespace Kentico.Xperience.AzureSearch.Indexing;
 
-public interface IAzureSearchModel
-{
-    public string? Url { get; set; }
-    public string ContentTypeName { get; set; }
-    public string LanguageName { get; set; }
-    public string ItemGuid { get; set; }
-    public string ObjectID { get; set; }
-    public string Name { get; set; }
-}
-
+/// <summary>
+/// Base implementation of <see cref="IAzureSearchModel"/> with decorators used to specify properties of indexed colums. <see href="https://learn.microsoft.com/en-us/azure/search/search-howto-dotnet-sdk"/>
+/// </summary>
 public class BaseAzureSearchModel : IAzureSearchModel
 {
     [SearchableField(IsSortable = true, IsFilterable = true, IsFacetable = true)]

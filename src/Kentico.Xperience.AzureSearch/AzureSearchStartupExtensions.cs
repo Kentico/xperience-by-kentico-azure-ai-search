@@ -19,6 +19,7 @@ public static class AzureSearchStartupExtensions
     /// </summary>
     /// <param name="serviceCollection"></param>
     /// <param name="configure"></param>
+    /// <param name="configuration">The application configuration.</param>
     /// <returns></returns>
     public static IServiceCollection AddKenticoAzureSearch(this IServiceCollection serviceCollection, Action<IAzureSearchBuilder> configure, IConfiguration configuration)
     {
@@ -65,6 +66,7 @@ public interface IAzureSearchBuilder
     /// Registers the given <typeparamref name="TStrategy" /> as a transient service under <paramref name="strategyName" />
     /// </summary>
     /// <typeparam name="TStrategy">The custom type of <see cref="IAzureSearchIndexingStrategy"/> </typeparam>
+    /// <typeparam name="TSearchModel">The custom rype of <see cref="IAzureSearchModel"/> used to create and use an index.</typeparam>
     /// <param name="strategyName">Used internally <typeparamref name="TStrategy" /> to enable dynamic assignment of strategies to search indexes. Names must be unique.</param>
     /// <exception cref="ArgumentException">
     ///     Thrown if an strategy has already been registered with the given <paramref name="strategyName"/>
@@ -78,7 +80,7 @@ internal class AzureSearchBuilder : IAzureSearchBuilder
     private readonly IServiceCollection serviceCollection;
 
     /// <summary>
-    /// If true, the <see cref="DefaultAzureSearchIndexingStrategy" /> will be available as an explicitly selectable indexing strategy
+    /// If true, the <see cref="BaseAzureSearchIndexingStrategy{BaseAzureSearchModel}" /> will be available as an explicitly selectable indexing strategy
     /// within the Admin UI. Defaults to <c>true</c>
     /// </summary>
     public bool IncludeDefaultStrategy { get; set; } = true;
@@ -90,6 +92,7 @@ internal class AzureSearchBuilder : IAzureSearchBuilder
     /// as a selectable strategy in the Admin UI
     /// </summary>
     /// <typeparam name="TStrategy"></typeparam>
+    /// <typeparam name="TSearchModel">The custom rype of <see cref="IAzureSearchModel"/> used to create and use an index.</typeparam>
     /// <param name="strategyName"></param>
     /// <returns></returns>
     public IAzureSearchBuilder RegisterStrategy<TStrategy, TSearchModel>(string strategyName) where TStrategy : BaseAzureSearchIndexingStrategy<TSearchModel> where TSearchModel : IAzureSearchModel, new()

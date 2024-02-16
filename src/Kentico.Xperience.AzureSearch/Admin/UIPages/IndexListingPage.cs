@@ -47,8 +47,8 @@ internal class IndexListingPage : ListingPage
     {
         if (!AzureSearchIndexStore.Instance.GetAllIndices().Any())
         {
-            PageConfiguration.Callouts =
-            [
+            PageConfiguration.Callouts = new List<CalloutConfiguration>
+            {
                 new()
                 {
                     Headline = "No indexes",
@@ -57,7 +57,7 @@ internal class IndexListingPage : ListingPage
                     Type = CalloutType.FriendlyWarning,
                     Placement = CalloutPlacement.OnDesk
                 }
-            ];
+            };
         }
 
         PageConfiguration.ColumnConfigurations

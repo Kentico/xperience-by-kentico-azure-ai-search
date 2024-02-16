@@ -7,6 +7,7 @@ namespace Kentico.Xperience.AzureSearch.Indexing;
 
 /// <summary>
 /// Default indexing strategy that provides simple indexing.
+/// Search model <typeparamref name="TSearchModel"/> used for Index definition and data retrieval.
 /// </summary>
 public class BaseAzureSearchIndexingStrategy<TSearchModel> : IAzureSearchIndexingStrategy where TSearchModel : IAzureSearchModel, new()
 {
@@ -14,12 +15,7 @@ public class BaseAzureSearchIndexingStrategy<TSearchModel> : IAzureSearchIndexin
 
     public BaseAzureSearchIndexingStrategy() => fieldBuilder = new FieldBuilder();
 
-    /// <summary>
-    /// Called when indexing a search model. Enables overriding of multiple fields with custom data.
-    /// By default, no custom content item fields or secured items are indexed, only the contents of <see cref="IIndexEventItemModel"/> and fields defined in <see cref="BaseAzureSearchModel"/>
-    /// </summary>
-    /// <param name="item">The <see cref="IIndexEventItemModel"/> currently being indexed.</param>
-    /// <returns>Modified AzureSearch document.</returns>
+    /// <inheritdoc />
     public virtual Task<IAzureSearchModel?> MapToAzureSearchModelOrNull(IIndexEventItemModel item)
     {
         if (item.IsSecured)
@@ -47,6 +43,7 @@ public class BaseAzureSearchIndexingStrategy<TSearchModel> : IAzureSearchIndexin
     /// <inheritdoc />
     public IList<SearchField> GetSearchFields() => fieldBuilder.Build(typeof(TSearchModel));
 
+    /// <inheritdoc />
     public async Task<int> UploadDocuments(IEnumerable<IAzureSearchModel> models, SearchClient searchClient)
     {
         var batch = new IndexDocumentsBatch<TSearchModel>();

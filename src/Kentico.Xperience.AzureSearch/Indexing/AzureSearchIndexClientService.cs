@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kentico.Xperience.AzureSearch.Indexing;
 
-public class AzureSearchIndexClientService : IAzureSearchIndexClientService
+public sealed class AzureSearchIndexClientService : IAzureSearchIndexClientService
 {
     private readonly SearchIndexClient indexClient;
     private readonly IServiceProvider serviceProvider;
@@ -17,6 +17,7 @@ public class AzureSearchIndexClientService : IAzureSearchIndexClientService
         this.serviceProvider = serviceProvider;
     }
 
+    /// <inheritdoc />
     public async Task<SearchClient> InitializeIndexClient(string indexName, CancellationToken cancellationToken)
     {
         var azureSearchIndex = AzureSearchIndexStore.Instance.GetIndex(indexName) ??
@@ -30,6 +31,7 @@ public class AzureSearchIndexClientService : IAzureSearchIndexClientService
         return indexClient.GetSearchClient(indexName);
     }
 
+    /// <inheritdoc />
     public async Task EditIndex(string oldIndexName, AzureSearchConfigurationModel newIndexConfiguration, CancellationToken cancellationToken)
     {
         var oldIndex = AzureSearchIndexStore.Instance.GetIndex(oldIndexName) ??
@@ -42,7 +44,7 @@ public class AzureSearchIndexClientService : IAzureSearchIndexClientService
         var newStrategy = serviceProvider.GetRequiredStrategy(newIndex);
         var newSearchFields = newStrategy.GetSearchFields();
 
-        if (Enumerable.SequenceEqual(oldSearchFields, newSearchFields, new SearchIndexComparer()))
+        if (Enumerable.SequenceEqual(oldSearchFields, newSearchFields, new AzureSearchIndexComparer()))
         {
             await DeleteIndex(oldIndexName, cancellationToken);
         }
@@ -85,46 +87,5 @@ public class AzureSearchIndexClientService : IAzureSearchIndexClientService
             await indexClient.DeleteIndexAsync(indexName);
             await indexClient.CreateOrUpdateIndexAsync(definition, cancellationToken: cancellationToken);
         }
-    }
-}
-
-internal class SearchIndexComparer : IEqualityComparer<SearchField>
-{
-    public bool Equals(SearchField? x, SearchField? y)
-    {
-        if ((x is null && y is not null) || (x is not null && y is null))
-        {
-            return false;
-        }
-        if (x is null && y is null)
-        {
-            return true;
-        }
-
-        return x!.IsKey == y!.IsKey &&
-            x!.Name == y!.Name &&
-            x!.IsSearchable == y!.IsSearchable &&
-            x!.IsSortable == y!.IsSortable &&
-            x!.Type == y!.Type &&
-            x!.AnalyzerName == y!.AnalyzerName &&
-            x!.Fields == y!.Fields &&
-            x!.IndexAnalyzerName == y!.IndexAnalyzerName &&
-            x!.IsFacetable == y!.IsFacetable &&
-            x!.IsFilterable == y!.IsFilterable &&
-            x!.IsHidden == y!.IsHidden &&
-            x!.SearchAnalyzerName == y!.SearchAnalyzerName &&
-            x!.SynonymMapNames == y!.SynonymMapNames &&
-            x!.VectorSearchDimensions == y!.VectorSearchDimensions &&
-            x!.VectorSearchProfileName == y!.VectorSearchProfileName;
-    }
-
-    public int GetHashCode(SearchField obj)
-    {
-        if (obj == null)
-        {
-            return 0;
-        }
-
-        return obj.Name.GetHashCode();
     }
 }

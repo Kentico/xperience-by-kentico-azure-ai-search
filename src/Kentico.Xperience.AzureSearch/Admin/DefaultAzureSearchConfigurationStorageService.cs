@@ -205,7 +205,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         var indexInfos = indexProvider.Get().GetEnumerableTypedResult().ToList();
         if (indexInfos.Count == 0)
         {
-            return [];
+            return new List<AzureSearchConfigurationModel>();
         }
 
         var paths = pathProvider.Get().ToList();
@@ -220,7 +220,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         var aliasInfoIds = indexAliasProvider.Get().GetEnumerableTypedResult().Select(x => x.AzureSearchIndexAliasItemId).ToList();
         if (aliasInfoIds.Count == 0)
         {
-            return [];
+            return new List<AzureSearchAliasConfigurationModel>();
         }
 
         var result = new List<AzureSearchAliasConfigurationModel>();

@@ -2,7 +2,6 @@
 using CMS.Membership;
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.AzureSearch.Admin;
-using Kentico.Xperience.AzureSearch.Admin.UIPages;
 using Kentico.Xperience.AzureSearch.Aliasing;
 using Kentico.Xperience.AzureSearch.Indexing;
 
@@ -24,10 +23,8 @@ internal class IndexAliasListingPage : ListingPage
 {
     private readonly IAzureSearchClient azureSearchClient;
     private readonly IPageUrlGenerator pageUrlGenerator;
-    private readonly IAzureSearchIndexClientService azureSearchIndexClientService;
     private readonly IAzureSearchIndexAliasService azureSearchIndexAliasService;
     private readonly IAzureSearchConfigurationStorageService configurationStorageService;
-    private readonly IConversionService conversionService;
 
     protected override string ObjectType => AzureSearchIndexAliasItemInfo.OBJECT_TYPE;
 
@@ -36,18 +33,14 @@ internal class IndexAliasListingPage : ListingPage
     /// </summary>
     public IndexAliasListingPage(
         IAzureSearchClient azureSearchClient,
-        IAzureSearchIndexClientService azureSearchIndexClientService,
         IAzureSearchIndexAliasService azureSearchIndexAliasService,
         IPageUrlGenerator pageUrlGenerator,
-        IAzureSearchConfigurationStorageService configurationStorageService,
-        IConversionService conversionService)
+        IAzureSearchConfigurationStorageService configurationStorageService)
     {
         this.azureSearchClient = azureSearchClient;
         this.pageUrlGenerator = pageUrlGenerator;
         this.azureSearchIndexAliasService = azureSearchIndexAliasService;
         this.configurationStorageService = configurationStorageService;
-        this.conversionService = conversionService;
-        this.azureSearchIndexClientService = azureSearchIndexClientService;
     }
 
     /// <inheritdoc/>
@@ -55,8 +48,8 @@ internal class IndexAliasListingPage : ListingPage
     {
         if (!AzureSearchIndexAliasStore.Instance.GetAllAliases().Any())
         {
-            PageConfiguration.Callouts =
-            [
+            PageConfiguration.Callouts = new List<CalloutConfiguration>
+            {
                 new()
                 {
                     Headline = "No aliases",
@@ -65,7 +58,7 @@ internal class IndexAliasListingPage : ListingPage
                     Type = CalloutType.FriendlyWarning,
                     Placement = CalloutPlacement.OnDesk
                 }
-            ];
+            };
         }
 
         PageConfiguration.ColumnConfigurations

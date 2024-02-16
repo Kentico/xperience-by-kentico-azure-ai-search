@@ -7,7 +7,7 @@
 public sealed class AzureSearchQueueItem
 {
     /// <summary>
-    /// The <see cref="ItemToIndex"/> that was changed.
+    /// The <see cref="IIndexEventItemModel"/> that was changed.
     /// </summary>
     public IIndexEventItemModel ItemToIndex { get; }
 
