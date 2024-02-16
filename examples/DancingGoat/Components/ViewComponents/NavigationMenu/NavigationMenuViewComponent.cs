@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
-
+using DancingGoat.Models;
+using DancingGoat.Search;
 using Kentico.Content.Web.Mvc.Routing;
 
 using Microsoft.AspNetCore.Mvc;
@@ -20,9 +21,17 @@ namespace DancingGoat.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var languageName = currentLanguageRetriever.Get();
+            string languageName = currentLanguageRetriever.Get();
 
-            var navigationViewModels = await navigationService.GetNavigationItemViewModels(languageName, HttpContext.RequestAborted);
+            var navigationViewModels = (await navigationService.GetNavigationItemViewModels(languageName, HttpContext.RequestAborted)).ToList();
+
+            navigationViewModels.AddRange(new List<NavigationItemViewModel>
+            {
+                new($"Search", "/Search"),
+                new($"{nameof(SearchController.Geo)}Search", $"/Search/{nameof(SearchController.Geo)}"),
+                new($"{nameof(SearchController.Semantic)}Search", $"/Search/{nameof(SearchController.Semantic)}"),
+                new($"{nameof(SearchController.Simple)}Search", $"/Search/{nameof(SearchController.Simple)}"),
+            });
 
             return View($"~/Components/ViewComponents/NavigationMenu/Default.cshtml", navigationViewModels);
         }

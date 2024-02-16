@@ -1,5 +1,6 @@
 ﻿using DancingGoat.Search.Models;
 using DancingGoat.Search.Services;
+using DancingGoat.Search.Strategies;
 
 namespace DancingGoat.Search;
 
@@ -9,15 +10,18 @@ public static class DancingGoatSearchStartupExtensions
     {
         services.AddKenticoAzureSearch(builder =>
         {
-            builder.RegisterStrategy<SimpleSearchIndexingStrategy, DancingGoatSimpleSearchModel>("Simple");
-            builder.RegisterStrategy<AdvancedSearchIndexingStrategy, DancingGoatSearchModel>("Advanced");
+            builder.RegisterStrategy<SemanticRankingSearchStrategy, DancingGoatSearchModel>(nameof(SemanticRankingSearchStrategy));
+            builder.RegisterStrategy<DancingGoatSearchStrategy, DancingGoatSearchModel>(nameof(DancingGoatSearchStrategy));
+            builder.RegisterStrategy<DancingGoatSimpleSearchStrategy, DancingGoatSimpleSearchModel>(nameof(DancingGoatSimpleSearchStrategy));
+            builder.RegisterStrategy<GeoLocationSearchStrategy, GeoLocationSearchModel>(nameof(GeoLocationSearchStrategy));
+            builder.RegisterStrategy<CustomItemsReindexingSearchStrategy, DancingGoatSearchModel>(nameof(CustomItemsReindexingSearchStrategy));
         }, configuration);
 
         services.AddTransient<DancingGoatSearchService>();
-        services.AddTransient<DancingGoatSimpleSearchService>();
 
         services.AddHttpClient<WebCrawlerService>();
         services.AddSingleton<WebScraperHtmlSanitizer>();
+        services.AddTransient<StrategyHelper>();
 
         return services;
     }

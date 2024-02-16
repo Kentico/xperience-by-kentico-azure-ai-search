@@ -28,7 +28,8 @@ builder.Services.AddKentico(features =>
         {
             LandingPage.CONTENT_TYPE_NAME,
             ContactsPage.CONTENT_TYPE_NAME,
-            ArticlePage.CONTENT_TYPE_NAME
+            ArticlePage.CONTENT_TYPE_NAME,
+            CafePage.CONTENT_TYPE_NAME
         }
     });
 
@@ -95,6 +96,8 @@ app.MapControllerRoute(
         controller = DancingGoatConstants.CONSTRAINT_FOR_NON_ROUTER_PAGE_CONTROLLERS
     }
 );
+
+app.MapControllers();
 
 app.Run();
 

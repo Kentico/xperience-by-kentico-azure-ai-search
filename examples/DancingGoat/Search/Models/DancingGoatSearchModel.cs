@@ -1,14 +1,13 @@
 ﻿using Azure.Search.Documents.Indexes;
-using Microsoft.Spatial;
+using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace DancingGoat.Search.Models;
 
-public class DancingGoatSearchModel : DancingGoatSimpleSearchModel
+public class DancingGoatSearchModel : BaseAzureSearchModel
 {
     [SearchableField]
     public string Content { get; set; }
 
-
-    //[SearchableField(IsSortable = true, IsFilterable = true, IsFacetable = true)]
-    //public GeographyPoint Point { get; set; }
+    [SearchableField]
+    public string Title { get; set; }
 }

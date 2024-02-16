@@ -25,6 +25,7 @@ namespace DancingGoat
             services.AddSingleton<ContactRepository>();
             services.AddSingleton<HomePageRepository>();
             services.AddSingleton<ArticlePageRepository>();
+            services.AddSingleton<CafePageRepository>();
             services.AddSingleton<ArticlesSectionRepository>();
             services.AddSingleton<ConfirmationPageRepository>();
             services.AddSingleton<CoffeeRepository>();

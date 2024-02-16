@@ -1,0 +1,42 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+
+@model DancingGoat.Models.CafePageViewModel
+
+@{
+    Layout = "~/Views/Shared/_DancingGoatLayout.cshtml";
+
+    ViewBag.Title = Model.Title;
+}
+
+<div class="article-detail-page">
+    <article class="col-lg-12 article-detail-related-box article-detail-full-width">
+        <div class="row equal-height">
+            @if (!string.IsNullOrEmpty(Model.TeaserUrl))
+            {
+                <div class="article-detail-image col-lg-6 col-md-6">
+                    <img src="@Url.Content(Model.TeaserUrl)" alt="@Model.Title" title="@Model.Title" class="img-responsive" loading="lazy" />
+                </div>
+                <div class="col-lg-1 col-md-1 article-title--padding">
+                </div>
+            }
+            <div class="col-lg-5 col-md-5 article-title--align-middle">
+                <h2>@Model.Title</h2>
+                <div class="article-detail-datetime">
+                    @Model.PublicationDate.ToString("D")
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="article-detail-content col-lg-9">
+                @Html.Raw(Model.Text)
+            </div>
+        </div>
+        <div class="row">
+            <div class="article-detail-content col-lg-9">
+                @Html.Raw(Model.Location)
+            </div>
+        </div>
+    </article>
+
+    <div class="clear"></div>
+</div>
