@@ -72,7 +72,7 @@ public class ExampleSearchIndexingStrategy : BaseAzureSearchIndexingStrategy<Sim
 }
 ```
 
-Some properties of the `IIndexEventItemModel` are added to the JObjects by default by the library and these can be found in the `BaseAzureSearchModel` class.
+Some properties of the `IIndexEventItemModel` are added to the indexed data by default by the library and these can be found in the `BaseAzureSearchModel` class.
 
 ```csharp
 public class BaseAzureSearchModel : IAzureSearchModel
