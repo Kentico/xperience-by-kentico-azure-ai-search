@@ -3,8 +3,8 @@
     <RootNamespace>DancingGoat</RootNamespace>
     <UserSecretsId>a5fede4d-ad40-4e59-9fec-46156fc6b6e0</UserSecretsId>
     <SeparatedAdmin Condition="'$(SeparatedAdmin)' == ''">false</SeparatedAdmin>
-    <Nullable>disable</Nullable>
-	  <WarningsAsErrors></WarningsAsErrors>
+	<Nullable>annotations</Nullable>
+	<RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="App_Data\CMSModules\WebFarm\webfarm.sync" />
