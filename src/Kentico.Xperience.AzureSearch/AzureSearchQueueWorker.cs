@@ -1,7 +1,8 @@
 using CMS.Base;
 using CMS.Core;
+using Kentico.Xperience.AzureSearch.Indexing;
 
-namespace Kentico.Xperience.AzureSearch.Indexing;
+namespace Kentico.Xperience.AzureSearch;
 
 /// <summary>
 /// Thread worker which enqueues recently updated or deleted nodes indexed

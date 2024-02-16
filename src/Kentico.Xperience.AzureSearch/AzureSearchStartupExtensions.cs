@@ -12,6 +12,21 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class AzureSearchStartupExtensions
 {
+    /// <summary>
+    /// Adds Azure search services and custom module to application using the <see cref="BaseAzureSearchIndexingStrategy{BaseAzureSearchModel}"/> for all indexes
+    /// </summary>
+    /// <param name="serviceCollection"></param>
+    /// <param name="configuration"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddKenticoAzureSearch(this IServiceCollection serviceCollection, IConfiguration configuration)
+    {
+        serviceCollection.AddAzureSearchServicesInternal(configuration);
+
+        serviceCollection.AddTransient<BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>>();
+        StrategyStorage.AddStrategy<BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>>("Default");
+
+        return serviceCollection;
+    }
 
     /// <summary>
     /// Adds AzureSearch services and custom module to application with customized options provided by the <see cref="IAzureSearchBuilder"/>
