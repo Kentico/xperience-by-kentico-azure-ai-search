@@ -4,14 +4,13 @@
 		<Title>$(Product)</Title>
 		<PackageId>Kentico.Xperience.AzureSearch</PackageId>
 		<Description>Enables the creation of AzureSearch search indexes and the indexing of Xperience website channel pages and reusable content items.</Description>
-		<RepositoryUrl>https://github.com/kentico/xperience-by-kentico-azuresearch</RepositoryUrl>
+		<RepositoryUrl>https://github.com/kentico/xperience-by-kentico-azure-ai-search</RepositoryUrl>
 	</PropertyGroup>
 
 	<PropertyGroup>
 		<AdminOrgName>kentico</AdminOrgName>
 		<RootNamespace>Kentico.Xperience.AzureSearch</RootNamespace>
 		<NoWarn>$(NoWarn);S1075</NoWarn>
-		<LangVersion>latest</LangVersion>
 
 		<!-- Required to prevent type conflicts with existing types -->
 		<HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
@@ -46,8 +45,12 @@
 	</Target>
 
 	<ItemGroup>
+		<PackageReference Include="Azure.Search.Documents" />
 		<PackageReference Include="Kentico.Xperience.Admin" />
 		<PackageReference Include="Kentico.Xperience.WebApp" />
-		<PackageReference Include="Microsoft.SemanticKernel.Connectors.AzureAISearch" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Admin\Client\dist\" />
 	</ItemGroup>
 </Project>
