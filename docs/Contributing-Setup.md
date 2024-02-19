@@ -1,6 +1,6 @@
 # Contributing Setup
 
----This documents the steps a maintainer or developer would follow to work on the library in their development environment---
+The requirements to setup, develop, and build this project are listed below.
 
 ## Required Software
 
