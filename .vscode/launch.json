@@ -9,9 +9,9 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/src/Kentico.Xperience.AzureAISearch.Sample/bin/Debug/net6.0/DancingGoat.dll",
+      "program": "${workspaceFolder}/examples/DancingGoat/bin/Debug/net6.0/DancingGoat.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/src/Kentico.Xperience.AzureAISearch.Sample",
+      "cwd": "${workspaceFolder}/examples/DancingGoat",
       "stopAtEntry": false,
       "serverReadyAction": {
         "action": "openExternally",

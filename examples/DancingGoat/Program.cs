@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
 using DancingGoat;
 using DancingGoat.Models;
 
@@ -11,16 +8,11 @@ using Kentico.OnlineMarketing.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Kentico.Web.Mvc;
 
-
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
-
+using DancingGoat.Search;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,7 +28,8 @@ builder.Services.AddKentico(features =>
         {
             LandingPage.CONTENT_TYPE_NAME,
             ContactsPage.CONTENT_TYPE_NAME,
-            ArticlePage.CONTENT_TYPE_NAME
+            ArticlePage.CONTENT_TYPE_NAME,
+            CafePage.CONTENT_TYPE_NAME
         }
     });
 
@@ -58,6 +51,8 @@ builder.Services.AddLocalization()
 
 builder.Services.AddDancingGoatServices();
 
+builder.Services.AddKenticoAzureSearchServices(builder.Configuration);
+
 ConfigureMembershipServices(builder.Services);
 
 var app = builder.Build();
@@ -69,7 +64,6 @@ app.UseStaticFiles();
 app.UseCookiePolicy();
 
 app.UseAuthentication();
-
 
 app.UseKentico();
 
@@ -102,6 +96,8 @@ app.MapControllerRoute(
         controller = DancingGoatConstants.CONSTRAINT_FOR_NON_ROUTER_PAGE_CONTROLLERS
     }
 );
+
+app.MapControllers();
 
 app.Run();
 
