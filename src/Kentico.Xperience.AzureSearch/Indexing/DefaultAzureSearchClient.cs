@@ -164,11 +164,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
             }
         }
 
-        log.LogInformation(
-            "Kentico.Xperience.AzureSearch",
-            "INDEX_REBUILD",
-            $"Rebuilding index [{azureSearchIndex.IndexName}]. {indexedItems.Count} web page items queued for re-indexing"
-        );
+        await searchIndexClient.DeleteIndexAsync(azureSearchIndex.IndexName, cancellationToken ?? default);
 
         indexedItems.ForEach(item => AzureSearchQueueWorker.EnqueueAzureSearchQueueItem(new AzureSearchQueueItem(item, AzureSearchTaskType.PUBLISH_INDEX, azureSearchIndex.IndexName)));
     }
