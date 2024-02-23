@@ -9,13 +9,14 @@ internal class AzureSearchIndexComparer : IEqualityComparer<SearchField>
 {
     public bool Equals(SearchField? x, SearchField? y)
     {
-        if ((x is null && y is not null) || (x is not null && y is null))
-        {
-            return false;
-        }
         if (x is null && y is null)
         {
             return true;
+        }
+
+        if ((x is null) || (y is null))
+        {
+            return false;
         }
 
         return x!.IsKey == y!.IsKey &&
