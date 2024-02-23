@@ -8,7 +8,7 @@ using Kentico.Xperience.AzureSearch.Indexing;
    parentType: typeof(AzureSearchApplicationPage),
    slug: "indexes",
    uiPageType: typeof(IndexListingPage),
-   name: "List of registered AzureSearch indices",
+   name: "List of registered Azure AI Search indices",
    templateName: TemplateNames.LISTING,
    order: UIPageOrder.NoOrder)]
 

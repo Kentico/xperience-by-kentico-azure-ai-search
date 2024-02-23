@@ -9,7 +9,7 @@ using Kentico.Xperience.AzureSearch.Indexing;
    parentType: typeof(IndexListingPage),
    slug: "indexes",
    uiPageType: typeof(IndexAliasListingPage),
-   name: "List of registered AzureSearch index aliases",
+   name: "List of registered Azure AI Search index aliases",
    templateName: TemplateNames.LISTING,
    order: UIPageOrder.NoOrder)]
 
