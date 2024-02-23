@@ -22,7 +22,6 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
     private readonly IInfoProvider<ChannelInfo> channelProvider;
     private readonly IConversionService conversionService;
     private readonly IProgressiveCache cache;
-    private readonly IEventLogService log;
     private readonly SearchIndexClient searchIndexClient;
 
     public DefaultAzureSearchClient(
@@ -33,7 +32,6 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         IInfoProvider<ChannelInfo> channelProvider,
         IConversionService conversionService,
         IProgressiveCache cache,
-        IEventLogService log,
         SearchIndexClient searchIndexClient)
     {
         this.azureSearchIndexClientService = azureSearchIndexClientService;
@@ -43,7 +41,6 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         this.channelProvider = channelProvider;
         this.conversionService = conversionService;
         this.cache = cache;
-        this.log = log;
         this.searchIndexClient = searchIndexClient;
     }
 
