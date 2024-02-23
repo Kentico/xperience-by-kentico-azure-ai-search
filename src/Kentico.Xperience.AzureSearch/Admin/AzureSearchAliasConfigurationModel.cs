@@ -17,6 +17,7 @@ public class AzureSearchAliasConfigurationModel
     public string AliasName { get; set; } = "";
 
     [GeneralSelectorComponent(dataProviderType: typeof(ExistingIndexOptionsProvider), Label = "Index Names", Order = 2)]
+    [MinLength(1, ErrorMessage = "You must select at least one index name")]
     public IEnumerable<string> IndexNames { get; set; } = Enumerable.Empty<string>();
 
     public AzureSearchAliasConfigurationModel()

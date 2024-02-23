@@ -7,7 +7,7 @@ using Kentico.Xperience.AzureSearch.Admin;
     identifier: AzureSearchApplicationPage.IDENTIFIER,
     type: typeof(AzureSearchApplicationPage),
     slug: "azuresearch",
-    name: "Search",
+    name: "Azure AI Search",
     category: BaseApplicationCategories.DEVELOPMENT,
     icon: Icons.Magnifier,
     templateName: TemplateNames.SECTION_LAYOUT)]
