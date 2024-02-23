@@ -59,6 +59,18 @@ To run the Sample app Admin customization in development mode, add the following
 }
 ```
 
+Then start Webpack dev server by running the scripts found in `~/src/Kentico.Xperience.AzureSearch/Admin/Client/package.json`
+
+- Use VS Code to run the [pre-defined task](https://code.visualstudio.com/Docs/editor/tasks) `npm: start - src/Kentico.Xperience.AzureSearch/Admin/Client`
+
+- If you are not using VS Code, you can run the scripts manually from the command line (optional)
+
+  ```pwsh
+  cd .\src\Kentico.Xperience.AzureSearch\Admin\Client\
+  npm install
+  npm start
+  ```
+
 ## Development Workflow
 
 1. Create a new branch with one of the following prefixes

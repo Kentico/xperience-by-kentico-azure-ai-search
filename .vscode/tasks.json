@@ -101,7 +101,10 @@
       "group": "build",
       "problemMatcher": [],
       "label": "npm: build - src/Kentico.Xperience.AzureSearch/Admin/Client",
-      "detail": "webpack --mode=production"
+      "detail": "webpack --mode=production",
+      "dependsOn": [
+        "npm: install - src/Kentico.Xperience.AzureSearch/Admin/Client"
+      ]
     },
     {
       "type": "npm",
@@ -110,7 +113,10 @@
       "group": "build",
       "problemMatcher": [],
       "label": "npm: build:dev - src/Kentico.Xperience.AzureSearch/Admin/Client",
-      "detail": "webpack --mode=development"
+      "detail": "webpack --mode=development",
+      "dependsOn": [
+        "npm: install - src/Kentico.Xperience.AzureSearch/Admin/Client"
+      ]
     },
     {
       "type": "npm",
@@ -118,7 +124,10 @@
       "path": "src/Kentico.Xperience.AzureSearch/Admin/Client",
       "problemMatcher": [],
       "label": "npm: start - src/Kentico.Xperience.AzureSearch/Admin/Client",
-      "detail": "webpack serve --mode development"
+      "detail": "webpack serve --mode development",
+      "dependsOn": [
+        "npm: install - src/Kentico.Xperience.AzureSearch/Admin/Client"
+      ]
     }
   ]
 }
