@@ -18,12 +18,15 @@ public class AzureSearchConfigurationModel
     public string IndexName { get; set; } = "";
 
     [GeneralSelectorComponent(dataProviderType: typeof(LanguageOptionsProvider), Label = "Indexed Languages", Order = 2)]
+    [MinLength(1, ErrorMessage = "You must select at least one Language Name")]
     public IEnumerable<string> LanguageNames { get; set; } = Enumerable.Empty<string>();
 
     [DropDownComponent(Label = "Channel Name", DataProviderType = typeof(ChannelOptionsProvider), Order = 3)]
+    [Required]
     public string ChannelName { get; set; } = "";
 
     [DropDownComponent(Label = "Indexing Strategy", DataProviderType = typeof(IndexingStrategyOptionsProvider), Order = 4, ExplanationText = "Changing strategy which has an incompatible configuration will result in deleting indexed items.")]
+    [Required]
     public string StrategyName { get; set; } = "";
 
     [TextInputComponent(Label = "Rebuild Hook")]
