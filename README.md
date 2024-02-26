@@ -25,7 +25,7 @@ This integration enables you to create [AzureSearch](https://azure.microsoft.com
 Add the package to your application using the .NET CLI
 
 ```powershell
-dotnet add package Kentico.Xperience.AzureAISearch
+dotnet add package Kentico.Xperience.AzureSearch
 ```
 
 ## Quick Start
