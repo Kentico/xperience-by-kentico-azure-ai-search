@@ -120,8 +120,7 @@ internal class AzureSearchBuilder : IAzureSearchBuilder
 
     private void ValidateIndexSearchModelProperties<TSearchModel>() where TSearchModel : IAzureSearchModel, new()
     {
-        var type = typeof(TSearchModel)
-            ?? throw new InvalidOperationException(ErrorMessage);
+        var type = typeof(TSearchModel);
 
         var propertiesWithAttributes = type.GetProperties().Select(x => new
         {
