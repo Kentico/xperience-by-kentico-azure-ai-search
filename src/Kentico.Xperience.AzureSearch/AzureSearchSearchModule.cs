@@ -7,6 +7,7 @@ using CMS.Websites;
 using Kentico.Xperience.AzureSearch;
 using Kentico.Xperience.AzureSearch.Indexing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 [assembly: RegisterModule(typeof(AzureSearchSearchModule))]
 
@@ -47,6 +48,13 @@ internal class AzureSearchSearchModule : Module
         base.OnInit(parameters);
 
         var services = parameters.Services;
+        var options = services.GetRequiredService<IOptions<AzureSearchOptions>>();
+
+        if (!options.Value.IsConfigured)
+        {
+            return;
+        }
+
 
         azureSearchTaskLogger = services.GetRequiredService<IAzureSearchTaskLogger>();
         appSettingsService = services.GetRequiredService<IAppSettingsService>();

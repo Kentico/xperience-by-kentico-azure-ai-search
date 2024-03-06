@@ -6,6 +6,7 @@ using Kentico.Xperience.AzureSearch.Admin;
 using Kentico.Xperience.AzureSearch.Aliasing;
 using Kentico.Xperience.AzureSearch.Indexing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 [assembly: RegisterModule(typeof(AzureSearchAdminModule))]
 
@@ -24,6 +25,13 @@ internal class AzureSearchAdminModule : AdminModule
     protected override void OnInit(ModuleInitParameters parameters)
     {
         base.OnInit(parameters);
+
+        var options = Service.Resolve<IOptions<AzureSearchOptions>>();
+
+        if (!options.Value.IsConfigured)
+        {
+            return;
+        }
 
         RegisterClientModule("kentico", "xperience-integrations-azuresearch");
 
