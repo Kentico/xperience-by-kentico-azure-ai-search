@@ -16,7 +16,7 @@ This integration enables you to create [AzureSearch](https://azure.microsoft.com
 
 ### Dependencies
 
-- [ASP.NET Core 6.0](https://dotnet.microsoft.com/en-us/download)
+- [ASP.NET Core 8.0](https://dotnet.microsoft.com/en-us/download)
 - [Xperience by Kentico](https://docs.xperience.io/xp/changelog)
 - [Azure AI Search](https://github.com/Azure/azure-sdk-for-net/tree/Azure.Search.Documents_11.6.0-beta.2/sdk/search/Azure.Search.Documents)
 
@@ -53,9 +53,9 @@ dotnet add package Kentico.Xperience.AzureSearch
 
 4. Create an index in Xperience's Administration within the Search application added by this library.
 ![Administration search edit form](/images/xperience-administration-search-index-edit-form.jpg)
-1. Rebuild the index in Xperience's Administration within the Search application added by this library.
+5. Rebuild the index in Xperience's Administration within the Search application added by this library.
 ![Administration search edit form](/images/xperience-administration-search-index-list.jpg)
-1. Display the results on your site with a Razor View 👍.
+6. Display the results on your site with a Razor View 👍.
 
 ## Use DancingGoat sample
 
