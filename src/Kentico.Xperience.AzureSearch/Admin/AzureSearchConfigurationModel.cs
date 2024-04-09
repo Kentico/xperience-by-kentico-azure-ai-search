@@ -41,7 +41,7 @@ public class AzureSearchConfigurationModel
         AzureSearchIndexItemInfo index,
         IEnumerable<AzureSearchIndexLanguageItemInfo> indexLanguages,
         IEnumerable<AzureSearchIncludedPathItemInfo> indexPaths,
-        IEnumerable<AzureSearchContentTypeItemInfo> contentTypes
+        IEnumerable<AzureSearchIndexContentType> contentTypes
     )
     {
         Id = index.AzureSearchIndexItemId;

@@ -1,27 +1,27 @@
 ﻿using DancingGoat.Models;
+
 using Kentico.Xperience.AzureSearch.Admin;
 using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace Kentico.Xperience.AzureSearch.Tests.Base;
 internal static class MockDataProvider
 {
-    public static IndexEventWebPageItemModel WebModel => new(
-        itemID: 0,
-        itemGuid: Guid.NewGuid(),
-        languageName: CzechLanguageName,
-        contentTypeName: ArticlePage.CONTENT_TYPE_NAME,
-        name: "Name",
-        isSecured: false,
-        contentTypeID: 1,
-        contentLanguageID: 1,
-        websiteChannelName: DefaultChannel,
-        webPageItemTreePath: "/",
-        order: 0
-    );
+    public static IndexEventWebPageItemModel WebModel(IndexEventWebPageItemModel item)
+    {
+        item.LanguageName = CzechLanguageName;
+        item.ContentTypeName = ArticlePage.CONTENT_TYPE_NAME;
+        item.Name = "Name";
+        item.ContentTypeID = 1;
+        item.ContentLanguageID = 1;
+        item.WebsiteChannelName = DefaultChannel;
+        item.WebPageItemTreePath = "/%";
+
+        return item;
+    }
 
     public static AzureSearchIndexIncludedPath Path => new("/%")
     {
-        ContentTypes = [ArticlePage.CONTENT_TYPE_NAME]
+        ContentTypes = [new AzureSearchIndexContentType(ArticlePage.CONTENT_TYPE_NAME, nameof(ArticlePage))]
     };
 
 
@@ -31,7 +31,8 @@ internal static class MockDataProvider
             IndexName = DefaultIndex,
             ChannelName = DefaultChannel,
             LanguageNames = new List<string>() { EnglishLanguageName, CzechLanguageName },
-            Paths = new List<AzureSearchIndexIncludedPath>() { Path }
+            Paths = new List<AzureSearchIndexIncludedPath>() { Path },
+            StrategyName = "strategy"
         },
         []
     );

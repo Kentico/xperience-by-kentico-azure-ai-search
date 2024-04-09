@@ -143,9 +143,9 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
                 if (includedPathAttribute.ContentTypes != null && includedPathAttribute.ContentTypes.Count > 0)
                 {
-                    foreach (string contentType in includedPathAttribute.ContentTypes)
+                    foreach (var contentType in includedPathAttribute.ContentTypes)
                     {
-                        queryBuilder.ForContentType(contentType, config => config.ForWebsite(azureSearchIndex.WebSiteChannelName, includeUrlPath: true));
+                        queryBuilder.ForContentType(contentType.ContentTypeName, config => config.ForWebsite(azureSearchIndex.WebSiteChannelName, includeUrlPath: true));
                     }
                 }
 

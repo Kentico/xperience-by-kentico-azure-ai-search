@@ -45,7 +45,7 @@ internal static class IndexedItemModelExtensions
 
         return azureSearchIndex.IncludedPaths.Any(path =>
         {
-            bool matchesContentType = path.ContentTypes.Contains(item.ContentTypeName, StringComparer.OrdinalIgnoreCase);
+            bool matchesContentType = path.ContentTypes.Exists(x => string.Equals(x.ContentTypeName, item.ContentTypeName));
 
             if (!matchesContentType)
             {
