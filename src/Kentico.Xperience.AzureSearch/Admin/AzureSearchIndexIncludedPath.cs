@@ -13,7 +13,7 @@ public class AzureSearchIndexIncludedPath
     /// <summary>
     /// A list of content types under the specified <see cref="AliasPath"/> that will be indexed.
     /// </summary>
-    public List<string> ContentTypes { get; set; } = new();
+    public List<AzureSearchIndexContentType> ContentTypes { get; set; } = new();
 
     /// <summary>
     /// The internal identifier of the included path.
@@ -28,10 +28,10 @@ public class AzureSearchIndexIncludedPath
     /// </summary>
     /// <param name="indexPath"></param>
     /// <param name="contentTypes"></param>
-    public AzureSearchIndexIncludedPath(AzureSearchIncludedPathItemInfo indexPath, IEnumerable<AzureSearchContentTypeItemInfo> contentTypes)
+    public AzureSearchIndexIncludedPath(AzureSearchIncludedPathItemInfo indexPath, IEnumerable<AzureSearchIndexContentType> contentTypes)
     {
         AliasPath = indexPath.AzureSearchIncludedPathItemAliasPath;
-        ContentTypes = contentTypes.Where(y => indexPath.AzureSearchIncludedPathItemId == y.AzureSearchContentTypeItemIncludedPathItemId).Select(y => y.AzureSearchContentTypeItemContentTypeName).ToList();
+        ContentTypes = contentTypes.ToList();
         Identifier = indexPath.AzureSearchIncludedPathItemId.ToString();
     }
 }

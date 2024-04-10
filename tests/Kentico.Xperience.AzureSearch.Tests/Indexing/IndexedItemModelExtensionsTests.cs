@@ -1,7 +1,9 @@
 ﻿using CMS.Core;
 using CMS.EventLog;
 using CMS.Tests;
+
 using FluentAssertions;
+
 using Kentico.Xperience.AzureSearch.Admin;
 using Kentico.Xperience.AzureSearch.Indexing;
 
@@ -54,7 +56,7 @@ public class Tests : UnitTests
     {
         var log = Substitute.For<EventLogService>();
 
-        IEnumerable<AzureSearchIndexIncludedPath> paths = [new("/path") { ContentTypes = ["contentType"], Identifier = "1" }];
+        IEnumerable<AzureSearchIndexIncludedPath> paths = [new("/path") { ContentTypes = [new("contentType", "contentType")], Identifier = "1" }];
 
         var index = new AzureSearchIndex(new AzureSearchConfigurationModel
         {
@@ -78,9 +80,9 @@ public class Tests : UnitTests
     public void IsIndexedByIndex_Will_Return_False_When_The_Matching_Index_Has_No_Matching_Paths()
     {
         var log = Substitute.For<EventLogService>();
-        List<string> contentTypes = ["contentType"];
+        List<AzureSearchIndexContentType> contentTypes = [new("contentType", "contentType")];
 
-        IEnumerable<AzureSearchIndexIncludedPath> exactPaths = [new("/path") { ContentTypes = contentTypes, Identifier = "1" }];
+        IEnumerable<AzureSearchIndexIncludedPath> exactPaths = [new("/path") { ContentTypes = [new("contentType", "contentType")], Identifier = "1" }];
 
         var index1 = new AzureSearchIndex(new AzureSearchConfigurationModel
         {
@@ -108,7 +110,7 @@ public class Tests : UnitTests
         AzureSearchIndexStore.Instance.AddIndex(index2);
 
         var sut = GetDefaultIndexEventWebPageItemModel();
-        sut.ContentTypeName = contentTypes[0];
+        sut.ContentTypeName = contentTypes[0].ContentTypeName;
         sut.WebPageItemTreePath = exactPaths.First().AliasPath + "/abc";
 
         sut.IsIndexedByIndex(log, index1.IndexName, "event").Should().BeFalse();
@@ -119,7 +121,7 @@ public class Tests : UnitTests
     public void IsIndexedByIndex_Will_Return_True_When_The_Matching_Index_Has_An_Exact_Path_Match()
     {
         var log = Substitute.For<EventLogService>();
-        List<string> contentTypes = ["contentType"];
+        List<AzureSearchIndexContentType> contentTypes = [new("contentType", "contentType")];
 
         IEnumerable<AzureSearchIndexIncludedPath> exactPaths = [new("/path/abc/def") { ContentTypes = contentTypes, Identifier = "1" }];
 
@@ -135,7 +137,7 @@ public class Tests : UnitTests
         }, new() { { "strategy", typeof(BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>) } });
         AzureSearchIndexStore.Instance.AddIndex(index1);
 
-        IEnumerable<AzureSearchIndexIncludedPath> wildcardPaths = [new("/path/%") { ContentTypes = ["contentType"], Identifier = "1" }];
+        IEnumerable<AzureSearchIndexIncludedPath> wildcardPaths = [new("/path/%") { ContentTypes = [new("contentType", "contentType")], Identifier = "1" }];
 
         var index2 = new AzureSearchIndex(new AzureSearchConfigurationModel
         {
@@ -150,7 +152,7 @@ public class Tests : UnitTests
         AzureSearchIndexStore.Instance.AddIndex(index2);
 
         var sut = GetDefaultIndexEventWebPageItemModel();
-        sut.ContentTypeName = contentTypes[0];
+        sut.ContentTypeName = contentTypes[0].ContentTypeName;
         sut.WebPageItemTreePath = exactPaths.First().AliasPath;
 
         sut.IsIndexedByIndex(log, index1.IndexName, "event").Should().BeTrue();

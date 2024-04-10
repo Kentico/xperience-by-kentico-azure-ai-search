@@ -19,7 +19,7 @@ public class AzureSearchIndexConfigurationComponentProperties : FormComponentPro
 
 public class AzureSearchIndexConfigurationComponentClientProperties : FormComponentClientProperties<IEnumerable<AzureSearchIndexIncludedPath>>
 {
-    public IEnumerable<string>? PossibleItems { get; set; }
+    public IEnumerable<AzureSearchIndexContentType>? PossibleContentTypeItems { get; set; }
 }
 
 public sealed class AzureSearchIndexConfigurationComponentAttribute : FormComponentAttribute
@@ -82,14 +82,14 @@ public class AzureSearchIndexConfigurationComponent : FormComponent<AzureSearchI
 
     protected override async Task ConfigureClientProperties(AzureSearchIndexConfigurationComponentClientProperties properties)
     {
-        var allWebsiteContentTypes = await DataClassInfoProvider
-            .GetClasses()
-            .WhereEquals(nameof(DataClassInfo.ClassContentTypeType), "Website")
-            .Columns(nameof(DataClassInfo.ClassName))
-            .GetEnumerableTypedResultAsync();
+        var allWebsiteContentTypes = DataClassInfoProvider.ProviderObject
+              .Get()
+              .WhereEquals(nameof(DataClassInfo.ClassContentTypeType), "Website")
+              .GetEnumerableTypedResult()
+              .Select(x => new AzureSearchIndexContentType(x.ClassName, x.ClassDisplayName));
 
-        properties.Value = Value ?? new();
-        properties.PossibleItems = allWebsiteContentTypes.Select(x => x.ClassName).ToList();
+        properties.Value = Value ?? [];
+        properties.PossibleContentTypeItems = allWebsiteContentTypes.ToList();
 
         await base.ConfigureClientProperties(properties);
     }

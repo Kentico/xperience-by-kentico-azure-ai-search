@@ -90,11 +90,11 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
             };
             pathProvider.Set(pathInfo);
 
-            foreach (string? contentType in path.ContentTypes)
+            foreach (var contentType in path.ContentTypes)
             {
                 var contentInfo = new AzureSearchContentTypeItemInfo()
                 {
-                    AzureSearchContentTypeItemContentTypeName = contentType,
+                    AzureSearchContentTypeItemContentTypeName = contentType.ContentTypeName,
                     AzureSearchContentTypeItemIncludedPathItemId = pathInfo.AzureSearchIncludedPathItemId,
                     AzureSearchContentTypeItemIndexItemId = newInfo.AzureSearchIndexItemId
                 };
@@ -149,14 +149,28 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
     public AzureSearchConfigurationModel? GetIndexDataOrNull(int indexId)
     {
         var indexInfo = indexProvider.Get().WithID(indexId).FirstOrDefault();
-        
         if (indexInfo == default)
         {
             return default;
         }
 
         var paths = pathProvider.Get().WhereEquals(nameof(AzureSearchIncludedPathItemInfo.AzureSearchIncludedPathItemIndexItemId), indexInfo.AzureSearchIndexItemId).GetEnumerableTypedResult();
-        var contentTypes = contentTypeProvider.Get().WhereEquals(nameof(AzureSearchContentTypeItemInfo.AzureSearchContentTypeItemIndexItemId), indexInfo.AzureSearchIndexItemId).GetEnumerableTypedResult();
+
+        var contentTypesInfoItems = contentTypeProvider
+        .Get()
+        .WhereEquals(nameof(AzureSearchContentTypeItemInfo.AzureSearchContentTypeItemIndexItemId), indexInfo.AzureSearchIndexItemId)
+        .GetEnumerableTypedResult();
+
+        var contentTypes = DataClassInfoProvider.ProviderObject
+            .Get()
+            .WhereIn(
+                nameof(DataClassInfo.ClassName),
+                contentTypesInfoItems
+                    .Select(x => x.AzureSearchContentTypeItemContentTypeName)
+                    .ToArray()
+            ).GetEnumerableTypedResult()
+            .Select(x => new AzureSearchIndexContentType(x.ClassName, x.ClassDisplayName));
+
         var languages = languageProvider.Get().WhereEquals(nameof(AzureSearchIndexLanguageItemInfo.AzureSearchIndexLanguageItemIndexItemId), indexInfo.AzureSearchIndexItemId).GetEnumerableTypedResult();
 
         return new AzureSearchConfigurationModel(indexInfo, languages, paths, contentTypes);
@@ -165,7 +179,6 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
     public AzureSearchAliasConfigurationModel? GetAliasDataOrNull(int aliasId)
     {
         var aliasInfo = indexAliasProvider.Get().WithID(aliasId).FirstOrDefault();
-        
         if (aliasInfo == default)
         {
             return default;
@@ -191,14 +204,27 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
     public IEnumerable<AzureSearchConfigurationModel> GetAllIndexData()
     {
         var indexInfos = indexProvider.Get().GetEnumerableTypedResult().ToList();
-        
         if (indexInfos.Count == 0)
         {
             return new List<AzureSearchConfigurationModel>();
         }
 
         var paths = pathProvider.Get().ToList();
-        var contentTypes = contentTypeProvider.Get().ToList();
+
+        var contentTypesInfoItems = contentTypeProvider
+           .Get()
+           .GetEnumerableTypedResult();
+
+        var contentTypes = DataClassInfoProvider.ProviderObject
+            .Get()
+            .WhereIn(
+                nameof(DataClassInfo.ClassName),
+                contentTypesInfoItems
+                    .Select(x => x.AzureSearchContentTypeItemContentTypeName)
+                    .ToArray()
+            ).GetEnumerableTypedResult()
+            .Select(x => new AzureSearchIndexContentType(x.ClassName, x.ClassDisplayName));
+
         var languages = languageProvider.Get().ToList();
 
         return indexInfos.Select(index => new AzureSearchConfigurationModel(index, languages, paths, contentTypes));
@@ -207,7 +233,6 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
     public IEnumerable<AzureSearchAliasConfigurationModel> GetAllAliasData()
     {
         var aliasInfoIds = indexAliasProvider.Get().GetEnumerableTypedResult().Select(x => x.AzureSearchIndexAliasItemId).ToList();
-        
         if (aliasInfoIds.Count == 0)
         {
             return new List<AzureSearchAliasConfigurationModel>();
@@ -274,11 +299,11 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
             };
             pathProvider.Set(pathInfo);
 
-            foreach (string? contentType in path.ContentTypes)
+            foreach (var contentType in path.ContentTypes)
             {
                 var contentInfo = new AzureSearchContentTypeItemInfo()
                 {
-                    AzureSearchContentTypeItemContentTypeName = contentType ?? "",
+                    AzureSearchContentTypeItemContentTypeName = contentType.ContentTypeName ?? "",
                     AzureSearchContentTypeItemIncludedPathItemId = pathInfo.AzureSearchIncludedPathItemId,
                     AzureSearchContentTypeItemIndexItemId = indexInfo.AzureSearchIndexItemId,
                 };
