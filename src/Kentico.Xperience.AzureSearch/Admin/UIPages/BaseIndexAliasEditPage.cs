@@ -1,11 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
+
+using Azure.Search.Documents.Indexes.Models;
+
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
-using Azure.Search.Documents.Indexes.Models;
-using IFormItemCollectionProvider = Kentico.Xperience.Admin.Base.Forms.Internal.IFormItemCollectionProvider;
-using Microsoft.IdentityModel.Tokens;
 using Kentico.Xperience.AzureSearch.Aliasing;
+
+using Microsoft.IdentityModel.Tokens;
+
+using IFormItemCollectionProvider = Kentico.Xperience.Admin.Base.Forms.Internal.IFormItemCollectionProvider;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
 

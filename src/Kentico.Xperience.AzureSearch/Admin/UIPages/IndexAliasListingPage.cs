@@ -1,5 +1,6 @@
 ﻿using CMS.Core;
 using CMS.Membership;
+
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.AzureSearch.Admin;
 using Kentico.Xperience.AzureSearch.Aliasing;
@@ -48,8 +49,8 @@ internal class IndexAliasListingPage : ListingPage
     {
         if (!AzureSearchIndexAliasStore.Instance.GetAllAliases().Any())
         {
-            PageConfiguration.Callouts = new List<CalloutConfiguration>
-            {
+            PageConfiguration.Callouts =
+            [
                 new()
                 {
                     Headline = "No aliases",
@@ -58,7 +59,7 @@ internal class IndexAliasListingPage : ListingPage
                     Type = CalloutType.FriendlyWarning,
                     Placement = CalloutPlacement.OnDesk
                 }
-            };
+            ];
         }
 
         PageConfiguration.ColumnConfigurations

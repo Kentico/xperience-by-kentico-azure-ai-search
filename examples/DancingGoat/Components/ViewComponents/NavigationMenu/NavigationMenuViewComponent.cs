@@ -1,5 +1,6 @@
 ﻿using DancingGoat.Models;
 using DancingGoat.Search;
+
 using Kentico.Content.Web.Mvc.Routing;
 
 using Microsoft.AspNetCore.Mvc;

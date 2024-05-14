@@ -10,9 +10,6 @@ namespace DancingGoat.ViewComponents
     /// </summary>
     public class BannerViewComponent : ViewComponent
     {
-        public ViewViewComponentResult Invoke(BannerViewModel banner)
-        {
-            return View("~/Components/ViewComponents/Banner/Default.cshtml", banner);
-        }
+        public ViewViewComponentResult Invoke(BannerViewModel banner) => View("~/Components/ViewComponents/Banner/Default.cshtml", banner);
     }
 }

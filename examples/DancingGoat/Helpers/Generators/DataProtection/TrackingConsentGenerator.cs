@@ -31,16 +31,10 @@ namespace DancingGoat.Helpers.Generator
         /// Initializes a new instance of the <see cref="TrackingConsentGenerator"/> class.
         /// </summary>
         /// <param name="consentInfoProvider">Consent info provider.</param>
-        public TrackingConsentGenerator(IConsentInfoProvider consentInfoProvider)
-        {
-            this.consentInfoProvider = consentInfoProvider;
-        }
+        public TrackingConsentGenerator(IConsentInfoProvider consentInfoProvider) => this.consentInfoProvider = consentInfoProvider;
 
 
-        public void Generate()
-        {
-            CreateConsent();
-        }
+        public void Generate() => CreateConsent();
 
 
         private void CreateConsent()

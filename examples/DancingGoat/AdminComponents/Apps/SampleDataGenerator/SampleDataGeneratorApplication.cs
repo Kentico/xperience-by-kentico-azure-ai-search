@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-using CMS.Base;
+﻿using CMS.Base;
 using CMS.ContactManagement;
 using CMS.Core;
 using CMS.DataEngine;
@@ -131,12 +127,10 @@ namespace DancingGoat.AdminComponents
         }
 
 
-        private OverviewCard GetGdprCard()
+        private OverviewCard GetGdprCard() => new OverviewCard
         {
-            return new OverviewCard
-            {
-                Headline = "Set up data protection (GDPR) demo",
-                Actions = new[]
+            Headline = "Set up data protection (GDPR) demo",
+            Actions = new[]
                 {
                     new Kentico.Xperience.Admin.Base.Action(ActionType.Command)
                     {
@@ -145,7 +139,7 @@ namespace DancingGoat.AdminComponents
                         ButtonColor = ButtonColor.Secondary
                     }
                 },
-                Components = new List<IOverviewCardComponent>()
+            Components = new List<IOverviewCardComponent>()
                 {
                     new StringContentCardComponent
                     {
@@ -153,8 +147,7 @@ namespace DancingGoat.AdminComponents
                             Once enabled, the demo functionality cannot be disabled. Use on demo instances only."
                     }
                 }
-            };
-        }
+        };
 
 
         private async Task SetChannelDefaultCookieLevelToEssential(int websiteChannelId)

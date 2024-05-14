@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using CMS.ContentEngine;
+﻿using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Helpers;
 using CMS.Websites;
@@ -24,15 +18,12 @@ namespace DancingGoat.Models
         /// Initializes new instance of <see cref="ArticlePageRepository"/>.
         /// </summary>
         public ArticlePageRepository(
-            IWebsiteChannelContext websiteChannelContext, 
-            IContentQueryExecutor executor, 
-            IWebPageQueryResultMapper mapper, 
+            IWebsiteChannelContext websiteChannelContext,
+            IContentQueryExecutor executor,
+            IWebPageQueryResultMapper mapper,
             IProgressiveCache cache,
             IWebPageLinkedItemsDependencyAsyncRetriever webPageLinkedItemsDependencyRetriever)
-            : base(websiteChannelContext, executor, mapper, cache)
-        {
-            this.webPageLinkedItemsDependencyRetriever = webPageLinkedItemsDependencyRetriever;
-        }
+            : base(websiteChannelContext, executor, mapper, cache) => this.webPageLinkedItemsDependencyRetriever = webPageLinkedItemsDependencyRetriever;
 
 
         /// <summary>
@@ -92,47 +83,35 @@ namespace DancingGoat.Models
 
 
 
-        private ContentItemQueryBuilder GetQueryBuilder(int topN, string treePath, string languageName)
-        {
-            return GetQueryBuilder(
+        private ContentItemQueryBuilder GetQueryBuilder(int topN, string treePath, string languageName) => GetQueryBuilder(
                 languageName,
                 config => config
                     .WithLinkedItems(1)
                     .TopN(topN)
                     .OrderBy(OrderByColumn.Desc(nameof(ArticlePage.ArticlePagePublishDate)))
                     .ForWebsite(WebsiteChannelContext.WebsiteChannelName, PathMatch.Children(treePath)));
-        }
 
 
-        private ContentItemQueryBuilder GetQueryBuilder(ICollection<Guid> guids, string languageName)
-        {
-            return GetQueryBuilder(
+        private ContentItemQueryBuilder GetQueryBuilder(ICollection<Guid> guids, string languageName) => GetQueryBuilder(
                 languageName,
                 config => config
                     .WithLinkedItems(1)
                     .OrderBy(OrderByColumn.Desc(nameof(ArticlePage.ArticlePagePublishDate)))
                     .ForWebsite(WebsiteChannelContext.WebsiteChannelName)
                     .Where(where => where.WhereIn(nameof(IWebPageContentQueryDataContainer.WebPageItemGUID), guids)));
-        }
 
 
-        private ContentItemQueryBuilder GetQueryBuilder(int id, string languageName)
-        {
-            return GetQueryBuilder(
+        private ContentItemQueryBuilder GetQueryBuilder(int id, string languageName) => GetQueryBuilder(
                 languageName,
                 config => config
                     .WithLinkedItems(1)
                     .ForWebsite(WebsiteChannelContext.WebsiteChannelName)
                     .Where(where => where.WhereEquals(nameof(IWebPageContentQueryDataContainer.WebPageItemID), id)));
-        }
 
 
-        private static ContentItemQueryBuilder GetQueryBuilder(string languageName, Action<ContentTypeQueryParameters> configureQuery = null)
-        {
-            return new ContentItemQueryBuilder()
+        private static ContentItemQueryBuilder GetQueryBuilder(string languageName, Action<ContentTypeQueryParameters> configureQuery = null) => new ContentItemQueryBuilder()
                     .ForContentType(ArticlePage.CONTENT_TYPE_NAME, configureQuery)
                     .InLanguage(languageName);
-        }
 
 
         private async Task<ISet<string>> GetDependencyCacheKeys(IEnumerable<ArticlePage> articles, CancellationToken cancellationToken)

@@ -1,7 +1,9 @@
 ﻿using DancingGoat.Models;
 using DancingGoat.Search.Models;
 using DancingGoat.Search.Services;
+
 using Kentico.Xperience.AzureSearch.Indexing;
+
 using Microsoft.IdentityModel.Tokens;
 
 namespace DancingGoat.Search;

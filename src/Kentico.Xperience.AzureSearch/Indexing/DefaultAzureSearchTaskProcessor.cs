@@ -1,6 +1,7 @@
 using CMS.Base;
 using CMS.Core;
 using CMS.Websites;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Kentico.Xperience.AzureSearch.Indexing;
@@ -8,7 +9,7 @@ namespace Kentico.Xperience.AzureSearch.Indexing;
 internal class AzureSearchBatchResult
 {
     internal int SuccessfulOperations { get; set; } = 0;
-    internal HashSet<AzureSearchIndex> PublishedIndices { get; set; } = new();
+    internal HashSet<AzureSearchIndex> PublishedIndices { get; set; } = [];
 }
 
 internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
@@ -71,9 +72,9 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
                         deleteTasks.Add(queueItem);
                     }
                 }
-                
-                deleteIds.AddRange(GetIdsToDelete(deleteTasks ?? new()).Where(x => x is not null).Select(x => x ?? ""));
-                
+
+                deleteIds.AddRange(GetIdsToDelete(deleteTasks ?? []).Where(x => x is not null).Select(x => x ?? ""));
+
                 if (AzureSearchIndexStore.Instance.GetIndex(group.Key) is { } index)
                 {
                     previousBatchResults.SuccessfulOperations += await azureSearchClient.DeleteRecords(deleteIds, group.Key, cancellationToken);

@@ -1,5 +1,7 @@
 ﻿using Azure.Search.Documents;
+
 using DancingGoat.Search.Models;
+
 using Kentico.Xperience.AzureSearch.Search;
 
 namespace DancingGoat.Search.Services;
@@ -41,7 +43,7 @@ public class DancingGoatSearchService
             }),
             TotalHits = (int)response.Value.TotalCount,
             Query = searchText,
-            TotalPages = (int)response.Value.TotalCount <= 0 ? 0 : ((int)response.Value.TotalCount - 1) / pageSize + 1,
+            TotalPages = (int)response.Value.TotalCount <= 0 ? 0 : (((int)response.Value.TotalCount - 1) / pageSize) + 1,
             PageSize = pageSize,
             Page = page
         };
@@ -82,7 +84,7 @@ public class DancingGoatSearchService
             }),
             TotalHits = (int)response.Value.TotalCount,
             Query = searchText,
-            TotalPages = (int)response.Value.TotalCount <= 0 ? 0 : ((int)response.Value.TotalCount - 1) / pageSize + 1,
+            TotalPages = (int)response.Value.TotalCount <= 0 ? 0 : (((int)response.Value.TotalCount - 1) / pageSize) + 1,
             PageSize = pageSize,
             Page = page
         };
@@ -119,7 +121,7 @@ public class DancingGoatSearchService
             }),
             TotalHits = (int)response.Value.TotalCount,
             Query = searchText,
-            TotalPages = (int)response.Value.TotalCount <= 0 ? 0 : ((int)response.Value.TotalCount - 1) / pageSize + 1,
+            TotalPages = (int)response.Value.TotalCount <= 0 ? 0 : (((int)response.Value.TotalCount - 1) / pageSize) + 1,
             PageSize = pageSize,
             Page = page
         };
@@ -168,7 +170,7 @@ public class DancingGoatSearchService
             }),
             TotalHits = (int)response.Value.TotalCount,
             Query = searchText,
-            TotalPages = (int)response.Value.TotalCount <= 0 ? 0 : ((int)response.Value.TotalCount - 1) / pageSize + 1,
+            TotalPages = (int)response.Value.TotalCount <= 0 ? 0 : (((int)response.Value.TotalCount - 1) / pageSize) + 1,
             PageSize = pageSize,
             Page = page
         };

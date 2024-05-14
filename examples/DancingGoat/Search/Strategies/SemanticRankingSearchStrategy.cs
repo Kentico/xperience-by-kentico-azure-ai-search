@@ -1,9 +1,12 @@
-﻿using DancingGoat.Models;
+﻿using Azure.Search.Documents.Indexes.Models;
+
+using DancingGoat.Models;
 using DancingGoat.Search.Models;
 using DancingGoat.Search.Services;
+
 using Kentico.Xperience.AzureSearch.Indexing;
+
 using Microsoft.IdentityModel.Tokens;
-using Azure.Search.Documents.Indexes.Models;
 
 namespace DancingGoat.Search;
 

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using CMS.ContentEngine;
+﻿using CMS.ContentEngine;
 using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
@@ -74,10 +68,7 @@ namespace DancingGoat.Models
                 throw new ArgumentNullException(nameof(cacheDependenciesFunc));
             }
 
-            if (queryOptions == null)
-            {
-                queryOptions = new ContentQueryExecutionOptions();
-            }
+            queryOptions ??= new ContentQueryExecutionOptions();
 
             return GetCachedQueryResultInternal(queryBuilder, queryOptions, container => mapper.Map<T>(container), cacheSettings, cacheDependenciesFunc, cancellationToken);
         }
@@ -119,10 +110,7 @@ namespace DancingGoat.Models
                 throw new ArgumentNullException(nameof(cacheDependenciesFunc));
             }
 
-            if (queryOptions == null)
-            {
-                queryOptions = new ContentQueryExecutionOptions();
-            }
+            queryOptions ??= new ContentQueryExecutionOptions();
 
             return GetCachedQueryResultInternal(queryBuilder, queryOptions, resultSelector, cacheSettings, cacheDependenciesFunc, cancellationToken);
         }
@@ -148,7 +136,7 @@ namespace DancingGoat.Models
             {
                 var result = await executor.GetWebPageResult(queryBuilder, resultSelector, options: queryOptions, cancellationToken: cancellationToken);
 
-                if (cacheSettings.Cached = (result != null && result.Any()))
+                if (cacheSettings.Cached = result != null && result.Any())
                 {
                     cacheSettings.CacheDependency = CacheHelper.GetCacheDependency(await cacheDependenciesFunc(result, cancellationToken));
                 }

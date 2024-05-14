@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using CMS.Websites;
+﻿using CMS.Websites;
 
 using DancingGoat.Models;
 
@@ -41,7 +37,7 @@ namespace DancingGoat.ViewComponents
 
         public async Task<ViewViewComponentResult> InvokeAsync(WebPageRelatedItem articlesSectionItem)
         {
-            var languageName = currentLanguageRetriever.Get();
+            string languageName = currentLanguageRetriever.Get();
 
             var articlesSection = await articlesSectionRepository.GetArticlesSection(articlesSectionItem.WebPageGuid, languageName);
             if (articlesSection == null)
@@ -59,7 +55,7 @@ namespace DancingGoat.ViewComponents
                 models.Add(model);
             }
 
-            var url = (await urlRetriever.Retrieve(articlesSection, languageName)).RelativePath;
+            string url = (await urlRetriever.Retrieve(articlesSection, languageName)).RelativePath;
 
             var viewModel = ArticlesSectionViewModel.GetViewModel(models, url);
 

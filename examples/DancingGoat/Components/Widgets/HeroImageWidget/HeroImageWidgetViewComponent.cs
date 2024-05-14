@@ -1,6 +1,3 @@
-using System.Linq;
-using System.Threading.Tasks;
-
 using DancingGoat.Models;
 using DancingGoat.Widgets;
 
@@ -42,7 +39,7 @@ namespace DancingGoat.Widgets
 
         public async Task<ViewViewComponentResult> InvokeAsync(HeroImageWidgetProperties properties)
         {
-            var languageName = currentLanguageRetriever.Get();
+            string languageName = currentLanguageRetriever.Get();
             var image = await GetImage(properties, languageName);
 
             return View("~/Components/Widgets/HeroImageWidget/_HeroImageWidget.cshtml", new HeroImageWidgetViewModel

@@ -1,9 +1,12 @@
 ﻿using CMS.Websites;
+
 using DancingGoat;
 using DancingGoat.Controllers;
 using DancingGoat.Models;
+
 using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
+
 using Microsoft.AspNetCore.Mvc;
 
 [assembly: RegisterWebPageRoute(CafePage.CONTENT_TYPE_NAME, typeof(DancingGoatCafeController), WebsiteChannelNames = new[] { DancingGoatConstants.WEBSITE_CHANNEL_NAME })]

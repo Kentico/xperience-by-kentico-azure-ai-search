@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-using CMS.DataEngine;
+﻿using CMS.DataEngine;
 using CMS.DataProtection;
 using CMS.Helpers;
 using CMS.Membership;
@@ -20,10 +17,7 @@ namespace Samples.DancingGoat
         /// Initializes a new instance of the <see cref="SampleMemberPersonalDataEraser"/> class.
         /// </summary>
         /// <param name="memberInfoProvider">Member info provider.</param>
-        public SampleMemberPersonalDataEraser(IMemberInfoProvider memberInfoProvider)
-        {
-            this.memberInfoProvider = memberInfoProvider;
-        }
+        public SampleMemberPersonalDataEraser(IMemberInfoProvider memberInfoProvider) => this.memberInfoProvider = memberInfoProvider;
 
 
         /// <summary>

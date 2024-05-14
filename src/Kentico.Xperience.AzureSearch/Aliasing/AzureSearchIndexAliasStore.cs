@@ -8,7 +8,7 @@ namespace Kentico.Xperience.AzureSearch.Aliasing;
 public sealed class AzureSearchIndexAliasStore
 {
     private static readonly Lazy<AzureSearchIndexAliasStore> mInstance = new();
-    private readonly List<AzureSearchIndexAlias> registeredAliases = new();
+    private readonly List<AzureSearchIndexAlias> registeredAliases = [];
 
     /// <summary>
     /// Gets singleton instance of the <see cref="AzureSearchIndexAliasStore"/>

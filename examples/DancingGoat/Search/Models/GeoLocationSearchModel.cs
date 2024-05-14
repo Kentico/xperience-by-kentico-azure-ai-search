@@ -1,5 +1,6 @@
 ﻿using Azure.Core.GeoJson;
 using Azure.Search.Documents.Indexes;
+
 using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace DancingGoat.Search.Models;
