@@ -34,6 +34,23 @@ See [Managing search index aliases](Managing-Aliases.md)
 
 See [Search index querying](Search-index-querying.md)
 
+## Disable indexing
+
+You can disable indexing. This might be useful if there are any problems with differing Kentico version between this integration
+and your application. You can do so in the `appsettings.json`. This option defaults to true and therefore does not need to be specified when you want to enable indexing.
+
+  ```json
+   "CMSAzureSearch": {
+       "SearchServiceEnabled" : false,         // Add this line to disable indexing
+       "SearchServiceEndPoint": "<your application url>",
+       "SearchServiceAdminApiKey": "<your application admin key>",
+       "SearchServiceQueryApiKey": "<your application query key>"
+   }
+   ```
+
+This disables reindexing through the rebuild hook and after web page and content item events. The administration UI module is still accessible, but does not show any data.
+Disabling indexing does not delete AzureSearch data from database. Already indexed data can still be accessed from your application.
+
 ## Upgrades and Uninstalling
 
 See [Uninstall](Uninstall.md)
