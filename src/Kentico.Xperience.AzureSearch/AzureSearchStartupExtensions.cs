@@ -53,11 +53,8 @@ public static class AzureSearchStartupExtensions
         return serviceCollection;
     }
 
-    private static IServiceCollection AddAzureSearchServicesInternal(this IServiceCollection services, IConfiguration configuration)
-    {
-        var azureSection = configuration.GetSection(AzureSearchOptions.CMS_AZURE_SEARCH_SECTION_NAME);
-
-        return services
+    private static IServiceCollection AddAzureSearchServicesInternal(this IServiceCollection services, IConfiguration configuration) =>
+        services
             .Configure<AzureSearchOptions>(configuration.GetSection(AzureSearchOptions.CMS_AZURE_SEARCH_SECTION_NAME))
             .AddSingleton<AzureSearchModuleInstaller>()
             .AddSingleton(x =>
@@ -76,7 +73,6 @@ public static class AzureSearchStartupExtensions
             .AddSingleton<IAzureSearchConfigurationStorageService, DefaultAzureSearchConfigurationStorageService>()
             .AddSingleton<IAzureSearchIndexClientService, AzureSearchIndexClientService>()
             .AddSingleton<IAzureSearchIndexAliasService, AzureSearchIndexAliasService>();
-    }
 }
 
 public interface IAzureSearchBuilder

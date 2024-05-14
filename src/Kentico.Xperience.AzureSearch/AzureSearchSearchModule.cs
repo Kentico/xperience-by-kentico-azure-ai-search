@@ -21,8 +21,6 @@ namespace Kentico.Xperience.AzureSearch;
 internal class AzureSearchSearchModule : Module
 {
     private IAzureSearchTaskLogger azureSearchTaskLogger = null!;
-    private IAppSettingsService appSettingsService = null!;
-    private IConversionService conversionService = null!;
 
     /// <inheritdoc/>
     public AzureSearchSearchModule() : base(nameof(AzureSearchSearchModule))
@@ -42,10 +40,7 @@ internal class AzureSearchSearchModule : Module
             return;
         }
 
-
         azureSearchTaskLogger = services.GetRequiredService<IAzureSearchTaskLogger>();
-        appSettingsService = services.GetRequiredService<IAppSettingsService>();
-        conversionService = services.GetRequiredService<IConversionService>();
 
         WebPageEvents.Publish.Execute += HandleEvent;
         WebPageEvents.Delete.Execute += HandleEvent;
