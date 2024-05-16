@@ -1,5 +1,6 @@
 ﻿using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes.Models;
+
 using Kentico.Xperience.AzureSearch.Admin;
 
 namespace Kentico.Xperience.AzureSearch.Indexing;

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Net;
 
 using CMS.Core;
 using CMS.DataEngine;
@@ -51,17 +48,14 @@ namespace DancingGoat.Controllers
             this.websiteChannelProvider = websiteChannelProvider;
             this.webPageUrlRetriever = webPageUrlRetriever;
             this.websiteChannelContext = websiteChannelContext;
-            this.currentLanguageRetriever = preferredLanguageRetriever;
+            currentLanguageRetriever = preferredLanguageRetriever;
         }
 
 
         // GET: Account/Login
         [HttpGet]
         [AllowAnonymous]
-        public ActionResult Login()
-        {
-            return View();
-        }
+        public ActionResult Login() => View();
 
 
         // POST: Account/Login
@@ -88,7 +82,7 @@ namespace DancingGoat.Controllers
 
             if (signInResult.Succeeded)
             {
-                var decodedReturnUrl = WebUtility.UrlDecode(returnUrl);
+                string decodedReturnUrl = WebUtility.UrlDecode(returnUrl);
                 if (!string.IsNullOrEmpty(decodedReturnUrl) && Url.IsLocalUrl(decodedReturnUrl))
                 {
                     return Redirect(decodedReturnUrl);
@@ -115,10 +109,7 @@ namespace DancingGoat.Controllers
 
 
         // GET: Account/Register
-        public ActionResult Register()
-        {
-            return View();
-        }
+        public ActionResult Register() => View();
 
 
         // POST: Account/Register
@@ -171,7 +162,7 @@ namespace DancingGoat.Controllers
 
         private async Task<string> GetHomeWebPageUrl(CancellationToken cancellationToken)
         {
-            var websiteChannelId = websiteChannelContext.WebsiteChannelID;
+            int websiteChannelId = websiteChannelContext.WebsiteChannelID;
             var websiteChannel = await websiteChannelProvider.GetAsync(websiteChannelId, cancellationToken);
 
             if (websiteChannel == null)
@@ -180,10 +171,10 @@ namespace DancingGoat.Controllers
             }
 
             var homePageUrl = await webPageUrlRetriever.Retrieve(
-                websiteChannel.WebsiteChannelHomePage, 
-                websiteChannelContext.WebsiteChannelName, 
-                currentLanguageRetriever.Get(), 
-                websiteChannelContext.IsPreview, 
+                websiteChannel.WebsiteChannelHomePage,
+                websiteChannelContext.WebsiteChannelName,
+                currentLanguageRetriever.Get(),
+                websiteChannelContext.IsPreview,
                 cancellationToken
             );
 

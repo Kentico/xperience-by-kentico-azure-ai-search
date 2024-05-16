@@ -1,5 +1,5 @@
-using Azure.Search.Documents;
 using Azure;
+using Azure.Search.Documents;
 
 namespace Kentico.Xperience.AzureSearch.Search;
 

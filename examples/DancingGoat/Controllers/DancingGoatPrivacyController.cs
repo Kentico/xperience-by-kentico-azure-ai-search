@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-using CMS.ContactManagement;
+﻿using CMS.ContactManagement;
+using CMS.DataEngine;
 using CMS.DataProtection;
 
 using DancingGoat;
@@ -9,7 +7,6 @@ using DancingGoat.Controllers;
 using DancingGoat.Helpers.Generator;
 using DancingGoat.Models;
 
-using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
 
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +21,7 @@ namespace DancingGoat.Controllers
         private const string ERROR_RESULT = "error";
 
         private readonly IConsentAgreementService consentAgreementService;
-        private readonly IConsentInfoProvider consentInfoProvider;
+        private readonly IInfoProvider<ConsentInfo> consentInfoProvider;
         private readonly IPreferredLanguageRetriever currentLanguageRetriever;
         private ContactInfo currentContact;
 
@@ -33,17 +30,14 @@ namespace DancingGoat.Controllers
         {
             get
             {
-                if (currentContact == null)
-                {
-                    currentContact = ContactManagementContext.CurrentContact;
-                }
+                currentContact ??= ContactManagementContext.CurrentContact;
 
                 return currentContact;
             }
         }
 
 
-        public DancingGoatPrivacyController(IConsentAgreementService consentAgreementService, IConsentInfoProvider consentInfoProvider, IPreferredLanguageRetriever currentLanguageRetriever)
+        public DancingGoatPrivacyController(IConsentAgreementService consentAgreementService, IInfoProvider<ConsentInfo> consentInfoProvider, IPreferredLanguageRetriever currentLanguageRetriever)
         {
             this.consentAgreementService = consentAgreementService;
             this.consentInfoProvider = consentInfoProvider;
@@ -94,21 +88,15 @@ namespace DancingGoat.Controllers
         }
 
 
-        private IEnumerable<PrivacyConsentViewModel> GetAgreedConsentsForCurrentContact()
-        {
-            return consentAgreementService.GetAgreedConsents(CurrentContact)
+        private IEnumerable<PrivacyConsentViewModel> GetAgreedConsentsForCurrentContact() => consentAgreementService.GetAgreedConsents(CurrentContact)
                 .Select(consent => new PrivacyConsentViewModel
                 {
                     Name = consent.Name,
                     Title = consent.DisplayName,
                     Text = consent.GetConsentText(currentLanguageRetriever.Get()).ShortText
                 });
-        }
 
 
-        private bool IsDemoEnabled()
-        {
-            return consentInfoProvider.Get(TrackingConsentGenerator.CONSENT_NAME) != null;
-        }
+        private bool IsDemoEnabled() => consentInfoProvider.Get(TrackingConsentGenerator.CONSENT_NAME) != null;
     }
 }

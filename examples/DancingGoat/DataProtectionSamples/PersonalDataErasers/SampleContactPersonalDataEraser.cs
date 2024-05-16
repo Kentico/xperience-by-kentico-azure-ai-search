@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using CMS.Activities;
+﻿using CMS.Activities;
 using CMS.ContactManagement;
 using CMS.DataEngine;
 using CMS.DataProtection;
@@ -27,7 +23,7 @@ namespace Samples.DancingGoat
         /// <remarks>
         /// GUIDs are used to select only specific forms on the Dancing Goat sample sites.
         /// </remarks>
-        private readonly Dictionary<Guid, string> dancingGoatForms = new Dictionary<Guid, string>
+        private readonly Dictionary<Guid, string> dancingGoatForms = new()
         {
             // DancingGoatCoreContactUsNew
             { new Guid("0081DC2E-47F4-4ACD-80AE-FE39612F379C"), "UserEmail" },
@@ -35,10 +31,10 @@ namespace Samples.DancingGoat
             { new Guid("DAAA080A-7B6B-489E-8150-290B1F24E715"), "Email" }
         };
 
-        private readonly IConsentAgreementInfoProvider consentAgreementInfoProvider;
-        private readonly IBizFormInfoProvider bizFormInfoProvider;
-        private readonly IAccountContactInfoProvider accountContactInfoProvider;
-        private readonly IContactInfoProvider contactInfoProvider;
+        private readonly IInfoProvider<ConsentAgreementInfo> consentAgreementInfoProvider;
+        private readonly IInfoProvider<BizFormInfo> bizFormInfoProvider;
+        private readonly IInfoProvider<AccountContactInfo> accountContactInfoProvider;
+        private readonly IInfoProvider<ContactInfo> contactInfoProvider;
 
 
         /// <summary>
@@ -49,10 +45,10 @@ namespace Samples.DancingGoat
         /// <param name="accountContactInfoProvider">Account contact info provider.</param>
         /// <param name="contactInfoProvider">Contact info provider.</param>
         public SampleContactPersonalDataEraser(
-            IConsentAgreementInfoProvider consentAgreementInfoProvider,
-            IBizFormInfoProvider bizFormInfoProvider,
-            IAccountContactInfoProvider accountContactInfoProvider,
-            IContactInfoProvider contactInfoProvider)
+            IInfoProvider<ConsentAgreementInfo> consentAgreementInfoProvider,
+            IInfoProvider<BizFormInfo> bizFormInfoProvider,
+            IInfoProvider<AccountContactInfo> accountContactInfoProvider,
+            IInfoProvider<ContactInfo> contactInfoProvider)
         {
             this.consentAgreementInfoProvider = consentAgreementInfoProvider;
             this.bizFormInfoProvider = bizFormInfoProvider;

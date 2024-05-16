@@ -1,11 +1,14 @@
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Models;
+
 using CMS.ContentEngine;
 using CMS.Core;
 using CMS.DataEngine;
 using CMS.Helpers;
 using CMS.Websites;
+
 using Kentico.Xperience.AzureSearch.Admin;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Kentico.Xperience.AzureSearch.Indexing;

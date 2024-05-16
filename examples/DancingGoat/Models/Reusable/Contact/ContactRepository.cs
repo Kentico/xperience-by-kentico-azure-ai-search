@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using CMS.ContentEngine;
+﻿using CMS.ContentEngine;
 using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
@@ -36,12 +31,9 @@ namespace DancingGoat.Models
         }
 
 
-        private static ContentItemQueryBuilder GetQueryBuilder(string languageName)
-        {
-            return new ContentItemQueryBuilder()
+        private static ContentItemQueryBuilder GetQueryBuilder(string languageName) => new ContentItemQueryBuilder()
                     .ForContentType(Contact.CONTENT_TYPE_NAME, config => config.TopN(1))
                     .InLanguage(languageName);
-        }
 
 
         private static Task<ISet<string>> GetDependencyCacheKeys(IEnumerable<Contact> contacts, CancellationToken cancellationToken)

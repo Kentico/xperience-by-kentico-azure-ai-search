@@ -34,7 +34,7 @@ internal static class IndexedItemModelExtensions
         if (azureSearchIndex is null)
         {
             log.LogError(nameof(IndexedItemModelExtensions), nameof(IsIndexedByIndex), $"Error loading registered AzureSearch index '{indexName}' for event [{eventName}].");
-            
+
             return false;
         }
 
@@ -91,7 +91,7 @@ internal static class IndexedItemModelExtensions
         if (azureSearchIndex is null)
         {
             log.LogError(nameof(IndexedItemModelExtensions), nameof(IsIndexedByIndex), $"Error loading registered AzureSearch index '{indexName}' for event [{eventName}].");
-            
+
             return false;
         }
 

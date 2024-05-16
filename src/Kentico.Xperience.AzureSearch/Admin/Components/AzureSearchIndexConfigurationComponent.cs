@@ -1,4 +1,5 @@
 ﻿using CMS.DataEngine;
+
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Kentico.Xperience.Admin.Base.Forms;
@@ -35,14 +36,14 @@ public class AzureSearchIndexConfigurationComponent : FormComponent<AzureSearchI
 
     public override string ClientComponentName => "@kentico/xperience-integrations-azuresearch/AzureSearchIndexConfiguration";
 
-    public override IEnumerable<AzureSearchIndexIncludedPath> GetValue() => Value ?? new();
+    public override IEnumerable<AzureSearchIndexIncludedPath> GetValue() => Value ?? [];
     public override void SetValue(IEnumerable<AzureSearchIndexIncludedPath> value) => Value = value.ToList();
 
     [FormComponentCommand]
     public Task<ICommandResponse<RowActionResult>> DeletePath(string path)
     {
         var toRemove = Value?.Find(x => Equals(x.AliasPath == path, StringComparison.OrdinalIgnoreCase));
-        
+
         if (toRemove != null)
         {
             Value?.Remove(toRemove);

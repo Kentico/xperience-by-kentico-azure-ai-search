@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-using CMS;
+﻿using CMS;
 using CMS.Activities;
 using CMS.Base;
 using CMS.ContactManagement;
@@ -30,16 +27,16 @@ namespace Samples.DancingGoat
     {
         private const string DATA_PROTECTION_SAMPLES_ENABLED_SETTINGS_KEY_NAME = "DataProtectionSamplesEnabled";
 
-        private IContactInfoProvider contactInfoProvider;
+        private IInfoProvider<ContactInfo> contactInfoProvider;
         private IMemberInfoProvider memberInfoProvider;
-        private IConsentAgreementInfoProvider consentAgreementInfoProvider;
-        private IBizFormInfoProvider bizFormInfoProvider;
-        private IAccountContactInfoProvider accountContactInfoProvider;
+        private IInfoProvider<ConsentAgreementInfo> consentAgreementInfoProvider;
+        private IInfoProvider<BizFormInfo> bizFormInfoProvider;
+        private IInfoProvider<AccountContactInfo> accountContactInfoProvider;
         private ISettingsKeyInfoProvider settingsKeyInfoProvider;
-        private IActivityInfoProvider activityInfoProvider;
+        private IInfoProvider<ActivityInfo> activityInfoProvider;
         private ICountryInfoProvider countryInfoProvider;
         private IStateInfoProvider stateInfoProvider;
-        private IAccountInfoProvider accountInfoProvider;
+        private IInfoProvider<AccountInfo> accountInfoProvider;
 
 
         /// <summary>
@@ -57,16 +54,16 @@ namespace Samples.DancingGoat
         {
             base.OnInit();
 
-            contactInfoProvider = Service.Resolve<IContactInfoProvider>();
+            contactInfoProvider = Service.Resolve<IInfoProvider<ContactInfo>>();
             memberInfoProvider = Service.Resolve<IMemberInfoProvider>();
-            consentAgreementInfoProvider = Service.Resolve<IConsentAgreementInfoProvider>();
-            bizFormInfoProvider = Service.Resolve<IBizFormInfoProvider>();
-            accountContactInfoProvider = Service.Resolve<IAccountContactInfoProvider>();
+            consentAgreementInfoProvider = Service.Resolve<IInfoProvider<ConsentAgreementInfo>>();
+            bizFormInfoProvider = Service.Resolve<IInfoProvider<BizFormInfo>>();
+            accountContactInfoProvider = Service.Resolve<IInfoProvider<AccountContactInfo>>();
             settingsKeyInfoProvider = Service.Resolve<ISettingsKeyInfoProvider>();
-            activityInfoProvider = Service.Resolve<IActivityInfoProvider>();
+            activityInfoProvider = Service.Resolve<IInfoProvider<ActivityInfo>>();
             countryInfoProvider = Service.Resolve<ICountryInfoProvider>();
             stateInfoProvider = Service.Resolve<IStateInfoProvider>();
-            accountInfoProvider = Service.Resolve<IAccountInfoProvider>();
+            accountInfoProvider = Service.Resolve<IInfoProvider<AccountInfo>>();
 
             InitializeSamples();
         }
@@ -126,28 +123,25 @@ namespace Samples.DancingGoat
         }
 
 
-        private void RegisterConsentRevokeHandler()
-        {
-            DataProtectionEvents.RevokeConsentAgreement.Execute += (sender, args) =>
-            {
-                if (args.Consent.ConsentName.Equals(TrackingConsentGenerator.CONSENT_NAME, StringComparison.Ordinal))
-                {
-                    DeleteContactActivities(args.Contact);
+        private void RegisterConsentRevokeHandler() => DataProtectionEvents.RevokeConsentAgreement.Execute += (sender, args) =>
+                                                                {
+                                                                    if (args.Consent.ConsentName.Equals(TrackingConsentGenerator.CONSENT_NAME, StringComparison.Ordinal))
+                                                                    {
+                                                                        DeleteContactActivities(args.Contact);
 
-                    // Remove cookies used for contact tracking
-                    var cookieAccessor = Service.Resolve<ICookieAccessor>();
+                                                                        // Remove cookies used for contact tracking
+                                                                        var cookieAccessor = Service.Resolve<ICookieAccessor>();
 
 #pragma warning disable CS0618 // CookieName is obsolete
-                    cookieAccessor.Remove(CookieName.CurrentContact);
-                    cookieAccessor.Remove(CookieName.CrossSiteContact);
+                                                                        cookieAccessor.Remove(CookieName.CurrentContact);
+                                                                        cookieAccessor.Remove(CookieName.CrossSiteContact);
 #pragma warning restore CS0618 // CookieName is obsolete
 
 
-                    // Set the cookie level to default
-                    var cookieLevelProvider = Service.Resolve<ICurrentCookieLevelProvider>();
-                    cookieLevelProvider.SetCurrentCookieLevel(cookieLevelProvider.GetDefaultCookieLevel());
-                }
-            };
-        }
+                                                                        // Set the cookie level to default
+                                                                        var cookieLevelProvider = Service.Resolve<ICurrentCookieLevelProvider>();
+                                                                        cookieLevelProvider.SetCurrentCookieLevel(cookieLevelProvider.GetDefaultCookieLevel());
+                                                                    }
+                                                                };
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+
 using CMS.DataEngine;
 
 namespace Kentico.Xperience.AzureSearch.Admin;

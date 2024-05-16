@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using System.Xml;
 
 using CMS.DataEngine;
@@ -32,10 +30,7 @@ namespace Samples.DancingGoat
         /// </summary>
         /// <param name="sectionName">Name of the section in machine readable format. Represents name of the tag.</param>
         /// <param name="sectionDisplayName">Name of the section in human readable format. This parameter is ignored.</param>
-        public void WriteStartSection(string sectionName, string sectionDisplayName)
-        {
-            xmlWriter.WriteStartElement(TransformElementName(sectionName));
-        }
+        public void WriteStartSection(string sectionName, string sectionDisplayName) => xmlWriter.WriteStartElement(TransformElementName(sectionName));
 
 
         /// <summary>
@@ -43,10 +38,7 @@ namespace Samples.DancingGoat
         /// </summary>
         /// <param name="originalName">Name to transform.</param>
         /// <returns>Transformed name.</returns>
-        private string TransformElementName(string originalName)
-        {
-            return originalName.Replace('.', '_');
-        }
+        private string TransformElementName(string originalName) => originalName.Replace('.', '_');
 
 
         /// <summary>
@@ -68,13 +60,13 @@ namespace Samples.DancingGoat
 
             foreach (var columnTuple in columns)
             {
-                var columnName = columnTuple.Name;
+                string columnName = columnTuple.Name;
                 if (string.IsNullOrWhiteSpace(columnTuple.DisplayName))
                 {
                     continue;
                 }
 
-                var value = baseInfo.GetValue(columnName);
+                object value = baseInfo.GetValue(columnName);
                 if (value == null)
                 {
                     continue;
@@ -109,10 +101,7 @@ namespace Samples.DancingGoat
         /// <summary>
         /// Writes XML end tag.
         /// </summary>
-        public void WriteEndSection()
-        {
-            xmlWriter.WriteEndElement();
-        }
+        public void WriteEndSection() => xmlWriter.WriteEndElement();
 
 
         /// <summary>
@@ -130,9 +119,6 @@ namespace Samples.DancingGoat
         /// <summary>
         /// Releases all resources used by the current instance of the <see cref="XmlPersonalDataWriter"/> class.
         /// </summary>
-        public void Dispose()
-        {
-            xmlWriter.Dispose();
-        }
+        public void Dispose() => xmlWriter.Dispose();
     }
 }

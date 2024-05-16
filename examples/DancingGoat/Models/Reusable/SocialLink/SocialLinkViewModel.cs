@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace DancingGoat.Models
+﻿namespace DancingGoat.Models
 {
     public record SocialLinkViewModel(string Title, string Url, string IconPath)
     {
@@ -10,7 +7,7 @@ namespace DancingGoat.Models
         /// </summary>
         public static SocialLinkViewModel GetViewModel(SocialLink socialLink)
         {
-            var socialLinkUrl = Uri.TryCreate(socialLink.SocialLinkUrl, UriKind.Absolute, out var _) ? socialLink.SocialLinkUrl : String.Empty;
+            string socialLinkUrl = Uri.TryCreate(socialLink.SocialLinkUrl, UriKind.Absolute, out var _) ? socialLink.SocialLinkUrl : string.Empty;
             return new SocialLinkViewModel(socialLink.SocialLinkTitle, socialLinkUrl, socialLink.SocialLinkIcon.FirstOrDefault()?.ImageFile?.Url);
         }
     }

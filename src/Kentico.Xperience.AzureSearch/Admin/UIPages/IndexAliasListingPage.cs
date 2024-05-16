@@ -1,9 +1,12 @@
 ﻿using CMS.Core;
 using CMS.Membership;
+
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.AzureSearch.Admin;
 using Kentico.Xperience.AzureSearch.Aliasing;
 using Kentico.Xperience.AzureSearch.Indexing;
+
+using Microsoft.Extensions.Options;
 
 [assembly: UIPage(
    parentType: typeof(IndexListingPage),
@@ -25,6 +28,7 @@ internal class IndexAliasListingPage : ListingPage
     private readonly IPageUrlGenerator pageUrlGenerator;
     private readonly IAzureSearchIndexAliasService azureSearchIndexAliasService;
     private readonly IAzureSearchConfigurationStorageService configurationStorageService;
+    private readonly AzureSearchOptions azureSearchOptions;
 
     protected override string ObjectType => AzureSearchIndexAliasItemInfo.OBJECT_TYPE;
 
@@ -34,6 +38,7 @@ internal class IndexAliasListingPage : ListingPage
     public IndexAliasListingPage(
         IAzureSearchClient azureSearchClient,
         IAzureSearchIndexAliasService azureSearchIndexAliasService,
+        IOptions<AzureSearchOptions> azureSearchOptions,
         IPageUrlGenerator pageUrlGenerator,
         IAzureSearchConfigurationStorageService configurationStorageService)
     {
@@ -41,35 +46,53 @@ internal class IndexAliasListingPage : ListingPage
         this.pageUrlGenerator = pageUrlGenerator;
         this.azureSearchIndexAliasService = azureSearchIndexAliasService;
         this.configurationStorageService = configurationStorageService;
+        this.azureSearchOptions = azureSearchOptions.Value;
     }
 
     /// <inheritdoc/>
     public override async Task ConfigurePage()
     {
-        if (!AzureSearchIndexAliasStore.Instance.GetAllAliases().Any())
+        if (!azureSearchOptions.SearchServiceEnabled)
         {
-            PageConfiguration.Callouts = new List<CalloutConfiguration>
-            {
+            PageConfiguration.Callouts =
+            [
                 new()
                 {
-                    Headline = "No aliases",
-                    Content = "No AzureSearch index aliases registered. See <a target='_blank' href='https://github.com/Kentico/kentico-xperience-azuresearch'>our instructions</a> to read more about creating and registering AzureSearch alias indexes.",
+                    Headline = "Indexing is disabled",
+                    Content = "Indexing is disabled. See <a target='_blank' href='https://github.com/Kentico/kentico-xperience-azuresearch'>our instructions</a> to read more about AzureSearch alias indexes.",
                     ContentAsHtml = true,
                     Type = CalloutType.FriendlyWarning,
                     Placement = CalloutPlacement.OnDesk
                 }
-            };
+            ];
         }
+        else
+        {
+            if (!AzureSearchIndexAliasStore.Instance.GetAllAliases().Any())
+            {
+                PageConfiguration.Callouts =
+                [
+                    new()
+                    {
+                        Headline = "No aliases",
+                        Content = "No AzureSearch index aliases registered. See <a target='_blank' href='https://github.com/Kentico/kentico-xperience-azuresearch'>our instructions</a> to read more about creating and registering AzureSearch alias indexes.",
+                        ContentAsHtml = true,
+                        Type = CalloutType.FriendlyWarning,
+                        Placement = CalloutPlacement.OnDesk
+                    }
+                ];
+            }
 
-        PageConfiguration.ColumnConfigurations
-            .AddColumn(nameof(AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemId), "ID", defaultSortDirection: SortTypeEnum.Asc, sortable: true)
-            .AddColumn(nameof(AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemIndexAliasName), "Name", sortable: true, searchable: true);
+            PageConfiguration.ColumnConfigurations
+                .AddColumn(nameof(AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemId), "ID", defaultSortDirection: SortTypeEnum.Asc, sortable: true)
+                .AddColumn(nameof(AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemIndexAliasName), "Name", sortable: true, searchable: true);
 
-        PageConfiguration.AddEditRowAction<IndexAliasEditPage>();
-        PageConfiguration.TableActions.AddCommand("Rebuild Aliased Index", nameof(Rebuild), icon: Icons.RotateRight);
-        PageConfiguration.TableActions.AddDeleteAction(nameof(Delete), "Delete Alias");
-        PageConfiguration.HeaderActions.AddLink<IndexAliasCreatePage>("Create Alias");
-        PageConfiguration.HeaderActions.AddLink<IndexListingPage>("Indexes");
+            PageConfiguration.AddEditRowAction<IndexAliasEditPage>();
+            PageConfiguration.TableActions.AddCommand("Rebuild Aliased Index", nameof(Rebuild), icon: Icons.RotateRight);
+            PageConfiguration.TableActions.AddDeleteAction(nameof(Delete), "Delete Alias");
+            PageConfiguration.HeaderActions.AddLink<IndexAliasCreatePage>("Create Alias");
+            PageConfiguration.HeaderActions.AddLink<IndexListingPage>("Indexes");
+        }
 
         await base.ConfigurePage();
     }

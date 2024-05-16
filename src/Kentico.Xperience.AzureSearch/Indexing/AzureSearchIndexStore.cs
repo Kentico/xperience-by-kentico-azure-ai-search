@@ -8,7 +8,7 @@ namespace Kentico.Xperience.AzureSearch.Indexing;
 public sealed class AzureSearchIndexStore
 {
     private static readonly Lazy<AzureSearchIndexStore> mInstance = new();
-    private readonly List<AzureSearchIndex> registeredIndexes = new();
+    private readonly List<AzureSearchIndex> registeredIndexes = [];
 
     /// <summary>
     /// Gets singleton instance of the <see cref="AzureSearchIndexStore"/>

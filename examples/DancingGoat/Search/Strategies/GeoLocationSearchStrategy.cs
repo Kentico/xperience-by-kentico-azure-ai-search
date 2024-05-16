@@ -1,8 +1,10 @@
-﻿using DancingGoat.Models;
+﻿using Azure.Core.GeoJson;
+
+using DancingGoat.Models;
 using DancingGoat.Search.Models;
 using DancingGoat.Search.Services;
+
 using Kentico.Xperience.AzureSearch.Indexing;
-using Azure.Core.GeoJson;
 
 namespace DancingGoat.Search;
 

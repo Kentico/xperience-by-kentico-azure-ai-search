@@ -4,8 +4,10 @@ using CMS.ContentEngine;
 using CMS.Core;
 using CMS.DataEngine;
 using CMS.Websites;
+
 using Kentico.Xperience.AzureSearch;
 using Kentico.Xperience.AzureSearch.Indexing;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -19,23 +21,6 @@ namespace Kentico.Xperience.AzureSearch;
 internal class AzureSearchSearchModule : Module
 {
     private IAzureSearchTaskLogger azureSearchTaskLogger = null!;
-    private IAppSettingsService appSettingsService = null!;
-    private IConversionService conversionService = null!;
-
-    private const string APP_SETTINGS_KEY_INDEXING_DISABLED = "CMSAzureSearchSearchDisableIndexing";
-
-    private bool IndexingDisabled
-    {
-        get
-        {
-            if (appSettingsService[APP_SETTINGS_KEY_INDEXING_DISABLED] is string value1)
-            {
-                return conversionService.GetBoolean(value1, false);
-            }
-
-            return false;
-        }
-    }
 
     /// <inheritdoc/>
     public AzureSearchSearchModule() : base(nameof(AzureSearchSearchModule))
@@ -50,15 +35,12 @@ internal class AzureSearchSearchModule : Module
         var services = parameters.Services;
         var options = services.GetRequiredService<IOptions<AzureSearchOptions>>();
 
-        if (!options.Value.IsConfigured)
+        if (!options.Value?.SearchServiceEnabled ?? false)
         {
             return;
         }
 
-
         azureSearchTaskLogger = services.GetRequiredService<IAzureSearchTaskLogger>();
-        appSettingsService = services.GetRequiredService<IAppSettingsService>();
-        conversionService = services.GetRequiredService<IConversionService>();
 
         WebPageEvents.Publish.Execute += HandleEvent;
         WebPageEvents.Delete.Execute += HandleEvent;
@@ -74,7 +56,7 @@ internal class AzureSearchSearchModule : Module
     /// </summary>
     private void HandleEvent(object? sender, CMSEventArgs e)
     {
-        if (IndexingDisabled || e is not WebPageEventArgsBase publishedEvent)
+        if (e is not WebPageEventArgsBase publishedEvent)
         {
             return;
         }
@@ -99,7 +81,7 @@ internal class AzureSearchSearchModule : Module
 
     private void HandleContentItemEvent(object? sender, CMSEventArgs e)
     {
-        if (IndexingDisabled || e is not ContentItemEventArgsBase publishedEvent)
+        if (e is not ContentItemEventArgsBase publishedEvent)
         {
             return;
         }

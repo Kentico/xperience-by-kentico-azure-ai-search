@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using DancingGoat.Models;
+﻿using DancingGoat.Models;
 using DancingGoat.Widgets;
 
 using Kentico.Content.Web.Mvc.Routing;
@@ -44,7 +40,7 @@ namespace DancingGoat.Widgets
 
         public async Task<ViewViewComponentResult> InvokeAsync(ProductCardProperties properties)
         {
-            var languageName = currentLanguageRetriever.Get();
+            string languageName = currentLanguageRetriever.Get();
             var selectedProductGuids = properties.SelectedProducts.Select(i => i.Identifier).ToList();
             IEnumerable<Coffee> products = (await repository.GetCoffees(selectedProductGuids, languageName))
                                                      .OrderBy(p => selectedProductGuids.IndexOf(p.SystemFields.ContentItemGUID));

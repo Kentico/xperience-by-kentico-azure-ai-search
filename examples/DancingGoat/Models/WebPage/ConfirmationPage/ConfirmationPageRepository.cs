@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using CMS.ContentEngine;
+﻿using CMS.ContentEngine;
 using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
@@ -39,16 +34,13 @@ namespace DancingGoat.Models
         }
 
 
-        private ContentItemQueryBuilder GetQueryBuilder(int webPageItemId, string languageName)
-        {
-            return new ContentItemQueryBuilder()
+        private ContentItemQueryBuilder GetQueryBuilder(int webPageItemId, string languageName) => new ContentItemQueryBuilder()
                     .ForContentType(ConfirmationPage.CONTENT_TYPE_NAME, config => config
                         .ForWebsite(WebsiteChannelContext.WebsiteChannelName, includeUrlPath: false)
                         .Where(where => where
                             .WhereEquals(nameof(IWebPageContentQueryDataContainer.WebPageItemID), webPageItemId))
                         .TopN(1))
                     .InLanguage(languageName);
-        }
 
 
         private static Task<ISet<string>> GetDependencyCacheKeys(IEnumerable<ConfirmationPage> confirmationPages, CancellationToken cancellationToken)

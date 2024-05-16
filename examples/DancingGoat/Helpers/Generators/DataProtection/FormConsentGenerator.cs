@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-using CMS.DataEngine;
+﻿using CMS.DataEngine;
 using CMS.DataProtection;
 using CMS.FormEngine;
 using CMS.OnlineForms;
@@ -28,8 +25,8 @@ namespace DancingGoat.Helpers.Generator
         private const string CONSENT_SHORT_TEXT_ES = "<p>Por lo presente acepto que esta información proporcionada puede ser utilizada con fines de marketing y contenido de sitios web dirigidos.</p>";
 
         private readonly IFormBuilderConfigurationSerializer formBuilderConfigurationSerializer;
-        private readonly IConsentInfoProvider consentInfoProvider;
-        private readonly IBizFormInfoProvider bizFormInfoProvider;
+        private readonly IInfoProvider<ConsentInfo> consentInfoProvider;
+        private readonly IInfoProvider<BizFormInfo> bizFormInfoProvider;
 
 
         /// <summary>
@@ -40,8 +37,8 @@ namespace DancingGoat.Helpers.Generator
         /// <param name="bizFormInfoProvider">BizForm info provide.</param>
         public FormConsentGenerator(
             IFormBuilderConfigurationSerializer formBuilderConfigurationSerializer,
-            IConsentInfoProvider consentInfoProvider,
-            IBizFormInfoProvider bizFormInfoProvider)
+            IInfoProvider<ConsentInfo> consentInfoProvider,
+            IInfoProvider<BizFormInfo> bizFormInfoProvider)
         {
             this.formBuilderConfigurationSerializer = formBuilderConfigurationSerializer;
             this.consentInfoProvider = consentInfoProvider;

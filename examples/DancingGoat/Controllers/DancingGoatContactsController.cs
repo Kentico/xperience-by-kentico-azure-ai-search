@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using DancingGoat;
+﻿using DancingGoat;
 using DancingGoat.Controllers;
 using DancingGoat.Models;
+
 using Kentico.Content.Web.Mvc.Routing;
 
 using Microsoft.AspNetCore.Mvc;
@@ -40,7 +36,7 @@ namespace DancingGoat.Controllers
 
         private async Task<ContactsIndexViewModel> GetIndexViewModel(CancellationToken cancellationToken)
         {
-            var languageName = currentLanguageRetriever.Get();
+            string languageName = currentLanguageRetriever.Get();
             var cafes = await cafeRepository.GetCompanyCafes(4, languageName, cancellationToken);
             var contact = await contactRepository.GetContact(languageName, HttpContext.RequestAborted);
 
@@ -52,9 +48,6 @@ namespace DancingGoat.Controllers
         }
 
 
-        private List<CafeViewModel> GetCompanyCafesModel(IEnumerable<Cafe> cafes)
-        {
-            return cafes.Select(cafe => CafeViewModel.GetViewModel(cafe)).ToList();
-        }
+        private List<CafeViewModel> GetCompanyCafesModel(IEnumerable<Cafe> cafes) => cafes.Select(cafe => CafeViewModel.GetViewModel(cafe)).ToList();
     }
 }

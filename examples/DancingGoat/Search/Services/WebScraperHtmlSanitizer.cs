@@ -1,4 +1,5 @@
 ﻿using AngleSharp.Html.Parser;
+
 using CMS.Helpers;
 
 namespace DancingGoat.Search.Services;

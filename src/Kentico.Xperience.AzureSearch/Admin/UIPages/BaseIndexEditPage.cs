@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.AzureSearch.Indexing;
+
 using IFormItemCollectionProvider = Kentico.Xperience.Admin.Base.Forms.Internal.IFormItemCollectionProvider;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
@@ -72,7 +74,7 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
     protected static string RemoveWhitespacesUsingStringBuilder(string source)
     {
         var builder = new StringBuilder(source.Length);
-        
+
         for (int i = 0; i < source.Length; i++)
         {
             char c = source[i];

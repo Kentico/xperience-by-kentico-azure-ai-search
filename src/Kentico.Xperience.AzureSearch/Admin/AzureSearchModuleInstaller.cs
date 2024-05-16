@@ -6,9 +6,9 @@ namespace Kentico.Xperience.AzureSearch.Admin;
 
 internal class AzureSearchModuleInstaller
 {
-    private readonly IResourceInfoProvider resourceProvider;
+    private readonly IInfoProvider<ResourceInfo> resourceProvider;
 
-    public AzureSearchModuleInstaller(IResourceInfoProvider resourceProvider) => this.resourceProvider = resourceProvider;
+    public AzureSearchModuleInstaller(IInfoProvider<ResourceInfo> resourceProvider) => this.resourceProvider = resourceProvider;
 
     public void Install()
     {

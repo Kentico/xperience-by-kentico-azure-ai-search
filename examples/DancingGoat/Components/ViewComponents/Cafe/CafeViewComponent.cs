@@ -10,9 +10,6 @@ namespace DancingGoat.ViewComponents
     /// </summary>
     public class CafeViewComponent : ViewComponent
     {
-        public ViewViewComponentResult Invoke(CafeViewModel cafe)
-        {
-            return View("~/Components/ViewComponents/Cafe/Default.cshtml", cafe);
-        }
+        public ViewViewComponentResult Invoke(CafeViewModel cafe) => View("~/Components/ViewComponents/Cafe/Default.cshtml", cafe);
     }
 }

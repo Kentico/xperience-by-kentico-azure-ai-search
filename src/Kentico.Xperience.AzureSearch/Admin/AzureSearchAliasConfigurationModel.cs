@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+
 using Kentico.Xperience.Admin.Base.FormAnnotations;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
