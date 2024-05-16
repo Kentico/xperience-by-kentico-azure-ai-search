@@ -36,9 +36,9 @@ namespace DancingGoat.AdminComponents
 
         private readonly IFormBuilderConfigurationSerializer formBuilderConfigurationSerializer;
         private readonly IEventLogService eventLogService;
-        private readonly IConsentInfoProvider consentInfoProvider;
-        private readonly IBizFormInfoProvider bizFormInfoProvider;
-        private readonly IContactGroupInfoProvider contactGroupInfoProvider;
+        private readonly IInfoProvider<ConsentInfo> consentInfoProvider;
+        private readonly IInfoProvider<BizFormInfo> bizFormInfoProvider;
+        private readonly IInfoProvider<ContactGroupInfo> contactGroupInfoProvider;
         private readonly ISettingsKeyInfoProvider settingsKeyInfoProvider;
         private readonly IInfoProvider<WebsiteChannelInfo> websiteChannelInfoProvider;
 
@@ -56,9 +56,9 @@ namespace DancingGoat.AdminComponents
         public SampleDataGeneratorApplication(
             IFormBuilderConfigurationSerializer formBuilderConfigurationSerializer,
             IEventLogService eventLogService,
-            IConsentInfoProvider consentInfoProvider,
-            IBizFormInfoProvider bizFormInfoProvider,
-            IContactGroupInfoProvider contactGroupInfoProvider,
+            IInfoProvider<ConsentInfo> consentInfoProvider,
+            IInfoProvider<BizFormInfo> bizFormInfoProvider,
+            IInfoProvider<ContactGroupInfo> contactGroupInfoProvider,
             ISettingsKeyInfoProvider settingsKeyInfoProvider,
             IInfoProvider<WebsiteChannelInfo> websiteChannelInfoProvider)
         {
@@ -127,7 +127,7 @@ namespace DancingGoat.AdminComponents
         }
 
 
-        private OverviewCard GetGdprCard() => new OverviewCard
+        private OverviewCard GetGdprCard() => new()
         {
             Headline = "Set up data protection (GDPR) demo",
             Actions = new[]

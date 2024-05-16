@@ -17,13 +17,13 @@ namespace Samples.DancingGoat
     internal class SampleContactDataCollectorCore
     {
         private readonly IPersonalDataWriter writer;
-        private readonly IActivityInfoProvider activityInfoProvider;
+        private readonly IInfoProvider<ActivityInfo> activityInfoProvider;
         private readonly ICountryInfoProvider countryInfoProvider;
         private readonly IStateInfoProvider stateInfoProvider;
-        private readonly IConsentAgreementInfoProvider consentAgreementInfoProvider;
-        private readonly IAccountContactInfoProvider accountContactInfoProvider;
-        private readonly IAccountInfoProvider accountInfoProvider;
-        private readonly IBizFormInfoProvider bizFormInfoProvider;
+        private readonly IInfoProvider<ConsentAgreementInfo> consentAgreementInfoProvider;
+        private readonly IInfoProvider<AccountContactInfo> accountContactInfoProvider;
+        private readonly IInfoProvider<AccountInfo> accountInfoProvider;
+        private readonly IInfoProvider<BizFormInfo> bizFormInfoProvider;
 
         // Lists store Tuples of database column names and their corresponding display names.
         private readonly List<CollectedColumn> contactInfoColumns = [
@@ -312,13 +312,13 @@ namespace Samples.DancingGoat
         /// <param name="bizFormInfoProvider">BizForm info provider.</param>
         public SampleContactDataCollectorCore(
             IPersonalDataWriter writer,
-            IActivityInfoProvider activityInfoProvider,
+            IInfoProvider<ActivityInfo> activityInfoProvider,
             ICountryInfoProvider countryInfoProvider,
             IStateInfoProvider stateInfoProvider,
-            IConsentAgreementInfoProvider consentAgreementInfoProvider,
-            IAccountContactInfoProvider accountContactInfoProvider,
-            IAccountInfoProvider accountInfoProvider,
-            IBizFormInfoProvider bizFormInfoProvider)
+            IInfoProvider<ConsentAgreementInfo> consentAgreementInfoProvider,
+            IInfoProvider<AccountContactInfo> accountContactInfoProvider,
+            IInfoProvider<AccountInfo> accountInfoProvider,
+            IInfoProvider<BizFormInfo> bizFormInfoProvider)
         {
             this.writer = writer;
             this.activityInfoProvider = activityInfoProvider;

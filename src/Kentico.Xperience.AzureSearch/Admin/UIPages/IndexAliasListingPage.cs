@@ -73,13 +73,13 @@ internal class IndexAliasListingPage : ListingPage
                 PageConfiguration.Callouts =
                 [
                     new()
-                {
-                    Headline = "No aliases",
-                    Content = "No AzureSearch index aliases registered. See <a target='_blank' href='https://github.com/Kentico/kentico-xperience-azuresearch'>our instructions</a> to read more about creating and registering AzureSearch alias indexes.",
-                    ContentAsHtml = true,
-                    Type = CalloutType.FriendlyWarning,
-                    Placement = CalloutPlacement.OnDesk
-                }
+                    {
+                        Headline = "No aliases",
+                        Content = "No AzureSearch index aliases registered. See <a target='_blank' href='https://github.com/Kentico/kentico-xperience-azuresearch'>our instructions</a> to read more about creating and registering AzureSearch alias indexes.",
+                        ContentAsHtml = true,
+                        Type = CalloutType.FriendlyWarning,
+                        Placement = CalloutPlacement.OnDesk
+                    }
                 ];
             }
 

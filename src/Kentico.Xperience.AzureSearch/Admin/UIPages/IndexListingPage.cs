@@ -73,13 +73,13 @@ internal class IndexListingPage : ListingPage
                 PageConfiguration.Callouts =
                 [
                     new()
-                {
-                    Headline = "No indexes",
-                    Content = "No AzureSearch indexes registered. See <a target='_blank' href='https://github.com/Kentico/kentico-xperience-azuresearch'>our instructions</a> to read more about creating and registering AzureSearch indexes.",
-                    ContentAsHtml = true,
-                    Type = CalloutType.FriendlyWarning,
-                    Placement = CalloutPlacement.OnDesk
-                }
+                    {
+                        Headline = "No indexes",
+                        Content = "No AzureSearch indexes registered. See <a target='_blank' href='https://github.com/Kentico/kentico-xperience-azuresearch'>our instructions</a> to read more about creating and registering AzureSearch indexes.",
+                        ContentAsHtml = true,
+                        Type = CalloutType.FriendlyWarning,
+                        Placement = CalloutPlacement.OnDesk
+                    }
                 ];
             }
 
