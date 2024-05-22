@@ -25,9 +25,20 @@ on:
       - "**/Client/**/*.json"
 
 jobs:
+  dotnet-format:
+    name: dotnet-format
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run dotnet format
+        run: dotnet format --exclude ./examples/** --verify-no-changes
+
   build:
     name: build
     runs-on: ubuntu-latest
+    needs: dotnet-format
     defaults:
       run:
         shell: pwsh
@@ -40,7 +51,7 @@ jobs:
       PROJECT_NAME: Kentico.Xperience.AzureSearch
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Install Node.js from package.json version"
         uses: actions/setup-node@v4
@@ -48,7 +59,7 @@ jobs:
           node-version-file: ./src/${{ env.PROJECT_NAME }}/Admin/Client/package.json
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
 
