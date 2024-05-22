@@ -13,6 +13,18 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": ".NET: build (Solution) - LOCAL_NUGET",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "-p:LOCAL_NUGET=true",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
       "label": ".NET: rebuild (Solution)",
       "command": "dotnet",
       "type": "process",
@@ -47,14 +59,16 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": ".NET: format (Azure)",
+      "label": ".NET: format (AzureSearch)",
       "command": "dotnet",
       "type": "process",
-      "args": ["format", "Kentico.Xperience.AzureSearch.csproj"],
-      "problemMatcher": "$msCompile",
-      "options": {
-        "cwd": "${workspaceFolder}/src/Kentico.Xperience.AzureSearch"
-      }
+      "args": [
+        "format",
+        "Kentico.Xperience.AzureSearch.sln",
+        "--exclude",
+        "./examples/**"
+      ],
+      "problemMatcher": "$msCompile"
     },
     {
       "label": ".NET: watch (DancingGoat)",
