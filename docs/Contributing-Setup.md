@@ -79,9 +79,9 @@ Then start Webpack dev server by running the scripts found in `~/src/Kentico.Xpe
    - `refactor/` - for restructuring of existing features
    - `fix/` - for bugfixes
 
-1. Run `dotnet format` against the `src/Kentico.Xperience.AzureSearch` project
+1. Run `dotnet format` against the `Kentico.Xperience.AzureSearch` solution
 
-   > use `dotnet: format` VS Code task.
+   > use `.NET: format (AzureSearch)` VS Code task.
 
 1. Commit changes, with a commit message preferably following the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary) convention.
 
