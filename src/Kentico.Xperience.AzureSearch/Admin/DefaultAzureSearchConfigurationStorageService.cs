@@ -1,7 +1,5 @@
 ﻿using System.Text;
 
-using AngleSharp;
-
 using CMS.DataEngine;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
