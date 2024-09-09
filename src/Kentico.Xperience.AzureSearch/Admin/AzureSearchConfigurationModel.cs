@@ -17,7 +17,7 @@ public class AzureSearchConfigurationModel
     [MaxLength(128)]
     [RegularExpression("^(?!-)[a-z0-9-]+(?<!-)$", ErrorMessage = "Index name must only contain lowercase letters, digits or dashes, cannot start or end with dashes and is limited to 128 characters.")]
     public string IndexName { get; set; } = string.Empty;
-    
+
     [AzureSearchIndexConfigurationComponent(Label = "Included Paths", Order = 2)]
     public IEnumerable<AzureSearchIndexIncludedPath> Paths { get; set; } = Enumerable.Empty<AzureSearchIndexIncludedPath>();
 
