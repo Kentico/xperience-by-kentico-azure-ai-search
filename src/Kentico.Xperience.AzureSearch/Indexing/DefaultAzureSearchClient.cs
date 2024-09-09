@@ -136,48 +136,76 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
     private async Task RebuildInternal(AzureSearchIndex azureSearchIndex, CancellationToken? cancellationToken)
     {
-        var indexedItems = new List<IndexEventWebPageItemModel>();
+        var indexedItems = new List<IIndexEventItemModel>();
 
         foreach (var includedPathAttribute in azureSearchIndex.IncludedPaths)
         {
+            var pathMatch =
+             includedPathAttribute.AliasPath.EndsWith("/%", StringComparison.OrdinalIgnoreCase)
+                 ? PathMatch.Children(includedPathAttribute.AliasPath[..^2])
+                 : PathMatch.Single(includedPathAttribute.AliasPath);
+
+            foreach (string language in azureSearchIndex.LanguageNames)
+            {
+                if (includedPathAttribute.ContentTypes != null && includedPathAttribute.ContentTypes.Count > 0)
+                {
+                    var queryBuilder = new ContentItemQueryBuilder();
+
+                    foreach (var contentType in includedPathAttribute.ContentTypes)
+                    {
+                        queryBuilder.ForContentType(contentType.ContentTypeName, config => config.ForWebsite(azureSearchIndex.WebSiteChannelName, includeUrlPath: true, pathMatch: pathMatch));
+
+                        queryBuilder.InLanguage(language);
+
+                        var webpages = await executor.GetWebPageResult(queryBuilder, container => container, cancellationToken: cancellationToken ?? default);
+
+                        foreach (var page in webpages)
+                        {
+                            var item = await MapToEventItem(page);
+                            indexedItems.Add(item);
+                        }
+                    }
+                }
+            }
+
             foreach (string language in azureSearchIndex.LanguageNames)
             {
                 var queryBuilder = new ContentItemQueryBuilder();
 
-                if (includedPathAttribute.ContentTypes != null && includedPathAttribute.ContentTypes.Count > 0)
+                if (azureSearchIndex.IncludedReusableContentTypes != null && azureSearchIndex.IncludedReusableContentTypes.Count > 0)
                 {
-                    foreach (var contentType in includedPathAttribute.ContentTypes)
+                    foreach (string reusableContentType in azureSearchIndex.IncludedReusableContentTypes)
                     {
-                        queryBuilder.ForContentType(contentType.ContentTypeName, config => config.ForWebsite(azureSearchIndex.WebSiteChannelName, includeUrlPath: true));
+                        queryBuilder.ForContentType(reusableContentType);
+                    }
+
+                    queryBuilder.InLanguage(language);
+
+                    var reusableItems = await executor.GetResult(queryBuilder, result => result, cancellationToken: cancellationToken ?? default);
+
+                    foreach (var reusableItem in reusableItems)
+                    {
+                        var item = await MapToEventReusableItem(reusableItem);
+                        indexedItems.Add(item);
                     }
                 }
-
-                queryBuilder.InLanguage(language);
-
-                var webpages = await executor.GetWebPageResult(queryBuilder, container => container, cancellationToken: cancellationToken ?? default);
-
-                foreach (var page in webpages)
-                {
-                    var item = await MapToEventItem(page);
-                    indexedItems.Add(item);
-                }
             }
+
+            await searchIndexClient.DeleteIndexAsync(azureSearchIndex.IndexName, cancellationToken ?? default);
+
+            indexedItems.ForEach(item => AzureSearchQueueWorker.EnqueueAzureSearchQueueItem(new AzureSearchQueueItem(item, AzureSearchTaskType.PUBLISH_INDEX, azureSearchIndex.IndexName)));
         }
-
-        await searchIndexClient.DeleteIndexAsync(azureSearchIndex.IndexName, cancellationToken ?? default);
-
-        indexedItems.ForEach(item => AzureSearchQueueWorker.EnqueueAzureSearchQueueItem(new AzureSearchQueueItem(item, AzureSearchTaskType.PUBLISH_INDEX, azureSearchIndex.IndexName)));
     }
 
     private async Task<IndexEventWebPageItemModel> MapToEventItem(IWebPageContentQueryDataContainer content)
     {
         var languages = await GetAllLanguages();
 
-        string languageName = languages.FirstOrDefault(l => l.ContentLanguageID == content.ContentItemCommonDataContentLanguageID)?.ContentLanguageName ?? "";
+        string languageName = languages.FirstOrDefault(l => l.ContentLanguageID == content.ContentItemCommonDataContentLanguageID)?.ContentLanguageName ?? string.Empty;
 
         var websiteChannels = await GetAllWebsiteChannels();
 
-        string channelName = websiteChannels.FirstOrDefault(c => c.WebsiteChannelID == content.WebPageItemWebsiteChannelID).ChannelName ?? "";
+        string channelName = websiteChannels.FirstOrDefault(c => c.WebsiteChannelID == content.WebPageItemWebsiteChannelID).ChannelName ?? string.Empty;
 
         var item = new IndexEventWebPageItemModel(
             content.WebPageItemID,
@@ -191,6 +219,25 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
             channelName,
             content.WebPageItemTreePath,
             content.WebPageItemOrder);
+
+        return item;
+    }
+
+    private async Task<IndexEventReusableItemModel> MapToEventReusableItem(IContentQueryDataContainer content)
+    {
+        var languages = await GetAllLanguages();
+
+        string languageName = languages.FirstOrDefault(l => l.ContentLanguageID == content.ContentItemCommonDataContentLanguageID)?.ContentLanguageName ?? string.Empty;
+
+        var item = new IndexEventReusableItemModel(
+            content.ContentItemID,
+            content.ContentItemGUID,
+            languageName,
+            content.ContentTypeName,
+            content.ContentItemName,
+            content.ContentItemIsSecured,
+            content.ContentItemContentTypeID,
+            content.ContentItemCommonDataContentLanguageID);
 
         return item;
     }
@@ -237,7 +284,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
             {
                 if (item.TryGetValue(nameof(WebsiteChannelInfo.WebsiteChannelID), out object channelID) && item.TryGetValue(nameof(ChannelInfo.ChannelName), out object channelName))
                 {
-                    items.Add(new(conversionService.GetInteger(channelID, 0), conversionService.GetString(channelName, "")));
+                    items.Add(new(conversionService.GetInteger(channelID, 0), conversionService.GetString(channelName, string.Empty)));
                 }
             }
 

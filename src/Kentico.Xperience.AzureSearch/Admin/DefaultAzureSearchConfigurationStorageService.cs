@@ -1,25 +1,29 @@
 ﻿using System.Text;
 
+using AngleSharp;
+
 using CMS.DataEngine;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
 
 internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfigurationStorageService
 {
-    private readonly IAzureSearchIndexItemInfoProvider indexProvider;
-    private readonly IAzureSearchIndexAliasItemInfoProvider indexAliasProvider;
-    private readonly IAzureSearchIndexAliasIndexItemInfoProvider indexAliasIndexProvider;
-    private readonly IAzureSearchIncludedPathItemInfoProvider pathProvider;
-    private readonly IAzureSearchContentTypeItemInfoProvider contentTypeProvider;
-    private readonly IAzureSearchIndexLanguageItemInfoProvider languageProvider;
+    private readonly IInfoProvider<AzureSearchIndexItemInfo> indexProvider;
+    private readonly IInfoProvider<AzureSearchIndexAliasItemInfo> indexAliasProvider;
+    private readonly IInfoProvider<AzureSearchIndexAliasIndexItemInfo> indexAliasIndexProvider;
+    private readonly IInfoProvider<AzureSearchIncludedPathItemInfo> pathProvider;
+    private readonly IInfoProvider<AzureSearchContentTypeItemInfo> contentTypeProvider;
+    private readonly IInfoProvider<AzureSearchIndexLanguageItemInfo> languageProvider;
+    private readonly IInfoProvider<AzureSearchReusableContentTypeItemInfo> reusableContentTypeProvider;
 
     public DefaultAzureSearchConfigurationStorageService(
-        IAzureSearchIndexItemInfoProvider indexProvider,
-        IAzureSearchIndexAliasItemInfoProvider indexAliasProvider,
-        IAzureSearchIndexAliasIndexItemInfoProvider indexAliasIndexProvider,
-        IAzureSearchIncludedPathItemInfoProvider pathProvider,
-        IAzureSearchContentTypeItemInfoProvider contentTypeProvider,
-        IAzureSearchIndexLanguageItemInfoProvider languageProvider
+        IInfoProvider<AzureSearchIndexItemInfo> indexProvider,
+        IInfoProvider<AzureSearchIndexAliasItemInfo> indexAliasProvider,
+        IInfoProvider<AzureSearchIndexAliasIndexItemInfo> indexAliasIndexProvider,
+        IInfoProvider<AzureSearchIncludedPathItemInfo> pathProvider,
+        IInfoProvider<AzureSearchContentTypeItemInfo> contentTypeProvider,
+        IInfoProvider<AzureSearchIndexLanguageItemInfo> languageProvider,
+        IInfoProvider<AzureSearchReusableContentTypeItemInfo> reusableContentTypeProvider
     )
     {
         this.indexProvider = indexProvider;
@@ -28,7 +32,9 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         this.contentTypeProvider = contentTypeProvider;
         this.languageProvider = languageProvider;
         this.indexAliasIndexProvider = indexAliasIndexProvider;
+        this.reusableContentTypeProvider = reusableContentTypeProvider;
     }
+
 
     private static string RemoveWhitespacesUsingStringBuilder(string source)
     {
@@ -47,6 +53,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         return source.Length == builder.Length ? source : builder.ToString();
     }
 
+
     public bool TryCreateIndex(AzureSearchConfigurationModel configuration)
     {
         var existingIndex = indexProvider.Get()
@@ -61,10 +68,10 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
         var newInfo = new AzureSearchIndexItemInfo()
         {
-            AzureSearchIndexItemIndexName = configuration.IndexName ?? "",
-            AzureSearchIndexItemChannelName = configuration.ChannelName ?? "",
-            AzureSearchIndexItemStrategyName = configuration.StrategyName ?? "",
-            AzureSearchIndexItemRebuildHook = configuration.RebuildHook ?? ""
+            AzureSearchIndexItemIndexName = configuration.IndexName ?? string.Empty,
+            AzureSearchIndexItemChannelName = configuration.ChannelName ?? string.Empty,
+            AzureSearchIndexItemStrategyName = configuration.StrategyName ?? string.Empty,
+            AzureSearchIndexItemRebuildHook = configuration.RebuildHook ?? string.Empty
         };
 
         indexProvider.Set(newInfo);
@@ -103,8 +110,23 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
             }
         }
 
+        if (configuration.ReusableContentTypeNames is not null)
+        {
+            foreach (string? reusableContentTypeName in configuration.ReusableContentTypeNames)
+            {
+                var reusableContentTypeItemInfo = new AzureSearchReusableContentTypeItemInfo()
+                {
+                    AzureSearchReusableContentTypeItemContentTypeName = reusableContentTypeName,
+                    AzureSearchReusableContentTypeItemIndexItemId = newInfo.AzureSearchIndexItemId
+                };
+
+                reusableContentTypeItemInfo.Insert();
+            }
+        }
+
         return true;
     }
+
 
     public bool TryCreateAlias(AzureSearchAliasConfigurationModel configuration)
     {
@@ -120,7 +142,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
         var aliasInfo = new AzureSearchIndexAliasItemInfo()
         {
-            AzureSearchIndexAliasItemIndexAliasName = configuration.AliasName ?? "",
+            AzureSearchIndexAliasItemIndexAliasName = configuration.AliasName ?? string.Empty,
         };
 
         var indexIds = indexProvider
@@ -147,6 +169,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         return true;
     }
 
+
     public AzureSearchConfigurationModel? GetIndexDataOrNull(int indexId)
     {
         var indexInfo = indexProvider.Get().WithID(indexId).FirstOrDefault();
@@ -172,10 +195,13 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
             ).GetEnumerableTypedResult()
             .Select(x => new AzureSearchIndexContentType(x.ClassName, x.ClassDisplayName));
 
+        var reusableContentTypes = reusableContentTypeProvider.Get().WhereEquals(nameof(AzureSearchReusableContentTypeItemInfo.AzureSearchReusableContentTypeItemIndexItemId), indexInfo.AzureSearchIndexItemId).GetEnumerableTypedResult();
+
         var languages = languageProvider.Get().WhereEquals(nameof(AzureSearchIndexLanguageItemInfo.AzureSearchIndexLanguageItemIndexItemId), indexInfo.AzureSearchIndexItemId).GetEnumerableTypedResult();
 
-        return new AzureSearchConfigurationModel(indexInfo, languages, paths, contentTypes);
+        return new AzureSearchConfigurationModel(indexInfo, languages, paths, contentTypes, reusableContentTypes);
     }
+
 
     public AzureSearchAliasConfigurationModel? GetAliasDataOrNull(int aliasId)
     {
@@ -198,9 +224,12 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         return new AzureSearchAliasConfigurationModel(aliasInfo, indexNames);
     }
 
+
     public List<int> GetIndexIds() => indexProvider.Get().Select(x => x.AzureSearchIndexItemId).ToList();
 
+
     public List<int> GetAliasIds() => indexAliasProvider.Get().Select(x => x.AzureSearchIndexAliasItemId).ToList();
+
 
     public IEnumerable<AzureSearchConfigurationModel> GetAllIndexData()
     {
@@ -228,8 +257,11 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
         var languages = languageProvider.Get().ToList();
 
-        return indexInfos.Select(index => new AzureSearchConfigurationModel(index, languages, paths, contentTypes));
+        var reusableContentTypes = reusableContentTypeProvider.Get().ToList();
+
+        return indexInfos.Select(index => new AzureSearchConfigurationModel(index, languages, paths, contentTypes, reusableContentTypes));
     }
+
 
     public IEnumerable<AzureSearchAliasConfigurationModel> GetAllAliasData()
     {
@@ -254,9 +286,10 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         return result;
     }
 
+
     public bool TryEditIndex(AzureSearchConfigurationModel configuration)
     {
-        configuration.IndexName = RemoveWhitespacesUsingStringBuilder(configuration.IndexName ?? "");
+        configuration.IndexName = RemoveWhitespacesUsingStringBuilder(configuration.IndexName ?? string.Empty);
 
         var indexInfo = indexProvider.Get()
             .WhereEquals(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemId), configuration.Id)
@@ -273,10 +306,10 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         contentTypeProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchContentTypeItemInfo.AzureSearchContentTypeItemIndexItemId)} = {configuration.Id}"));
         indexAliasIndexProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexItemId)} = {configuration.Id}"));
 
-        indexInfo.AzureSearchIndexItemRebuildHook = configuration.RebuildHook ?? "";
-        indexInfo.AzureSearchIndexItemStrategyName = configuration.StrategyName ?? "";
-        indexInfo.AzureSearchIndexItemChannelName = configuration.ChannelName ?? "";
-        indexInfo.AzureSearchIndexItemIndexName = configuration.IndexName ?? "";
+        indexInfo.AzureSearchIndexItemRebuildHook = configuration.RebuildHook ?? string.Empty;
+        indexInfo.AzureSearchIndexItemStrategyName = configuration.StrategyName ?? string.Empty;
+        indexInfo.AzureSearchIndexItemChannelName = configuration.ChannelName ?? string.Empty;
+        indexInfo.AzureSearchIndexItemIndexName = configuration.IndexName ?? string.Empty;
 
         indexProvider.Set(indexInfo);
 
@@ -304,7 +337,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
             {
                 var contentInfo = new AzureSearchContentTypeItemInfo()
                 {
-                    AzureSearchContentTypeItemContentTypeName = contentType.ContentTypeName ?? "",
+                    AzureSearchContentTypeItemContentTypeName = contentType.ContentTypeName ?? string.Empty,
                     AzureSearchContentTypeItemIncludedPathItemId = pathInfo.AzureSearchIncludedPathItemId,
                     AzureSearchContentTypeItemIndexItemId = indexInfo.AzureSearchIndexItemId,
                 };
@@ -312,12 +345,16 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
             }
         }
 
+        RemoveUnusedReusableContentTypes(configuration);
+        SetNewIndexReusableContentTypeItems(configuration, indexInfo);
+
         return true;
     }
 
+
     public bool TryEditAlias(AzureSearchAliasConfigurationModel configuration)
     {
-        configuration.AliasName = RemoveWhitespacesUsingStringBuilder(configuration.AliasName ?? "");
+        configuration.AliasName = RemoveWhitespacesUsingStringBuilder(configuration.AliasName ?? string.Empty);
 
         var aliasInfo = indexAliasProvider.Get()
             .WhereEquals(nameof(AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemId), configuration.Id)
@@ -331,7 +368,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
             return false;
         }
 
-        aliasInfo.AzureSearchIndexAliasItemIndexAliasName = configuration.AliasName ?? "";
+        aliasInfo.AzureSearchIndexAliasItemIndexAliasName = configuration.AliasName ?? string.Empty;
 
         var indexIds = indexProvider
             .Get()
@@ -355,6 +392,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         return true;
     }
 
+
     public bool TryDeleteIndex(int id)
     {
         indexProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemId)} = {id}"));
@@ -362,9 +400,11 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         languageProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexLanguageItemInfo.AzureSearchIndexLanguageItemIndexItemId)} = {id}"));
         contentTypeProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchContentTypeItemInfo.AzureSearchContentTypeItemIndexItemId)} = {id}"));
         indexAliasIndexProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexItemId)} = {id}"));
+        reusableContentTypeProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchReusableContentTypeItemInfo.AzureSearchReusableContentTypeItemIndexItemId)} = {id}"));
 
         return true;
     }
+
 
     public bool TryDeleteAlias(int id)
     {
@@ -372,5 +412,44 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         indexAliasIndexProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexAliasId)} = {id}"));
 
         return true;
+    }
+
+
+    private void RemoveUnusedReusableContentTypes(AzureSearchConfigurationModel configuration)
+    {
+        var removeReusableContentTypesQuery = reusableContentTypeProvider
+            .Get()
+            .WhereEquals(nameof(AzureSearchReusableContentTypeItemInfo.AzureSearchReusableContentTypeItemIndexItemId), configuration.Id)
+            .WhereNotIn(nameof(AzureSearchReusableContentTypeItemInfo.AzureSearchReusableContentTypeItemContentTypeName), configuration.ReusableContentTypeNames.ToArray());
+
+        reusableContentTypeProvider.BulkDelete(new WhereCondition(removeReusableContentTypesQuery));
+    }
+
+
+    private void SetNewIndexReusableContentTypeItems(AzureSearchConfigurationModel configuration, AzureSearchIndexItemInfo indexInfo)
+    {
+        var newReusableContentTypes = GetNewReusableContentTypesOnIndex(configuration);
+
+        foreach (string? reusableContentType in newReusableContentTypes)
+        {
+            var reusableContentTypeInfo = new AzureSearchReusableContentTypeItemInfo()
+            {
+                AzureSearchReusableContentTypeItemContentTypeName = reusableContentType,
+                AzureSearchReusableContentTypeItemIndexItemId = indexInfo.AzureSearchIndexItemId,
+            };
+
+            reusableContentTypeProvider.Set(reusableContentTypeInfo);
+        }
+    }
+
+
+    private IEnumerable<string> GetNewReusableContentTypesOnIndex(AzureSearchConfigurationModel configuration)
+    {
+        var existingReusableContentTypes = reusableContentTypeProvider
+            .Get()
+            .WhereEquals(nameof(AzureSearchReusableContentTypeItemInfo.AzureSearchReusableContentTypeItemIndexItemId), configuration.Id)
+            .GetEnumerableTypedResult();
+
+        return configuration.ReusableContentTypeNames.Where(x => !existingReusableContentTypes.Any(y => y.AzureSearchReusableContentTypeItemContentTypeName == x));
     }
 }

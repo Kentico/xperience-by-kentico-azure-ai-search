@@ -16,25 +16,28 @@ public class AzureSearchConfigurationModel
     [MinLength(1)]
     [MaxLength(128)]
     [RegularExpression("^(?!-)[a-z0-9-]+(?<!-)$", ErrorMessage = "Index name must only contain lowercase letters, digits or dashes, cannot start or end with dashes and is limited to 128 characters.")]
-    public string IndexName { get; set; } = "";
+    public string IndexName { get; set; } = string.Empty;
+    
+    [AzureSearchIndexConfigurationComponent(Label = "Included Paths", Order = 2)]
+    public IEnumerable<AzureSearchIndexIncludedPath> Paths { get; set; } = Enumerable.Empty<AzureSearchIndexIncludedPath>();
 
-    [GeneralSelectorComponent(dataProviderType: typeof(LanguageOptionsProvider), Label = "Indexed Languages", Order = 2)]
+    [GeneralSelectorComponent(dataProviderType: typeof(ReusableContentOptionsProvider), Label = "Included Reusable Content Types", Order = 3)]
+    public IEnumerable<string> ReusableContentTypeNames { get; set; } = Enumerable.Empty<string>();
+
+    [GeneralSelectorComponent(dataProviderType: typeof(LanguageOptionsProvider), Label = "Indexed Languages", Order = 4)]
     [MinLength(1, ErrorMessage = "You must select at least one Language Name")]
     public IEnumerable<string> LanguageNames { get; set; } = Enumerable.Empty<string>();
 
-    [DropDownComponent(Label = "Channel Name", DataProviderType = typeof(ChannelOptionsProvider), Order = 3)]
+    [DropDownComponent(Label = "Channel Name", DataProviderType = typeof(ChannelOptionsProvider), Order = 5)]
     [Required]
-    public string ChannelName { get; set; } = "";
+    public string ChannelName { get; set; } = string.Empty;
 
-    [DropDownComponent(Label = "Indexing Strategy", DataProviderType = typeof(IndexingStrategyOptionsProvider), Order = 4, ExplanationText = "Changing strategy which has an incompatible configuration will result in deleting indexed items.")]
+    [DropDownComponent(Label = "Indexing Strategy", DataProviderType = typeof(IndexingStrategyOptionsProvider), Order = 6, ExplanationText = "Changing strategy which has an incompatible configuration will result in deleting indexed items.")]
     [Required]
-    public string StrategyName { get; set; } = "";
+    public string StrategyName { get; set; } = string.Empty;
 
-    [TextInputComponent(Label = "Rebuild Hook")]
-    public string RebuildHook { get; set; } = "";
-
-    [AzureSearchIndexConfigurationComponent(Label = "Included Paths")]
-    public IEnumerable<AzureSearchIndexIncludedPath> Paths { get; set; } = Enumerable.Empty<AzureSearchIndexIncludedPath>();
+    [TextInputComponent(Label = "Rebuild Hook", Order = 7)]
+    public string RebuildHook { get; set; } = string.Empty;
 
     public AzureSearchConfigurationModel() { }
 
@@ -42,7 +45,8 @@ public class AzureSearchConfigurationModel
         AzureSearchIndexItemInfo index,
         IEnumerable<AzureSearchIndexLanguageItemInfo> indexLanguages,
         IEnumerable<AzureSearchIncludedPathItemInfo> indexPaths,
-        IEnumerable<AzureSearchIndexContentType> contentTypes
+        IEnumerable<AzureSearchIndexContentType> contentTypes,
+        IEnumerable<AzureSearchReusableContentTypeItemInfo> reusableContentTypes
     )
     {
         Id = index.AzureSearchIndexItemId;
@@ -50,6 +54,10 @@ public class AzureSearchConfigurationModel
         ChannelName = index.AzureSearchIndexItemChannelName;
         RebuildHook = index.AzureSearchIndexItemRebuildHook;
         StrategyName = index.AzureSearchIndexItemStrategyName;
+        ReusableContentTypeNames = reusableContentTypes
+             .Where(c => c.AzureSearchReusableContentTypeItemIndexItemId == index.AzureSearchIndexItemId)
+             .Select(c => c.AzureSearchReusableContentTypeItemContentTypeName)
+             .ToList();
         LanguageNames = indexLanguages
             .Where(l => l.AzureSearchIndexLanguageItemIndexItemId == index.AzureSearchIndexItemId)
             .Select(l => l.AzureSearchIndexLanguageItemName)
