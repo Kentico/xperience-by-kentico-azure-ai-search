@@ -14,7 +14,7 @@ namespace Kentico.Xperience.AzureSearch.Admin;
 /// Data container class for <see cref="AzureSearchIndexAliasItemInfo"/>.
 /// </summary>
 [Serializable]
-public partial class AzureSearchIndexAliasItemInfo : AbstractInfo<AzureSearchIndexAliasItemInfo, IAzureSearchIndexAliasItemInfoProvider>
+public partial class AzureSearchIndexAliasItemInfo : AbstractInfo<AzureSearchIndexAliasItemInfo, IInfoProvider<AzureSearchIndexAliasItemInfo>>
 {
     /// <summary>
     /// Object type.
@@ -25,7 +25,7 @@ public partial class AzureSearchIndexAliasItemInfo : AbstractInfo<AzureSearchInd
     /// <summary>
     /// Type information.
     /// </summary>
-    public static readonly ObjectTypeInfo TYPEINFO = new(typeof(AzureSearchIndexAliasItemInfoProvider), OBJECT_TYPE, "KenticoAzureSearch.AzureSearchIndexAliasItem", nameof(AzureSearchIndexAliasItemId), null, nameof(AzureSearchIndexAliasItemGuid), nameof(AzureSearchIndexAliasItemIndexAliasName), null, null, null, null)
+    public static readonly ObjectTypeInfo TYPEINFO = new(typeof(IInfoProvider<AzureSearchIndexAliasItemInfo>), OBJECT_TYPE, "KenticoAzureSearch.AzureSearchIndexAliasItem", nameof(AzureSearchIndexAliasItemId), null, nameof(AzureSearchIndexAliasItemGuid), nameof(AzureSearchIndexAliasItemIndexAliasName), null, null, null, null)
     {
         TouchCacheDependencies = true,
         ContinuousIntegrationSettings =
