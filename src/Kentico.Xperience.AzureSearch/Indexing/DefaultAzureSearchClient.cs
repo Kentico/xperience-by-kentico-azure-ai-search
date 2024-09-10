@@ -167,34 +167,33 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
                     }
                 }
             }
+        }
+        foreach (string language in azureSearchIndex.LanguageNames)
+        {
+            var queryBuilder = new ContentItemQueryBuilder();
 
-            foreach (string language in azureSearchIndex.LanguageNames)
+            if (azureSearchIndex.IncludedReusableContentTypes != null && azureSearchIndex.IncludedReusableContentTypes.Count > 0)
             {
-                var queryBuilder = new ContentItemQueryBuilder();
-
-                if (azureSearchIndex.IncludedReusableContentTypes != null && azureSearchIndex.IncludedReusableContentTypes.Count > 0)
+                foreach (string reusableContentType in azureSearchIndex.IncludedReusableContentTypes)
                 {
-                    foreach (string reusableContentType in azureSearchIndex.IncludedReusableContentTypes)
-                    {
-                        queryBuilder.ForContentType(reusableContentType);
-                    }
+                    queryBuilder.ForContentType(reusableContentType);
+                }
 
-                    queryBuilder.InLanguage(language);
+                queryBuilder.InLanguage(language);
 
-                    var reusableItems = await executor.GetResult(queryBuilder, result => result, cancellationToken: cancellationToken ?? default);
+                var reusableItems = await executor.GetResult(queryBuilder, result => result, cancellationToken: cancellationToken ?? default);
 
-                    foreach (var reusableItem in reusableItems)
-                    {
-                        var item = await MapToEventReusableItem(reusableItem);
-                        indexedItems.Add(item);
-                    }
+                foreach (var reusableItem in reusableItems)
+                {
+                    var item = await MapToEventReusableItem(reusableItem);
+                    indexedItems.Add(item);
                 }
             }
-
-            await searchIndexClient.DeleteIndexAsync(azureSearchIndex.IndexName, cancellationToken ?? default);
-
-            indexedItems.ForEach(item => AzureSearchQueueWorker.EnqueueAzureSearchQueueItem(new AzureSearchQueueItem(item, AzureSearchTaskType.PUBLISH_INDEX, azureSearchIndex.IndexName)));
         }
+
+        await searchIndexClient.DeleteIndexAsync(azureSearchIndex.IndexName, cancellationToken ?? default);
+
+        indexedItems.ForEach(item => AzureSearchQueueWorker.EnqueueAzureSearchQueueItem(new AzureSearchQueueItem(item, AzureSearchTaskType.PUBLISH_INDEX, azureSearchIndex.IndexName)));
     }
 
     private async Task<IndexEventWebPageItemModel> MapToEventItem(IWebPageContentQueryDataContainer content)

@@ -15,6 +15,7 @@ public static class DancingGoatSearchStartupExtensions
             builder.RegisterStrategy<DancingGoatSimpleSearchStrategy, DancingGoatSimpleSearchModel>(nameof(DancingGoatSimpleSearchStrategy));
             builder.RegisterStrategy<GeoLocationSearchStrategy, GeoLocationSearchModel>(nameof(GeoLocationSearchStrategy));
             builder.RegisterStrategy<CustomItemsReindexingSearchStrategy, DancingGoatSearchModel>(nameof(CustomItemsReindexingSearchStrategy));
+            builder.RegisterStrategy<ReusableContentItemsIndexingStrategy, DancingGoatSearchModel>(nameof(ReusableContentItemsIndexingStrategy));
         }, configuration);
 
         services.AddTransient<DancingGoatSearchService>();
