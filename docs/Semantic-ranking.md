@@ -77,7 +77,7 @@ public class SemanticRankingSearchStrategy : BaseAzureSearchIndexingStrategy<Dan
                     return null;
                 }
 
-                result.Title = page?.CafeTitle ?? "";
+                result.Title = page?.CafeTitle ?? string.Empty;
                 string rawContent = await webCrawler.CrawlWebPage(page!);
                 result.Content = htmlSanitizer.SanitizeHtmlDocument(rawContent);
             }
@@ -95,7 +95,7 @@ public class SemanticRankingSearchStrategy : BaseAzureSearchIndexingStrategy<Dan
                     return null;
                 }
 
-                result.Title = page?.ArticleTitle ?? "";
+                result.Title = page?.ArticleTitle ?? string.Empty;
                 string rawContent = await webCrawler.CrawlWebPage(page!);
                 result.Content = htmlSanitizer.SanitizeHtmlDocument(rawContent);
             }

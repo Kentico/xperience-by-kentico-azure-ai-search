@@ -73,7 +73,7 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
                     }
                 }
 
-                deleteIds.AddRange(GetIdsToDelete(deleteTasks ?? []).Where(x => x is not null).Select(x => x ?? ""));
+                deleteIds.AddRange(GetIdsToDelete(deleteTasks ?? []).Where(x => x is not null).Select(x => x ?? string.Empty));
 
                 if (AzureSearchIndexStore.Instance.GetIndex(group.Key) is { } index)
                 {

@@ -44,6 +44,8 @@ internal class AzureSearchSearchModule : Module
 
         WebPageEvents.Publish.Execute += HandleEvent;
         WebPageEvents.Delete.Execute += HandleEvent;
+        WebPageEvents.Unpublish.Execute += HandleEvent;
+        ContentItemEvents.Unpublish.Execute += HandleContentItemEvent;
         ContentItemEvents.Publish.Execute += HandleContentItemEvent;
         ContentItemEvents.Delete.Execute += HandleContentItemEvent;
 

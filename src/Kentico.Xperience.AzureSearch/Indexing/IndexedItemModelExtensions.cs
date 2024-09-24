@@ -38,6 +38,11 @@ internal static class IndexedItemModelExtensions
             return false;
         }
 
+        if (!string.Equals(item.WebsiteChannelName, azureSearchIndex.WebSiteChannelName))
+        {
+            return false;
+        }
+
         if (!azureSearchIndex.LanguageNames.Exists(x => x == item.LanguageName))
         {
             return false;
