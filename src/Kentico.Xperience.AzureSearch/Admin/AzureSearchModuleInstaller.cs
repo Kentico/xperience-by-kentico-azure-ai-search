@@ -22,6 +22,7 @@ internal class AzureSearchModuleInstaller
         InstallAzureSearchLanguageInfo(resource);
         InstallAzureSearchIndexPathItemInfo(resource);
         InstallAzureSearchContentTypeItemInfo(resource);
+        InstallAzureSearchReusableContentTypeItemInfo(resource);
     }
 
     public ResourceInfo InitializeResource(ResourceInfo resource)
@@ -384,6 +385,64 @@ internal class AzureSearchModuleInstaller
         formItem = new FormFieldInfo
         {
             Name = nameof(AzureSearchContentTypeItemInfo.AzureSearchContentTypeItemIndexItemId),
+            AllowEmpty = false,
+            Visible = true,
+            Precision = 0,
+            DataType = "integer",
+            ReferenceToObjectType = AzureSearchIndexItemInfo.OBJECT_TYPE,
+            ReferenceType = ObjectDependencyEnum.Required
+        };
+
+        formInfo.AddFormItem(formItem);
+
+        SetFormDefinition(info, formInfo);
+
+        if (info.HasChanged)
+        {
+            DataClassInfoProvider.SetDataClassInfo(info);
+        }
+    }
+
+    public void InstallAzureSearchReusableContentTypeItemInfo(ResourceInfo resource)
+    {
+        var info = DataClassInfoProvider.GetDataClassInfo(AzureSearchReusableContentTypeItemInfo.OBJECT_TYPE) ?? DataClassInfo.New(AzureSearchReusableContentTypeItemInfo.OBJECT_TYPE);
+
+        info.ClassName = AzureSearchReusableContentTypeItemInfo.TYPEINFO.ObjectClassName;
+        info.ClassTableName = AzureSearchReusableContentTypeItemInfo.TYPEINFO.ObjectClassName.Replace(".", "_");
+        info.ClassDisplayName = "Azure Search Reusable Content Type Item";
+        info.ClassType = ClassType.OTHER;
+        info.ClassResourceID = resource.ResourceID;
+
+        var formInfo = FormHelper.GetBasicFormDefinition(nameof(AzureSearchReusableContentTypeItemInfo.AzureSearchReusableContentTypeItemId));
+
+        var formItem = new FormFieldInfo
+        {
+            Name = nameof(AzureSearchReusableContentTypeItemInfo.AzureSearchReusableContentTypeItemContentTypeName),
+            AllowEmpty = false,
+            Visible = true,
+            Precision = 0,
+            Size = 100,
+            DataType = "text",
+            Enabled = true,
+            IsUnique = false
+        };
+        formInfo.AddFormItem(formItem);
+
+        formItem = new FormFieldInfo
+        {
+            Name = nameof(AzureSearchReusableContentTypeItemInfo.AzureSearchReusableContentTypeItemGuid),
+            Enabled = true,
+            AllowEmpty = false,
+            Visible = true,
+            Precision = 0,
+            DataType = "guid",
+        };
+
+        formInfo.AddFormItem(formItem);
+
+        formItem = new FormFieldInfo
+        {
+            Name = nameof(AzureSearchReusableContentTypeItemInfo.AzureSearchReusableContentTypeItemIndexItemId),
             AllowEmpty = false,
             Visible = true,
             Precision = 0,

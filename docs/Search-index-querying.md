@@ -71,8 +71,8 @@ Map Retrieved SearchModel data to a more simple `SearchResultModel`
 ```csharp
 public class SearchResultModel
 {
-    public string Title { get; set; } = "";
-    public string Url { get; set; } = "";
+    public string Title { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
 }
 ```
 

@@ -97,7 +97,7 @@ internal class DefaultAzureSearchTaskLogger : IAzureSearchTaskLogger
         }
 
         if (eventName.Equals(WebPageEvents.Delete.Name, StringComparison.OrdinalIgnoreCase) ||
-            eventName.Equals(WebPageEvents.Archive.Name, StringComparison.OrdinalIgnoreCase))
+            eventName.Equals(WebPageEvents.Unpublish.Name, StringComparison.OrdinalIgnoreCase))
         {
             return AzureSearchTaskType.DELETE;
         }

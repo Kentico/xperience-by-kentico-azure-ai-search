@@ -55,7 +55,7 @@ public class ExampleSearchIndexingStrategy : BaseAzureSearchIndexingStrategy<Sim
                     return null;
                 }
 
-                result.Title = page?.ArticleTitle ?? "";
+                result.Title = page?.ArticleTitle ?? string.Empty;
             }
             else
             {
@@ -78,22 +78,22 @@ Some properties of the `IIndexEventItemModel` are added to the indexed data by d
 public class BaseAzureSearchModel : IAzureSearchModel
 {
     [SearchableField(IsSortable = true, IsFilterable = true, IsFacetable = true)]
-    public string? Url { get; set; } = "";
+    public string? Url { get; set; } = string.Empty;
 
     [SearchableField(IsFacetable = true, IsFilterable = true)]
-    public string ContentTypeName { get; set; } = "";
+    public string ContentTypeName { get; set; } = string.Empty;
 
     [SearchableField(IsSortable = true, IsFacetable = true, IsFilterable = true)]
-    public string LanguageName { get; set; } = "";
+    public string LanguageName { get; set; } = string.Empty;
 
     [SimpleField(IsKey = false)]
-    public string ItemGuid { get; set; } = "";
+    public string ItemGuid { get; set; } = string.Empty;
 
     [SimpleField(IsKey = true)]
-    public string ObjectID { get; set; } = "";
+    public string ObjectID { get; set; } = string.Empty;
 
     [SimpleField(IsKey = false)]
-    public string Name { get; set; } = "";
+    public string Name { get; set; } = string.Empty;
 }
 ```
 
