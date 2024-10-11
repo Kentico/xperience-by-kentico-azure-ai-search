@@ -20,16 +20,16 @@ namespace Kentico.Xperience.AzureSearch.Admin;
 [UIEvaluatePermission(SystemPermissions.CREATE)]
 internal class IndexCreatePage : BaseIndexEditPage
 {
-    private readonly IPageUrlGenerator pageUrlGenerator;
+    private readonly IPageLinkGenerator pageLinkGenerator;
     private AzureSearchConfigurationModel? model = null;
 
     public IndexCreatePage(
         IFormItemCollectionProvider formItemCollectionProvider,
         IFormDataBinder formDataBinder,
         IAzureSearchConfigurationStorageService storageService,
-        IPageUrlGenerator pageUrlGenerator,
+        IPageLinkGenerator pageLinkGenerator,
         IAzureSearchIndexClientService searchClientService)
-        : base(formItemCollectionProvider, formDataBinder, storageService, searchClientService) => this.pageUrlGenerator = pageUrlGenerator;
+        : base(formItemCollectionProvider, formDataBinder, storageService, searchClientService) => this.pageLinkGenerator = pageLinkGenerator;
 
     protected override AzureSearchConfigurationModel Model
     {
@@ -49,7 +49,12 @@ internal class IndexCreatePage : BaseIndexEditPage
         {
             var index = AzureSearchIndexStore.Instance.GetRequiredIndex(model.IndexName);
 
-            var successResponse = NavigateTo(pageUrlGenerator.GenerateUrl<IndexEditPage>(index.Identifier.ToString()))
+            var pageParameterValues = new PageParameterValues
+            {
+                { typeof(IndexEditPage), index.Identifier }
+            };
+
+            var successResponse = NavigateTo(pageLinkGenerator.GetPath<IndexEditPage>(pageParameterValues))
                 .AddSuccessMessage("Index created.");
 
             return successResponse;

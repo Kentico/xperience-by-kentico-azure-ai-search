@@ -1,9 +1,19 @@
-﻿using CMS.Websites;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using CMS.Websites;
 
 namespace DancingGoat.Models
 {
     public record ArticleDetailViewModel(string Title, string TeaserUrl, string Summary, string Text, DateTime PublicationDate, Guid Guid, bool IsSecured, string Url, IEnumerable<RelatedArticleViewModel> RelatedArticles)
+        : IWebPageBasedViewModel
     {
+        /// <inheritdoc/>
+        public IWebPageFieldsSource WebPage { get; init; }
+
+
         /// <summary>
         /// Validates and maps <see cref="ArticlePage"/> to a <see cref="ArticleDetailViewModel"/>.
         /// </summary>
@@ -32,8 +42,10 @@ namespace DancingGoat.Models
                 articlePage.SystemFields.ContentItemGUID,
                 articlePage.SystemFields.ContentItemIsSecured,
                 url.RelativePath,
-                relatedArticlesViewModels
-            );
+                relatedArticlesViewModels)
+            {
+                WebPage = articlePage
+            };
         }
     }
 }

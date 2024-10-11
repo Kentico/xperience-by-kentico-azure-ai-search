@@ -1,4 +1,9 @@
-﻿using CMS.Websites;
+﻿using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+using CMS.Websites;
 
 namespace DancingGoat.Models
 {
@@ -7,11 +12,11 @@ namespace DancingGoat.Models
         /// <summary>
         /// Validates and maps <see cref="ArticlePage"/> to a <see cref="ArticleViewModel"/>.
         /// </summary>
-        public static async Task<ArticleViewModel> GetViewModel(ArticlePage articlePage, IWebPageUrlRetriever urlRetriever, string languageName)
+        public static async Task<ArticleViewModel> GetViewModel(ArticlePage articlePage, IWebPageUrlRetriever urlRetriever, string languageName, CancellationToken cancellationToken = default)
         {
             var teaser = articlePage.ArticlePageTeaser.FirstOrDefault();
 
-            var url = await urlRetriever.Retrieve(articlePage, languageName);
+            var url = await urlRetriever.Retrieve(articlePage, languageName, cancellationToken);
 
             return new ArticleViewModel(
                 articlePage.ArticleTitle,

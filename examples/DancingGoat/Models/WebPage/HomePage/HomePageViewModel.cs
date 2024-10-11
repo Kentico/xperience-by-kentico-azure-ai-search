@@ -1,9 +1,18 @@
-﻿using CMS.Websites;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using CMS.Websites;
 
 namespace DancingGoat.Models
 {
     public record HomePageViewModel(BannerViewModel Banner, EventViewModel Event, string OurStoryText, ReferenceViewModel Reference, IEnumerable<CafeViewModel> Cafes, WebPageRelatedItem ArticlesSection)
+        : IWebPageBasedViewModel
     {
+        /// <inheritdoc/>
+        public IWebPageFieldsSource WebPage { get; init; }
+
+
         /// <summary>
         /// Validates and maps <see cref="HomePage"/> to a <see cref="HomePageViewModel"/>.
         /// </summary>
@@ -20,7 +29,10 @@ namespace DancingGoat.Models
                 home.HomePageOurStory,
                 ReferenceViewModel.GetViewModel(home.HomePageReference.FirstOrDefault()),
                 home.HomePageCafes.Select(CafeViewModel.GetViewModel),
-                home.HomePageArticlesSection.FirstOrDefault());
+                home.HomePageArticlesSection.FirstOrDefault())
+            {
+                WebPage = home
+            };
         }
     }
 }

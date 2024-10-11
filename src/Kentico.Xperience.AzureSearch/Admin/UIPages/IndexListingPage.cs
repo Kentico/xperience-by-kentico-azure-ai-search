@@ -25,7 +25,7 @@ internal class IndexListingPage : ListingPage
 {
     private readonly AzureSearchOptions azureSearchOptions;
     private readonly IAzureSearchClient azureSearchClient;
-    private readonly IPageUrlGenerator pageUrlGenerator;
+    private readonly IPageLinkGenerator pageLinkGenerator;
     private readonly IAzureSearchConfigurationStorageService configurationStorageService;
     private readonly IConversionService conversionService;
 
@@ -36,14 +36,14 @@ internal class IndexListingPage : ListingPage
     /// </summary>
     public IndexListingPage(
         IAzureSearchClient azureSearchClient,
-        IPageUrlGenerator pageUrlGenerator,
+        IPageLinkGenerator pageLinkGenerator,
         IOptions<AzureSearchOptions> azureSearchOptions,
         IAzureSearchConfigurationStorageService configurationStorageService,
         IConversionService conversionService)
     {
         this.azureSearchClient = azureSearchClient;
         this.azureSearchOptions = azureSearchOptions.Value;
-        this.pageUrlGenerator = pageUrlGenerator;
+        this.pageLinkGenerator = pageLinkGenerator;
         this.configurationStorageService = configurationStorageService;
         this.conversionService = conversionService;
     }
@@ -189,7 +189,7 @@ internal class IndexListingPage : ListingPage
     [PageCommand(Permission = SystemPermissions.DELETE)]
     public async Task<INavigateResponse> Delete(int id, CancellationToken cancellationToken)
     {
-        var response = NavigateTo(pageUrlGenerator.GenerateUrl<IndexListingPage>());
+        var response = NavigateTo(pageLinkGenerator.GetPath<IndexListingPage>());
         var index = AzureSearchIndexStore.Instance.GetIndex(id);
         if (index == null)
         {
