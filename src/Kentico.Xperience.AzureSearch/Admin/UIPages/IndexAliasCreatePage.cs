@@ -54,7 +54,7 @@ internal class IndexAliasCreatePage : BaseIndexAliasEditPage
                 { typeof(IndexAliasEditPage), alias.Identifier }
             };
 
-            var successResponse = NavigateTo(pageLinkGenerator.GetPath<IndexAliasListingPage>(pageParameterValues))
+            var successResponse = NavigateTo(pageLinkGenerator.GetPath<IndexAliasEditPage>(pageParameterValues))
                 .AddSuccessMessage("Index alias created.");
 
             return successResponse;
