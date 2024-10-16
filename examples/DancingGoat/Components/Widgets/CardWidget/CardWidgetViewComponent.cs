@@ -1,3 +1,6 @@
+﻿using System.Linq;
+using System.Threading.Tasks;
+
 using DancingGoat.Models;
 using DancingGoat.Widgets;
 
@@ -40,7 +43,7 @@ namespace DancingGoat.Widgets
 
         public async Task<ViewViewComponentResult> InvokeAsync(CardWidgetProperties properties)
         {
-            string languageName = currentLanguageRetriever.Get();
+            var languageName = currentLanguageRetriever.Get();
             var image = await GetImage(properties, languageName);
 
             return View("~/Components/Widgets/CardWidget/_CardWidget.cshtml", new CardWidgetViewModel

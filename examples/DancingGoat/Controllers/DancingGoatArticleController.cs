@@ -1,4 +1,7 @@
-﻿using CMS.Websites;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+using CMS.Websites;
 
 using DancingGoat;
 using DancingGoat.Controllers;
@@ -41,7 +44,7 @@ namespace DancingGoat.Controllers
 
         public async Task<IActionResult> Index()
         {
-            string languageName = currentLanguageRetriever.Get();
+            var languageName = currentLanguageRetriever.Get();
 
             var webPage = webPageDataContextRetriever.Retrieve().WebPage;
 
@@ -52,18 +55,22 @@ namespace DancingGoat.Controllers
             var models = new List<ArticleViewModel>();
             foreach (var article in articles)
             {
-                var model = await ArticleViewModel.GetViewModel(article, urlRetriever, languageName);
-                models.Add(model);
+                var articleModel = await ArticleViewModel.GetViewModel(article, urlRetriever, languageName);
+                models.Add(articleModel);
             }
 
-            return View(models);
+            var url = (await urlRetriever.Retrieve(articlesSection, languageName)).RelativePath;
+
+            var model = ArticlesSectionViewModel.GetViewModel(articlesSection, models, url);
+
+            return View(model);
         }
 
 
         public async Task<IActionResult> Article()
         {
-            string languageName = currentLanguageRetriever.Get();
-            int webPageItemId = webPageDataContextRetriever.Retrieve().WebPage.WebPageItemID;
+            var languageName = currentLanguageRetriever.Get();
+            var webPageItemId = webPageDataContextRetriever.Retrieve().WebPage.WebPageItemID;
 
             var article = await articlePageRepository.GetArticle(webPageItemId, languageName, HttpContext.RequestAborted);
 

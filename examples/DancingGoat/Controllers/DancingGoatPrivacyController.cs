@@ -1,4 +1,8 @@
-﻿using CMS.ContactManagement;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using CMS.ContactManagement;
 using CMS.DataEngine;
 using CMS.DataProtection;
 
@@ -7,6 +11,7 @@ using DancingGoat.Controllers;
 using DancingGoat.Helpers.Generator;
 using DancingGoat.Models;
 
+using Kentico.Content.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
 
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +28,8 @@ namespace DancingGoat.Controllers
         private readonly IConsentAgreementService consentAgreementService;
         private readonly IInfoProvider<ConsentInfo> consentInfoProvider;
         private readonly IPreferredLanguageRetriever currentLanguageRetriever;
+        private readonly IWebPageDataContextRetriever webPageDataContextRetriever;
+        private readonly PrivacyPageRepository privacyPageRepository;
         private ContactInfo currentContact;
 
 
@@ -30,24 +37,33 @@ namespace DancingGoat.Controllers
         {
             get
             {
-                currentContact ??= ContactManagementContext.CurrentContact;
+                if (currentContact == null)
+                {
+                    currentContact = ContactManagementContext.CurrentContact;
+                }
 
                 return currentContact;
             }
         }
 
 
-        public DancingGoatPrivacyController(IConsentAgreementService consentAgreementService, IInfoProvider<ConsentInfo> consentInfoProvider, IPreferredLanguageRetriever currentLanguageRetriever)
+        public DancingGoatPrivacyController(PrivacyPageRepository privacyPageRepository, IConsentAgreementService consentAgreementService, IInfoProvider<ConsentInfo> consentInfoProvider, IPreferredLanguageRetriever currentLanguageRetriever, IWebPageDataContextRetriever webPageDataContextRetriever)
         {
+            this.privacyPageRepository = privacyPageRepository;
             this.consentAgreementService = consentAgreementService;
             this.consentInfoProvider = consentInfoProvider;
             this.currentLanguageRetriever = currentLanguageRetriever;
+            this.webPageDataContextRetriever = webPageDataContextRetriever;
         }
 
 
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var model = new PrivacyViewModel();
+            var webPage = webPageDataContextRetriever.Retrieve().WebPage;
+
+            var privacyPage = await privacyPageRepository.GetPrivacyPage(webPage.WebPageItemID, webPage.LanguageName, HttpContext.RequestAborted);
+
+            var model = new PrivacyViewModel { WebPage = privacyPage };
 
             if (!IsDemoEnabled())
             {
@@ -88,15 +104,21 @@ namespace DancingGoat.Controllers
         }
 
 
-        private IEnumerable<PrivacyConsentViewModel> GetAgreedConsentsForCurrentContact() => consentAgreementService.GetAgreedConsents(CurrentContact)
+        private IEnumerable<PrivacyConsentViewModel> GetAgreedConsentsForCurrentContact()
+        {
+            return consentAgreementService.GetAgreedConsents(CurrentContact)
                 .Select(consent => new PrivacyConsentViewModel
                 {
                     Name = consent.Name,
                     Title = consent.DisplayName,
                     Text = consent.GetConsentText(currentLanguageRetriever.Get()).ShortText
                 });
+        }
 
 
-        private bool IsDemoEnabled() => consentInfoProvider.Get(TrackingConsentGenerator.CONSENT_NAME) != null;
+        private bool IsDemoEnabled()
+        {
+            return consentInfoProvider.Get(TrackingConsentGenerator.CONSENT_NAME) != null;
+        }
     }
 }

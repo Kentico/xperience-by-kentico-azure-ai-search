@@ -38,7 +38,7 @@ public class DancingGoatSimpleSearchStrategy : BaseAzureSearchIndexingStrategy<D
                 return null;
             }
 
-            result.Title = page?.ArticleTitle ?? string.Empty;
+            result.Title = page.ArticleTitle ?? string.Empty;
         }
         else if (string.Equals(item.ContentTypeName, HomePage.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase))
         {

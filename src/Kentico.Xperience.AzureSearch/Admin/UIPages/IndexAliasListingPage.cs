@@ -25,7 +25,7 @@ namespace Kentico.Xperience.AzureSearch.Admin;
 internal class IndexAliasListingPage : ListingPage
 {
     private readonly IAzureSearchClient azureSearchClient;
-    private readonly IPageUrlGenerator pageUrlGenerator;
+    private readonly IPageLinkGenerator pageLinkGenerator;
     private readonly IAzureSearchIndexAliasService azureSearchIndexAliasService;
     private readonly IAzureSearchConfigurationStorageService configurationStorageService;
     private readonly AzureSearchOptions azureSearchOptions;
@@ -39,11 +39,11 @@ internal class IndexAliasListingPage : ListingPage
         IAzureSearchClient azureSearchClient,
         IAzureSearchIndexAliasService azureSearchIndexAliasService,
         IOptions<AzureSearchOptions> azureSearchOptions,
-        IPageUrlGenerator pageUrlGenerator,
+        IPageLinkGenerator pageLinkGenerator,
         IAzureSearchConfigurationStorageService configurationStorageService)
     {
         this.azureSearchClient = azureSearchClient;
-        this.pageUrlGenerator = pageUrlGenerator;
+        this.pageLinkGenerator = pageLinkGenerator;
         this.azureSearchIndexAliasService = azureSearchIndexAliasService;
         this.configurationStorageService = configurationStorageService;
         this.azureSearchOptions = azureSearchOptions.Value;
@@ -144,7 +144,7 @@ internal class IndexAliasListingPage : ListingPage
     [PageCommand(Permission = SystemPermissions.DELETE)]
     public async Task<INavigateResponse> Delete(int id, CancellationToken cancellationToken)
     {
-        var response = NavigateTo(pageUrlGenerator.GenerateUrl<IndexAliasListingPage>());
+        var response = NavigateTo(pageLinkGenerator.GetPath<IndexAliasListingPage>());
         var alias = AzureSearchIndexAliasStore.Instance.GetAlias(id);
         if (alias == null)
         {

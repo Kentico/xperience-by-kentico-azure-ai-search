@@ -49,8 +49,8 @@ public class GeoLocationSearchStrategy : BaseAzureSearchIndexingStrategy<GeoLoca
                 return null;
             }
 
-            result.Title = page?.CafeTitle ?? string.Empty;
-            result.Location = page?.CafeLocation ?? string.Empty;
+            result.Title = page.CafeTitle ?? string.Empty;
+            result.Location = page.CafeLocation ?? string.Empty;
 
             //We can use this value later to sort by distance from the user accessing our search page.
             //Example for this scenario is shown in DancingGoatSearchService.GeoSearch

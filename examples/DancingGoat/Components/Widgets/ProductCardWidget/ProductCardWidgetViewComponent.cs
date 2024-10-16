@@ -1,4 +1,9 @@
-﻿using DancingGoat.Models;
+﻿using System.Linq;
+using System.Threading.Tasks;
+
+using CMS.ContentEngine;
+
+using DancingGoat.Models;
 using DancingGoat.Widgets;
 
 using Kentico.Content.Web.Mvc.Routing;
@@ -22,7 +27,7 @@ namespace DancingGoat.Widgets
         public const string IDENTIFIER = "DancingGoat.LandingPage.ProductCardWidget";
 
 
-        private readonly CoffeeRepository repository;
+        private readonly ProductRepository repository;
         private readonly IPreferredLanguageRetriever currentLanguageRetriever;
 
 
@@ -31,7 +36,7 @@ namespace DancingGoat.Widgets
         /// </summary>
         /// <param name="repository">Repository for retrieving products.</param>
         /// <param name="currentLanguageRetriever">Retrieves preferred language name for the current request. Takes language fallback into account.</param>
-        public ProductCardWidgetViewComponent(CoffeeRepository repository, IPreferredLanguageRetriever currentLanguageRetriever)
+        public ProductCardWidgetViewComponent(ProductRepository repository, IPreferredLanguageRetriever currentLanguageRetriever)
         {
             this.repository = repository;
             this.currentLanguageRetriever = currentLanguageRetriever;
@@ -40,10 +45,10 @@ namespace DancingGoat.Widgets
 
         public async Task<ViewViewComponentResult> InvokeAsync(ProductCardProperties properties)
         {
-            string languageName = currentLanguageRetriever.Get();
+            var languageName = currentLanguageRetriever.Get();
             var selectedProductGuids = properties.SelectedProducts.Select(i => i.Identifier).ToList();
-            IEnumerable<Coffee> products = (await repository.GetCoffees(selectedProductGuids, languageName))
-                                                     .OrderBy(p => selectedProductGuids.IndexOf(p.SystemFields.ContentItemGUID));
+            var products = (await repository.GetProducts(selectedProductGuids, languageName))
+                                            .OrderBy(p => selectedProductGuids.IndexOf(((IContentItemFieldsSource)p).SystemFields.ContentItemGUID));
             var model = ProductCardListViewModel.GetViewModel(products);
 
             return View("~/Components/Widgets/ProductCardWidget/_ProductCardWidget.cshtml", model);

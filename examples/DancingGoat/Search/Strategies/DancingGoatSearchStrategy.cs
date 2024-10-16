@@ -35,21 +35,20 @@ public class DancingGoatSearchStrategy : BaseAzureSearchIndexingStrategy<Dancing
         {
             return null;
         }
-        if (string.Equals(item.ContentTypeName, CafePage.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(item.ContentTypeName, GrinderPage.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase))
         {
             // The implementation of GetPage<T>() is below
-            var page = await strategyHelper.GetPage<CafePage>(
+            var page = await strategyHelper.GetPage<GrinderPage>(
                 indexedPage.ItemGuid,
                 indexedPage.WebsiteChannelName,
                 indexedPage.LanguageName,
-                CafePage.CONTENT_TYPE_NAME);
+                GrinderPage.CONTENT_TYPE_NAME);
 
             if (page is null)
             {
                 return null;
             }
 
-            result.Title = page?.CafeTitle ?? string.Empty;
             string rawContent = await webCrawler.CrawlWebPage(page!);
             result.Content = htmlSanitizer.SanitizeHtmlDocument(rawContent);
         }
@@ -67,7 +66,7 @@ public class DancingGoatSearchStrategy : BaseAzureSearchIndexingStrategy<Dancing
                 return null;
             }
 
-            result.Title = page?.ArticleTitle ?? string.Empty;
+            result.Title = page.ArticleTitle ?? string.Empty;
             string rawContent = await webCrawler.CrawlWebPage(page!);
             result.Content = htmlSanitizer.SanitizeHtmlDocument(rawContent);
         }

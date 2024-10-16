@@ -1,4 +1,7 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 using CMS.Core;
 using CMS.DataEngine;
@@ -48,14 +51,17 @@ namespace DancingGoat.Controllers
             this.websiteChannelProvider = websiteChannelProvider;
             this.webPageUrlRetriever = webPageUrlRetriever;
             this.websiteChannelContext = websiteChannelContext;
-            currentLanguageRetriever = preferredLanguageRetriever;
+            this.currentLanguageRetriever = preferredLanguageRetriever;
         }
 
 
         // GET: Account/Login
         [HttpGet]
         [AllowAnonymous]
-        public ActionResult Login() => View();
+        public ActionResult Login()
+        {
+            return View();
+        }
 
 
         // POST: Account/Login
@@ -82,7 +88,7 @@ namespace DancingGoat.Controllers
 
             if (signInResult.Succeeded)
             {
-                string decodedReturnUrl = WebUtility.UrlDecode(returnUrl);
+                var decodedReturnUrl = WebUtility.UrlDecode(returnUrl);
                 if (!string.IsNullOrEmpty(decodedReturnUrl) && Url.IsLocalUrl(decodedReturnUrl))
                 {
                     return Redirect(decodedReturnUrl);
@@ -109,7 +115,10 @@ namespace DancingGoat.Controllers
 
 
         // GET: Account/Register
-        public ActionResult Register() => View();
+        public ActionResult Register()
+        {
+            return View();
+        }
 
 
         // POST: Account/Register
@@ -162,7 +171,7 @@ namespace DancingGoat.Controllers
 
         private async Task<string> GetHomeWebPageUrl(CancellationToken cancellationToken)
         {
-            int websiteChannelId = websiteChannelContext.WebsiteChannelID;
+            var websiteChannelId = websiteChannelContext.WebsiteChannelID;
             var websiteChannel = await websiteChannelProvider.GetAsync(websiteChannelId, cancellationToken);
 
             if (websiteChannel == null)

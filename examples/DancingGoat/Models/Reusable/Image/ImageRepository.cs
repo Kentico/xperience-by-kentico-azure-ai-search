@@ -1,14 +1,19 @@
-﻿using CMS.ContentEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+using CMS.ContentEngine;
 using CMS.Helpers;
-using CMS.Websites;
 using CMS.Websites.Routing;
 
 namespace DancingGoat.Models
 {
     public class ImageRepository : ContentRepositoryBase
     {
-        public ImageRepository(IWebsiteChannelContext websiteChannelContext, IContentQueryExecutor executor, IWebPageQueryResultMapper mapper, IProgressiveCache cache)
-            : base(websiteChannelContext, executor, mapper, cache)
+        public ImageRepository(IWebsiteChannelContext websiteChannelContext, IContentQueryExecutor executor, IProgressiveCache cache)
+            : base(websiteChannelContext, executor, cache)
         {
         }
 
@@ -28,12 +33,15 @@ namespace DancingGoat.Models
         }
 
 
-        private static ContentItemQueryBuilder GetQueryBuilder(Guid imageGuid, string languageName) => new ContentItemQueryBuilder()
+        private static ContentItemQueryBuilder GetQueryBuilder(Guid imageGuid, string languageName)
+        {
+            return new ContentItemQueryBuilder()
                     .ForContentType(Image.CONTENT_TYPE_NAME,
                         config => config
                                 .TopN(1)
                                 .Where(where => where.WhereEquals(nameof(IContentQueryDataContainer.ContentItemGUID), imageGuid)))
                     .InLanguage(languageName);
+        }
 
 
         private static Task<ISet<string>> GetDependencyCacheKeys(IEnumerable<Image> images, CancellationToken cancellationToken)
