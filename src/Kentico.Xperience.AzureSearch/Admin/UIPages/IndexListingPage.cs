@@ -1,4 +1,4 @@
-﻿using CMS.Core;
+using CMS.Core;
 using CMS.Membership;
 
 using Kentico.Xperience.Admin.Base;
@@ -58,7 +58,7 @@ internal class IndexListingPage : ListingPage
                 new()
                 {
                     Headline = "Indexing is disabled",
-                    Content = "Indexing is disabled. See <a target='_blank' href='https://github.com/Kentico/kentico-xperience-azuresearch'>our instructions</a> to read more about AzureSearch alias indexes.",
+                    Content = "Indexing is disabled. See <a target='_blank' href='https://github.com/Kentico/xperience-by-kentico-azure-ai-search'>our instructions</a> to read more about AzureSearch alias indexes.",
                     ContentAsHtml = true,
                     Type = CalloutType.FriendlyWarning,
                     Placement = CalloutPlacement.OnDesk
@@ -75,7 +75,7 @@ internal class IndexListingPage : ListingPage
                     new()
                     {
                         Headline = "No indexes",
-                        Content = "No AzureSearch indexes registered. See <a target='_blank' href='https://github.com/Kentico/kentico-xperience-azuresearch'>our instructions</a> to read more about creating and registering AzureSearch indexes.",
+                        Content = "No AzureSearch indexes registered. See <a target='_blank' href='https://github.com/Kentico/xperience-by-kentico-azure-ai-search'>our instructions</a> to read more about creating and registering AzureSearch indexes.",
                         ContentAsHtml = true,
                         Type = CalloutType.FriendlyWarning,
                         Placement = CalloutPlacement.OnDesk
