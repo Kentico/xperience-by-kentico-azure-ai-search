@@ -27,7 +27,7 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
 
     protected async Task<ModificationResponse> ValidateAndProcess(AzureSearchConfigurationModel configuration)
     {
-        configuration.IndexName = RemoveWhitespacesUsingStringBuilder(configuration.IndexName ?? "");
+        configuration.IndexName = RemoveWhitespacesUsingStringBuilder(configuration.IndexName ?? string.Empty);
 
         var context = new ValidationContext(configuration, null, null);
         var validationResults = new List<System.ComponentModel.DataAnnotations.ValidationResult>();

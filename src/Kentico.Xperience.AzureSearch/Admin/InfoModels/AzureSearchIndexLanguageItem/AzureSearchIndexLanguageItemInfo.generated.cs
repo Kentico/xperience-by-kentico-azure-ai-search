@@ -15,7 +15,7 @@ namespace Kentico.Xperience.AzureSearch.Admin;
 /// Data container class for <see cref="AzureSearchIndexLanguageItemInfo"/>.
 /// </summary>
 [Serializable]
-public partial class AzureSearchIndexLanguageItemInfo : AbstractInfo<AzureSearchIndexLanguageItemInfo, IAzureSearchIndexLanguageItemInfoProvider>
+public partial class AzureSearchIndexLanguageItemInfo : AbstractInfo<AzureSearchIndexLanguageItemInfo, IInfoProvider<AzureSearchIndexLanguageItemInfo>>
 {
     /// <summary>
     /// Object type.
@@ -26,7 +26,7 @@ public partial class AzureSearchIndexLanguageItemInfo : AbstractInfo<AzureSearch
     /// <summary>
     /// Type information.
     /// </summary>
-    public static readonly ObjectTypeInfo TYPEINFO = new(typeof(AzureSearchIndexedLanguageInfoProvider), OBJECT_TYPE, "KenticoAzureSearch.AzureSearchIndexLanguageItem", nameof(AzureSearchIndexLanguageItemID), null, nameof(AzureSearchIndexLanguageItemGuid), null, null, null, null, null)
+    public static readonly ObjectTypeInfo TYPEINFO = new(typeof(IInfoProvider<AzureSearchIndexLanguageItemInfo>), OBJECT_TYPE, "KenticoAzureSearch.AzureSearchIndexLanguageItem", nameof(AzureSearchIndexLanguageItemID), null, nameof(AzureSearchIndexLanguageItemGuid), null, null, null, null, null)
     {
         TouchCacheDependencies = true,
         DependsOn = new List<ObjectDependency>()

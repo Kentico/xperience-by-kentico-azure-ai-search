@@ -1,13 +1,15 @@
-﻿using Kentico.Xperience.Admin.Base.FormAnnotations;
+﻿using CMS.DataEngine;
+
+using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Kentico.Xperience.Admin.Base.Forms;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
 
 internal class ExistingIndexOptionsProvider : IGeneralSelectorDataProvider
 {
-    private readonly IAzureSearchIndexItemInfoProvider indexProvider;
+    private readonly IInfoProvider<AzureSearchIndexItemInfo> indexProvider;
 
-    public ExistingIndexOptionsProvider(IAzureSearchIndexItemInfoProvider indexProvider) => this.indexProvider = indexProvider;
+    public ExistingIndexOptionsProvider(IInfoProvider<AzureSearchIndexItemInfo> indexProvider) => this.indexProvider = indexProvider;
 
     public async Task<PagedSelectListItems<string>> GetItemsAsync(string searchTerm, int pageIndex, CancellationToken cancellationToken)
     {

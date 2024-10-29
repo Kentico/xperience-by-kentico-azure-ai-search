@@ -23,7 +23,7 @@ public sealed class AzureSearchOptions
     {
         get;
         set;
-    } = "";
+    } = string.Empty;
 
     /// <summary>
     /// Admin api key used for azure search service management. see <see href="https://learn.microsoft.com/en-us/azure/search/search-manage"/> for more information. 
@@ -32,7 +32,7 @@ public sealed class AzureSearchOptions
     {
         get;
         set;
-    } = "";
+    } = string.Empty;
 
     /// <summary>
     /// Client api key used to retrieve indexed data from azure search portal. see <see href="https://learn.microsoft.com/en-us/azure/search/search-manage"/> for more information.  
@@ -41,5 +41,5 @@ public sealed class AzureSearchOptions
     {
         get;
         set;
-    } = "";
+    } = string.Empty;
 }

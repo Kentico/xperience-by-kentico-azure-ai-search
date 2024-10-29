@@ -1,6 +1,11 @@
-﻿using CMS.ContentEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+using CMS.ContentEngine;
 using CMS.Helpers;
-using CMS.Websites;
 using CMS.Websites.Routing;
 
 namespace DancingGoat.Models
@@ -16,31 +21,35 @@ namespace DancingGoat.Models
         public CafeRepository(
             IWebsiteChannelContext websiteChannelContext,
             IContentQueryExecutor executor,
-            IWebPageQueryResultMapper mapper,
             IProgressiveCache cache,
             ILinkedItemsDependencyAsyncRetriever linkedItemsDependencyRetriever)
-            : base(websiteChannelContext, executor, mapper, cache) => this.linkedItemsDependencyRetriever = linkedItemsDependencyRetriever;
+            : base(websiteChannelContext, executor, cache)
+        {
+            this.linkedItemsDependencyRetriever = linkedItemsDependencyRetriever;
+        }
 
         /// <summary>
-        /// Returns an enumerable collection of company cafes ordered by a position in the content tree.
+        /// Returns an enumerable collection of cafes.
         /// </summary>
-        public async Task<IEnumerable<Cafe>> GetCompanyCafes(int count, string languageName, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Cafe>> GetCafes(int count, string languageName, CancellationToken cancellationToken = default)
         {
             var queryBuilder = GetQueryBuilder(count, languageName);
 
-            var cacheSettings = new CacheSettings(5, WebsiteChannelContext.WebsiteChannelName, nameof(CafeRepository), languageName, nameof(GetCompanyCafes), count);
+            var cacheSettings = new CacheSettings(5, WebsiteChannelContext.WebsiteChannelName, nameof(CafeRepository), nameof(GetCafes), count, languageName);
 
             return await GetCachedQueryResult<Cafe>(queryBuilder, null, cacheSettings, GetDependencyCacheKeys, cancellationToken);
         }
 
 
-        private static ContentItemQueryBuilder GetQueryBuilder(int count, string languageName) => new ContentItemQueryBuilder()
+        private static ContentItemQueryBuilder GetQueryBuilder(int count, string languageName)
+        {
+            return new ContentItemQueryBuilder()
                     .ForContentType(Cafe.CONTENT_TYPE_NAME,
                         config => config
-                            .WithLinkedItems(1)
-                            .TopN(count)
-                            .Where(where => where.WhereTrue(nameof(Cafe.CafeIsCompanyCafe))))
+                        .WithLinkedItems(1)
+                        .TopN(count))
                     .InLanguage(languageName);
+        }
 
 
         private async Task<ISet<string>> GetDependencyCacheKeys(IEnumerable<Cafe> cafes, CancellationToken cancellationToken)

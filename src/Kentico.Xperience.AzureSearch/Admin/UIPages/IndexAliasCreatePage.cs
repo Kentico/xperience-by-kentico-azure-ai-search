@@ -20,7 +20,7 @@ namespace Kentico.Xperience.AzureSearch.Admin;
 [UIEvaluatePermission(SystemPermissions.CREATE)]
 internal class IndexAliasCreatePage : BaseIndexAliasEditPage
 {
-    private readonly IPageUrlGenerator pageUrlGenerator;
+    private readonly IPageLinkGenerator pageLinkGenerator;
     private AzureSearchAliasConfigurationModel? model = null;
 
     public IndexAliasCreatePage(
@@ -28,8 +28,8 @@ internal class IndexAliasCreatePage : BaseIndexAliasEditPage
         IFormDataBinder formDataBinder,
         IAzureSearchIndexAliasService azureSearchIndexAliasService,
         IAzureSearchConfigurationStorageService storageService,
-        IPageUrlGenerator pageUrlGenerator)
-        : base(formItemCollectionProvider, formDataBinder, azureSearchIndexAliasService, storageService) => this.pageUrlGenerator = pageUrlGenerator;
+        IPageLinkGenerator pageLinkGenerator)
+        : base(formItemCollectionProvider, formDataBinder, azureSearchIndexAliasService, storageService) => this.pageLinkGenerator = pageLinkGenerator;
 
     protected override AzureSearchAliasConfigurationModel Model
     {
@@ -49,7 +49,12 @@ internal class IndexAliasCreatePage : BaseIndexAliasEditPage
         {
             var alias = AzureSearchIndexAliasStore.Instance.GetRequiredAlias(model.AliasName);
 
-            var successResponse = NavigateTo(pageUrlGenerator.GenerateUrl<IndexAliasEditPage>(alias.Identifier.ToString()))
+            var pageParameterValues = new PageParameterValues
+            {
+                { typeof(IndexAliasEditPage), alias.Identifier }
+            };
+
+            var successResponse = NavigateTo(pageLinkGenerator.GetPath<IndexAliasEditPage>(pageParameterValues))
                 .AddSuccessMessage("Index alias created.");
 
             return successResponse;

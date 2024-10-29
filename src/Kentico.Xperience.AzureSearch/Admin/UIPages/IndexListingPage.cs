@@ -1,4 +1,4 @@
-﻿using CMS.Core;
+using CMS.Core;
 using CMS.Membership;
 
 using Kentico.Xperience.Admin.Base;
@@ -25,7 +25,7 @@ internal class IndexListingPage : ListingPage
 {
     private readonly AzureSearchOptions azureSearchOptions;
     private readonly IAzureSearchClient azureSearchClient;
-    private readonly IPageUrlGenerator pageUrlGenerator;
+    private readonly IPageLinkGenerator pageLinkGenerator;
     private readonly IAzureSearchConfigurationStorageService configurationStorageService;
     private readonly IConversionService conversionService;
 
@@ -36,14 +36,14 @@ internal class IndexListingPage : ListingPage
     /// </summary>
     public IndexListingPage(
         IAzureSearchClient azureSearchClient,
-        IPageUrlGenerator pageUrlGenerator,
+        IPageLinkGenerator pageLinkGenerator,
         IOptions<AzureSearchOptions> azureSearchOptions,
         IAzureSearchConfigurationStorageService configurationStorageService,
         IConversionService conversionService)
     {
         this.azureSearchClient = azureSearchClient;
         this.azureSearchOptions = azureSearchOptions.Value;
-        this.pageUrlGenerator = pageUrlGenerator;
+        this.pageLinkGenerator = pageLinkGenerator;
         this.configurationStorageService = configurationStorageService;
         this.conversionService = conversionService;
     }
@@ -58,7 +58,7 @@ internal class IndexListingPage : ListingPage
                 new()
                 {
                     Headline = "Indexing is disabled",
-                    Content = "Indexing is disabled. See <a target='_blank' href='https://github.com/Kentico/kentico-xperience-azuresearch'>our instructions</a> to read more about AzureSearch alias indexes.",
+                    Content = "Indexing is disabled. See <a target='_blank' href='https://github.com/Kentico/xperience-by-kentico-azure-ai-search'>our instructions</a> to read more about AzureSearch alias indexes.",
                     ContentAsHtml = true,
                     Type = CalloutType.FriendlyWarning,
                     Placement = CalloutPlacement.OnDesk
@@ -75,7 +75,7 @@ internal class IndexListingPage : ListingPage
                     new()
                     {
                         Headline = "No indexes",
-                        Content = "No AzureSearch indexes registered. See <a target='_blank' href='https://github.com/Kentico/kentico-xperience-azuresearch'>our instructions</a> to read more about creating and registering AzureSearch indexes.",
+                        Content = "No AzureSearch indexes registered. See <a target='_blank' href='https://github.com/Kentico/xperience-by-kentico-azure-ai-search'>our instructions</a> to read more about creating and registering AzureSearch indexes.",
                         ContentAsHtml = true,
                         Type = CalloutType.FriendlyWarning,
                         Placement = CalloutPlacement.OnDesk
@@ -189,7 +189,7 @@ internal class IndexListingPage : ListingPage
     [PageCommand(Permission = SystemPermissions.DELETE)]
     public async Task<INavigateResponse> Delete(int id, CancellationToken cancellationToken)
     {
-        var response = NavigateTo(pageUrlGenerator.GenerateUrl<IndexListingPage>());
+        var response = NavigateTo(pageLinkGenerator.GetPath<IndexListingPage>());
         var index = AzureSearchIndexStore.Instance.GetIndex(id);
         if (index == null)
         {

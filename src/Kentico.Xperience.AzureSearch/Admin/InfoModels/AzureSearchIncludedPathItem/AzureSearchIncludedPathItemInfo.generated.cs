@@ -14,7 +14,7 @@ namespace Kentico.Xperience.AzureSearch.Admin;
 /// Data container class for <see cref="AzureSearchIncludedPathItemInfo"/>.
 /// </summary>
 [Serializable]
-public partial class AzureSearchIncludedPathItemInfo : AbstractInfo<AzureSearchIncludedPathItemInfo, IAzureSearchIncludedPathItemInfoProvider>
+public partial class AzureSearchIncludedPathItemInfo : AbstractInfo<AzureSearchIncludedPathItemInfo, IInfoProvider<AzureSearchIncludedPathItemInfo>>
 {
     /// <summary>
     /// Object type.
@@ -25,7 +25,7 @@ public partial class AzureSearchIncludedPathItemInfo : AbstractInfo<AzureSearchI
     /// <summary>
     /// Type information.
     /// </summary>
-    public static readonly ObjectTypeInfo TYPEINFO = new(typeof(AzureSearchIncludedPathItemInfoProvider), OBJECT_TYPE, "KenticoAzureSearch.AzureSearchIncludedPathItem", nameof(AzureSearchIncludedPathItemId), null, nameof(AzureSearchIncludedPathItemGuid), null, null, null, null, null)
+    public static readonly ObjectTypeInfo TYPEINFO = new(typeof(IInfoProvider<AzureSearchIncludedPathItemInfo>), OBJECT_TYPE, "KenticoAzureSearch.AzureSearchIncludedPathItem", nameof(AzureSearchIncludedPathItemId), null, nameof(AzureSearchIncludedPathItemGuid), null, null, null, null, null)
     {
         TouchCacheDependencies = true,
         DependsOn = new List<ObjectDependency>()

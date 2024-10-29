@@ -44,7 +44,7 @@ public class WebCrawlerService
                 ex,
                 $"Tree Path: {page.SystemFields.WebPageItemTreePath}");
         }
-        return "";
+        return string.Empty;
     }
 
     public async Task<string> CrawlPage(string url)
@@ -62,6 +62,6 @@ public class WebCrawlerService
                 ex,
                 $"Url: {url}");
         }
-        return "";
+        return string.Empty;
     }
 }
