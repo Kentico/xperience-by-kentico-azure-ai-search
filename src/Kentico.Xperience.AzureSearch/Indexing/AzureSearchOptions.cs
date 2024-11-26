@@ -42,4 +42,9 @@ public sealed class AzureSearchOptions
         get;
         set;
     } = string.Empty;
+
+    /// <summary>
+    /// Optional delay between indexing individual <see cref="IIndexEventItemModel"/>s.
+    /// </summary>
+    public int IndexItemDelay { get; set; }
 }

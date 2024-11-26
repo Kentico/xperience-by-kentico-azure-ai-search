@@ -3,6 +3,7 @@ using CMS.Core;
 using CMS.Websites;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Kentico.Xperience.AzureSearch.Indexing;
 
@@ -18,17 +19,20 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
     private readonly IServiceProvider serviceProvider;
     private readonly IAzureSearchClient azureSearchClient;
     private readonly IEventLogService eventLogService;
+    private readonly AzureSearchOptions azureSearchOptions;
 
     public DefaultAzureSearchTaskProcessor(
         IAzureSearchClient azureSearchClient,
         IEventLogService eventLogService,
         IWebPageUrlRetriever urlRetriever,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        IOptions<AzureSearchOptions> azureSearchOptions)
     {
         this.azureSearchClient = azureSearchClient;
         this.eventLogService = eventLogService;
         this.urlRetriever = urlRetriever;
         this.serviceProvider = serviceProvider;
+        this.azureSearchOptions = azureSearchOptions.Value;
     }
 
     /// <inheritdoc />
@@ -46,6 +50,20 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
         return batchResults.SuccessfulOperations;
     }
 
+    private async Task AddQueueItemToUpsertOrDelete(AzureSearchQueueItem item, List<IAzureSearchModel> upsertData, List<AzureSearchQueueItem> deleteTasks)
+    {
+        var document = await GetSearchModel(item);
+
+        if (document is not null)
+        {
+            upsertData.Add(document);
+        }
+        else
+        {
+            deleteTasks.Add(item);
+        }
+    }
+
     private async Task ProcessAzureSearchBatch(IEnumerable<AzureSearchQueueItem> queueItems, AzureSearchBatchResult previousBatchResults, CancellationToken cancellationToken)
     {
         var groups = queueItems.GroupBy(item => item.IndexName);
@@ -60,16 +78,17 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
                 var updateTasks = group.Where(queueItem => queueItem.TaskType is AzureSearchTaskType.PUBLISH_INDEX or AzureSearchTaskType.UPDATE);
                 var upsertData = new List<IAzureSearchModel>();
 
-                foreach (var queueItem in updateTasks)
+                if (updateTasks.Any())
                 {
-                    var document = await GetSearchModel(queueItem);
-                    if (document is not null)
+                    await AddQueueItemToUpsertOrDelete(updateTasks.First(), upsertData, deleteTasks);
+                }
+
+                if (updateTasks.Count() > 1)
+                {
+                    foreach (var queueItem in updateTasks.Skip(1))
                     {
-                        upsertData.Add(document);
-                    }
-                    else
-                    {
-                        deleteTasks.Add(queueItem);
+                        await Task.Delay(azureSearchOptions.IndexItemDelay, cancellationToken);
+                        await AddQueueItemToUpsertOrDelete(queueItem, upsertData, deleteTasks);
                     }
                 }
 
