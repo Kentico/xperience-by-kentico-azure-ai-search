@@ -38,7 +38,11 @@ dotnet add package Kentico.Xperience.AzureSearch
    "CMSAzureSearch": {
        "SearchServiceEndPoint": "<your application url>",
        "SearchServiceAdminApiKey": "<your application admin key>",
-       "SearchServiceQueryApiKey": "<your application query key>"
+       "SearchServiceQueryApiKey": "<your application query key>",
+       
+       // Opotionally add delay between indexing items.
+       // This is useful if there are a lot of pages and items on your web which when crawled would increase the performance requirements.
+       "IndexItemDelay" :  0
    }
    ```
 
