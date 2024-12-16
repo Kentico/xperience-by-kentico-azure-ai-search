@@ -7,11 +7,11 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Azure.Search.Documents" Version="11.6.0-beta.2" />
-    <PackageVersion Include="Kentico.Xperience.Admin" Version="29.5.3" />
-    <PackageVersion Include="Kentico.Xperience.WebApp" Version="29.5.3" />
-    <PackageVersion Include="kentico.xperience.azurestorage" Version="29.5.3" />
-    <PackageVersion Include="kentico.xperience.imageprocessing" Version="29.5.3" />
-    <PackageVersion Include="Kentico.Xperience.Core.Tests" Version="29.5.3" />
+    <PackageVersion Include="Kentico.Xperience.Admin" Version="30.0.0" />
+    <PackageVersion Include="Kentico.Xperience.WebApp" Version="30.0.0" />
+    <PackageVersion Include="kentico.xperience.azurestorage" Version="30.0.0" />
+    <PackageVersion Include="kentico.xperience.imageprocessing" Version="30.0.0" />
+    <PackageVersion Include="Kentico.Xperience.Core.Tests" Version="30.0.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="9.20.0.85982" />
 

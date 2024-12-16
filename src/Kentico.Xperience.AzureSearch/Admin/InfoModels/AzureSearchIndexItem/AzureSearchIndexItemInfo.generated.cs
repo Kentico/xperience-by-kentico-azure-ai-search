@@ -120,17 +120,6 @@ public partial class AzureSearchIndexItemInfo : AbstractInfo<AzureSearchIndexIte
 
 
     /// <summary>
-    /// Constructor for de-serialization.
-    /// </summary>
-    /// <param name="info">Serialization info.</param>
-    /// <param name="context">Streaming context.</param>
-    protected AzureSearchIndexItemInfo(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-    }
-
-
-    /// <summary>
     /// Creates an empty instance of the <see cref="AzureSearchIndexItemInfo"/> class.
     /// </summary>
     public AzureSearchIndexItemInfo()
