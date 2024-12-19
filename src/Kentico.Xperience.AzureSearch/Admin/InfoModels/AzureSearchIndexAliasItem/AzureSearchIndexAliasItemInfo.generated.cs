@@ -87,17 +87,6 @@ public partial class AzureSearchIndexAliasItemInfo : AbstractInfo<AzureSearchInd
 
 
     /// <summary>
-    /// Constructor for de-serialization.
-    /// </summary>
-    /// <param name="info">Serialization info.</param>
-    /// <param name="context">Streaming context.</param>
-    protected AzureSearchIndexAliasItemInfo(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-    }
-
-
-    /// <summary>
     /// Creates an empty instance of the <see cref="AzureSearchIndexAliasItemInfo"/> class.
     /// </summary>
     public AzureSearchIndexAliasItemInfo()
