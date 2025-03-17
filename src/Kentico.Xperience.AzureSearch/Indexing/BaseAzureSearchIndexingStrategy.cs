@@ -42,7 +42,7 @@ public class BaseAzureSearchIndexingStrategy<TSearchModel> : IAzureSearchIndexin
     public IList<SearchField> GetSearchFields() => fieldBuilder.Build(typeof(TSearchModel));
 
     /// <inheritdoc />
-    public async Task<int> UploadDocuments(IEnumerable<IAzureSearchModel> models, SearchClient searchClient)
+    public virtual async Task<int> UploadDocuments(IEnumerable<IAzureSearchModel> models, SearchClient searchClient)
     {
         var batch = new IndexDocumentsBatch<TSearchModel>();
 
