@@ -13,7 +13,6 @@ public static class DancingGoatSearchStartupExtensions
             builder.RegisterStrategy<SemanticRankingSearchStrategy, DancingGoatSearchModel>(nameof(SemanticRankingSearchStrategy));
             builder.RegisterStrategy<DancingGoatSearchStrategy, DancingGoatSearchModel>(nameof(DancingGoatSearchStrategy));
             builder.RegisterStrategy<DancingGoatSimpleSearchStrategy, DancingGoatSimpleSearchModel>(nameof(DancingGoatSimpleSearchStrategy));
-            builder.RegisterStrategy<GeoLocationSearchStrategy, GeoLocationSearchModel>(nameof(GeoLocationSearchStrategy));
             builder.RegisterStrategy<CustomItemsReindexingSearchStrategy, DancingGoatSearchModel>(nameof(CustomItemsReindexingSearchStrategy));
             builder.RegisterStrategy<ReusableContentItemsIndexingStrategy, DancingGoatSearchModel>(nameof(ReusableContentItemsIndexingStrategy));
         }, configuration);

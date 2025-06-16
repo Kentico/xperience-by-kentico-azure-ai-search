@@ -109,23 +109,6 @@ public class CustomItemsReindexingSearchStrategy : BaseAzureSearchIndexingStrate
             string rawContent = await webCrawler.CrawlWebPage(page!);
             result.Content = htmlSanitizer.SanitizeHtmlDocument(rawContent);
         }
-        else if (string.Equals(item.ContentTypeName, GrinderPage.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase))
-        {
-            // The implementation of GetPage<T>() is below
-            var page = await strategyHelper.GetPage<GrinderPage>(
-                indexedPage.ItemGuid,
-                indexedPage.WebsiteChannelName,
-                indexedPage.LanguageName,
-                GrinderPage.CONTENT_TYPE_NAME);
-
-            if (page is null)
-            {
-                return null;
-            }
-
-            string rawContent = await webCrawler.CrawlWebPage(page!);
-            result.Content = htmlSanitizer.SanitizeHtmlDocument(rawContent);
-        }
         else if (string.Equals(item.ContentTypeName, HomePage.CONTENT_TYPE_NAME, StringComparison.OrdinalIgnoreCase))
         {
             var page = await strategyHelper.GetPage<HomePage>(
