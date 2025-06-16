@@ -5,10 +5,10 @@
 /// </summary>
 public interface IAzureSearchModel
 {
-    public string? Url { get; set; }
-    public string ContentTypeName { get; set; }
-    public string LanguageName { get; set; }
-    public string ItemGuid { get; set; }
-    public string ObjectID { get; set; }
-    public string Name { get; set; }
+    string? Url { get; set; }
+    string ContentTypeName { get; set; }
+    string LanguageName { get; set; }
+    string ItemGuid { get; set; }
+    string ObjectID { get; set; }
+    string Name { get; set; }
 }

@@ -9,7 +9,7 @@ internal class IndexStoreTests
     [Test]
     public void AddAndGetIndex()
     {
-        AzureSearchIndexStore.Instance.SetIndicies(new List<AzureSearchConfigurationModel>());
+        AzureSearchIndexStore.Instance.SetIndicies([]);
 
         AzureSearchIndexStore.Instance.AddIndex(MockDataProvider.Index);
         AzureSearchIndexStore.Instance.AddIndex(MockDataProvider.GetIndex("TestIndex", 1));
@@ -24,7 +24,7 @@ internal class IndexStoreTests
     [Test]
     public void AddIndex_AlreadyExists()
     {
-        AzureSearchIndexStore.Instance.SetIndicies(new List<AzureSearchConfigurationModel>());
+        AzureSearchIndexStore.Instance.SetIndicies([]);
         AzureSearchIndexStore.Instance.AddIndex(MockDataProvider.Index);
 
         bool hasThrown = false;
@@ -47,7 +47,7 @@ internal class IndexStoreTests
         var defaultIndex = new AzureSearchConfigurationModel { IndexName = "DefaultIndex", Id = 0 };
         var simpleIndex = new AzureSearchConfigurationModel { IndexName = "SimpleIndex", Id = 1 };
 
-        AzureSearchIndexStore.Instance.SetIndicies(new List<AzureSearchConfigurationModel>() { defaultIndex, simpleIndex });
+        AzureSearchIndexStore.Instance.SetIndicies([defaultIndex, simpleIndex]);
 
         Assert.Multiple(() =>
         {

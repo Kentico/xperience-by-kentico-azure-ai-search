@@ -22,7 +22,7 @@ public class SemanticRankingConfiguration
     public SemanticRankingConfiguration(SemanticSearch semanticSearch)
     {
         SemanticSearch = semanticSearch;
-        Suggesters = new List<SearchSuggester>();
+        Suggesters = [];
     }
 
     /// <summary>
