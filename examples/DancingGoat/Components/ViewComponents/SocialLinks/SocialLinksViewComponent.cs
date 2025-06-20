@@ -1,33 +1,26 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using DancingGoat.Models;
 
-using DancingGoat.Models;
-
-using Kentico.Content.Web.Mvc.Routing;
+using Kentico.Content.Web.Mvc;
 
 using Microsoft.AspNetCore.Mvc;
 
-namespace DancingGoat.ViewComponents
+namespace DancingGoat.ViewComponents;
+
+public class SocialLinksViewComponent : ViewComponent
 {
-    public class SocialLinksViewComponent : ViewComponent
+    private readonly IContentRetriever contentRetriever;
+
+
+    public SocialLinksViewComponent(IContentRetriever contentRetriever) => this.contentRetriever = contentRetriever;
+
+
+    public async Task<IViewComponentResult> InvokeAsync()
     {
-        private readonly SocialLinkRepository socialLinkRepository;
-        private readonly IPreferredLanguageRetriever currentLanguageRetriever;
+        var socialLinks = await contentRetriever.RetrieveContent<SocialLink>(
+            new RetrieveContentParameters { LinkedItemsMaxLevel = 1 },
+            HttpContext.RequestAborted
+        );
 
-        public SocialLinksViewComponent(SocialLinkRepository socialLinkRepository, IPreferredLanguageRetriever currentLanguageRetriever)
-        {
-            this.socialLinkRepository = socialLinkRepository;
-            this.currentLanguageRetriever = currentLanguageRetriever;
-        }
-
-
-        public async Task<IViewComponentResult> InvokeAsync()
-        {
-            var languageName = currentLanguageRetriever.Get();
-
-            var socialLinks = await socialLinkRepository.GetSocialLinks(languageName, HttpContext.RequestAborted);
-
-            return View("~/Components/ViewComponents/SocialLinks/Default.cshtml", socialLinks.Select(SocialLinkViewModel.GetViewModel));
-        }
+        return View("~/Components/ViewComponents/SocialLinks/Default.cshtml", socialLinks.Select(SocialLinkViewModel.GetViewModel));
     }
 }

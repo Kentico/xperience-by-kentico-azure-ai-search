@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-using DancingGoat;
+﻿using DancingGoat;
 using DancingGoat.Controllers;
 using DancingGoat.Models;
 
@@ -12,31 +10,17 @@ using Microsoft.AspNetCore.Mvc;
 
 [assembly: RegisterWebPageRoute(LandingPage.CONTENT_TYPE_NAME, typeof(DancingGoatLandingPageController), WebsiteChannelNames = new[] { DancingGoatConstants.WEBSITE_CHANNEL_NAME })]
 
-namespace DancingGoat.Controllers
+namespace DancingGoat.Controllers;
+
+public class DancingGoatLandingPageController : Controller
 {
-    public class DancingGoatLandingPageController : Controller
+    private readonly IContentRetriever contentRetriever;
+
+    public DancingGoatLandingPageController(IContentRetriever contentRetriever) => this.contentRetriever = contentRetriever;
+
+    public async Task<IActionResult> Index()
     {
-        private readonly LandingPageRepository landingPageRepository;
-        private readonly IWebPageDataContextRetriever webPageDataContextRetriever;
-        private readonly IPreferredLanguageRetriever currentLanguageRetriever;
-
-
-        public DancingGoatLandingPageController(LandingPageRepository landingPageRepository, IWebPageDataContextRetriever webPageDataContextRetriever, IPreferredLanguageRetriever currentLanguageRetriever)
-        {
-            this.landingPageRepository = landingPageRepository;
-            this.webPageDataContextRetriever = webPageDataContextRetriever;
-            this.currentLanguageRetriever = currentLanguageRetriever;
-        }
-
-
-        public async Task<IActionResult> Index()
-        {
-            var webPageItemId = webPageDataContextRetriever.Retrieve().WebPage.WebPageItemID;
-            var languageName = currentLanguageRetriever.Get();
-
-            var landingPage = await landingPageRepository.GetLandingPage(webPageItemId, languageName, cancellationToken: HttpContext.RequestAborted);
-
-            return new TemplateResult(landingPage);
-        }
+        var landingPage = await contentRetriever.RetrieveCurrentPage<LandingPage>(HttpContext.RequestAborted);
+        return new TemplateResult(landingPage);
     }
 }

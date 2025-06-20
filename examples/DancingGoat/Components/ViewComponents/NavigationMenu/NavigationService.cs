@@ -1,85 +1,65 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using CMS.Helpers;
+﻿using CMS.Helpers;
 using CMS.Websites;
 using CMS.Websites.Routing;
 
 using DancingGoat.Models;
 
-namespace DancingGoat.ViewComponents
+using Kentico.Content.Web.Mvc;
+
+namespace DancingGoat.ViewComponents;
+
+public class NavigationService
 {
-    public class NavigationService
+    private readonly IContentRetriever contentRetriever;
+    private readonly IWebPageUrlRetriever webPageUrlRetriever;
+    private readonly IWebsiteChannelContext websiteChannelContext;
+    private readonly IProgressiveCache progressiveCache;
+
+    public NavigationService(
+        IContentRetriever contentRetriever,
+        IWebPageUrlRetriever webPageUrlRetriever,
+        IWebsiteChannelContext websiteChannelContext,
+        IProgressiveCache progressiveCache)
     {
-        private readonly NavigationItemRepository navigationItemRepository;
-        private readonly IWebPageUrlRetriever webPageUrlRetriever;
-        private readonly IProgressiveCache progressiveCache;
-        private readonly IWebsiteChannelContext websiteChannelContext;
+        this.contentRetriever = contentRetriever;
+        this.webPageUrlRetriever = webPageUrlRetriever;
+        this.websiteChannelContext = websiteChannelContext;
+        this.progressiveCache = progressiveCache;
+    }
 
 
-        public NavigationService(
-            NavigationItemRepository navigationItemRepository,
-            IWebPageUrlRetriever webPageUrlRetriever,
-            IProgressiveCache progressiveCache,
-            IWebsiteChannelContext websiteChannelContext)
+    public async Task<IEnumerable<NavigationItemViewModel>> GetSiteNavigationItemViewModels(string languageName, CancellationToken cancellationToken = default) => await GetNavigationItemViewModelsInternal(DancingGoatConstants.SITE_NAVIGATION_MENU_TREE_PATH, languageName, cancellationToken);
+
+
+    public async Task<IEnumerable<NavigationItemViewModel>> GetStoreNavigationItemViewModels(string languageName, CancellationToken cancellationToken = default) => await GetNavigationItemViewModelsInternal(DancingGoatConstants.STORE_NAVIGATION_MENU_TREE_PATH, languageName, cancellationToken);
+
+
+    public async Task<IEnumerable<NavigationItemViewModel>> GetNavigationItemViewModelsInternal(string treePath, string languageName, CancellationToken cancellationToken = default)
+    {
+        using var collector = new CacheDependencyCollector();
+        return await progressiveCache.LoadAsync(async (cacheSettings, cancellationToken) =>
         {
-            this.navigationItemRepository = navigationItemRepository;
-            this.webPageUrlRetriever = webPageUrlRetriever;
-            this.progressiveCache = progressiveCache;
-            this.websiteChannelContext = websiteChannelContext;
-        }
-
-
-        public async Task<IEnumerable<NavigationItemViewModel>> GetNavigationItemViewModels(string languageName, CancellationToken cancellationToken = default)
-        {
-            var navigationItems = (await navigationItemRepository.GetNavigationItems(languageName, cancellationToken))
-                .ToList();
-
-            var menuItemGuids = navigationItems
-                .Select(navigationItem => navigationItem.NavigationItemLink.First().WebPageGuid)
-                .ToList();
-
-            var navigationModels = await GetModelsCached(navigationItems, menuItemGuids, languageName, cancellationToken);
-
-            return navigationModels;
-        }
-
-
-        private async Task<IEnumerable<NavigationItemViewModel>> GetModelsCached(List<NavigationItem> navigationItems, List<Guid> menuItemGuids, string languageName, CancellationToken cancellationToken)
-        {
-            var cacheSettings = new CacheSettings(5, websiteChannelContext.WebsiteChannelName, nameof(GetNavigationItemViewModels), languageName);
-
-            return await progressiveCache.LoadAsync(async (settings, cancellationToken) =>
-            {
-                var urls = await webPageUrlRetriever.Retrieve(menuItemGuids, websiteChannelContext.WebsiteChannelName, languageName, cancellationToken: cancellationToken);
-
-                var navigationModels = navigationItems
-                        .Where(navigationItem => urls.ContainsKey(navigationItem.NavigationItemLink.First().WebPageGuid))
-                        .Select(navigationItem =>
-                            new NavigationItemViewModel(
-                                navigationItem.NavigationItemName,
-                                urls[navigationItem.NavigationItemLink.First().WebPageGuid].RelativePath
-                            ));
-
-                if (cacheSettings.Cached = navigationModels != null && navigationModels.Any())
+            var navigationItems = (await contentRetriever.RetrievePages<NavigationItem>(
+                new RetrievePagesParameters
                 {
-                    var cacheKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    PathMatch = PathMatch.Children(treePath, 1)
+                },
+                query => query.OrderBy(nameof(IWebPageContentQueryDataContainer.WebPageItemOrder)),
+                RetrievalCacheSettings.CacheDisabled,
+                cancellationToken
+            )).ToList();
 
-                    foreach (var key in menuItemGuids)
-                    {
-                        cacheKeys.Add(CacheHelper.BuildCacheItemName(new[] { "webpageitem", "byguid", key.ToString() }, false));
-                    }
+            var urls = await webPageUrlRetriever
+                .Retrieve([.. navigationItems.SelectMany(x => x.NavigationItemLink.Select(y => y.WebPageGuid))],
+                    websiteChannelContext.WebsiteChannelName, languageName, websiteChannelContext.IsPreview, cancellationToken);
 
-                    cacheKeys.Add(CacheHelper.BuildCacheItemName(new[] { "webpageitem", "bychannel", websiteChannelContext.WebsiteChannelName, "childrenofpath", DancingGoatConstants.NAVIGATION_MENU_FOLDER_PATH }));
+            cacheSettings.CacheDependency = collector.GetCacheDependency();
 
-                    cacheSettings.CacheDependency = CacheHelper.GetCacheDependency(cacheKeys);
-                }
-
-                return navigationModels;
-            }, cacheSettings, cancellationToken);
-        }
+            return navigationItems.Select(x => new NavigationItemViewModel(
+                x.NavigationItemName,
+                urls[x.NavigationItemLink.First().WebPageGuid].RelativePath
+            ));
+        },
+        new CacheSettings(10, $"NavigationItems_{treePath}"), cancellationToken);
     }
 }

@@ -1,54 +1,44 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Threading;
-
-using CMS.Websites;
+﻿using CMS.Websites;
 
 using DancingGoat.Models;
 
-using Kentico.Content.Web.Mvc.Routing;
+using Kentico.Content.Web.Mvc;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
 
-namespace DancingGoat.ViewComponents
+namespace DancingGoat.ViewComponents;
+
+/// <summary>
+/// Cafe card section view component.
+/// </summary>
+public class CafeCardSectionViewComponent : ViewComponent
 {
-    /// <summary>
-    /// Cafe card section view component.
-    /// </summary>
-    public class CafeCardSectionViewComponent : ViewComponent
+    private readonly IContentRetriever contentRetriever;
+
+    public CafeCardSectionViewComponent(IContentRetriever contentRetriever) => this.contentRetriever = contentRetriever;
+
+
+    public async Task<ViewViewComponentResult> InvokeAsync(IEnumerable<CafeViewModel> cafes)
     {
-        private readonly ContactsPageRepository contactsPageRepository;
-        private readonly IWebPageUrlRetriever webPageUrlRetriever;
-        private readonly IPreferredLanguageRetriever currentLanguageRetriever;
+        string contactsPagePath = await GetContactsPagePath(HttpContext.RequestAborted);
+        var model = new CafeCardSectionViewModel(cafes, contactsPagePath);
+
+        return View("~/Components/ViewComponents/CafeCardSection/Default.cshtml", model);
+    }
 
 
-        public CafeCardSectionViewComponent(IPreferredLanguageRetriever currentLanguageRetriever, ContactsPageRepository contactsPageRepository, IWebPageUrlRetriever webPageUrlRetriever)
-        {
-            this.currentLanguageRetriever = currentLanguageRetriever;
-            this.contactsPageRepository = contactsPageRepository;
-            this.webPageUrlRetriever = webPageUrlRetriever;
-        }
+    private async Task<string> GetContactsPagePath(CancellationToken cancellationToken)
+    {
+        var contactsPage = (await contentRetriever.RetrievePages<ContactsPage>(
+            RetrievePagesParameters.Default,
+            query => query.UrlPathColumns(),
+            new RetrievalCacheSettings("UrlPathColumns"),
+            cancellationToken
+        )).FirstOrDefault();
 
+        var url = contactsPage.GetUrl();
 
-        public async Task<ViewViewComponentResult> InvokeAsync(IEnumerable<CafeViewModel> cafes)
-        {
-            string languageName = currentLanguageRetriever.Get();
-            string contactsPagePath = await GetContactsPagePath(languageName, HttpContext.RequestAborted);
-            var model = new CafeCardSectionViewModel(cafes, contactsPagePath);
-
-            return View("~/Components/ViewComponents/CafeCardSection/Default.cshtml", model);
-        }
-
-
-        private async Task<string> GetContactsPagePath(string languageName, CancellationToken cancellationToken)
-        {
-            const string CONTACTS_PAGE_TREE_PATH = "/Contacts";
-
-            var contactsPage = await contactsPageRepository.GetContactsPage(CONTACTS_PAGE_TREE_PATH, languageName, cancellationToken);
-            var url = await webPageUrlRetriever.Retrieve(contactsPage, cancellationToken);
-
-            return url.RelativePath;
-        }
+        return url.RelativePath;
     }
 }

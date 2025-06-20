@@ -1,33 +1,27 @@
-﻿using System.Threading.Tasks;
+﻿using DancingGoat.Models;
 
-using DancingGoat.Models;
-
-using Kentico.Content.Web.Mvc.Routing;
+using Kentico.Content.Web.Mvc;
 
 using Microsoft.AspNetCore.Mvc;
 
-namespace DancingGoat.ViewComponents
+namespace DancingGoat.ViewComponents;
+
+public class CompanyAddressViewComponent : ViewComponent
 {
-    public class CompanyAddressViewComponent : ViewComponent
+    private readonly IContentRetriever contentRetriever;
+
+
+    public CompanyAddressViewComponent(IContentRetriever contentRetriever) => this.contentRetriever = contentRetriever;
+
+
+    public async Task<IViewComponentResult> InvokeAsync()
     {
-        private readonly ContactRepository contactRepository;
-        private readonly IPreferredLanguageRetriever currentLanguageRetriever;
+        var contact = (await contentRetriever.RetrieveContent<Contact>(
+            HttpContext.RequestAborted
+        )).FirstOrDefault();
 
+        var model = ContactViewModel.GetViewModel(contact);
 
-        public CompanyAddressViewComponent(ContactRepository contactRepository, IPreferredLanguageRetriever currentLanguageRetriever)
-        {
-            this.contactRepository = contactRepository;
-            this.currentLanguageRetriever = currentLanguageRetriever;
-        }
-
-
-        public async Task<IViewComponentResult> InvokeAsync()
-        {
-            var languageName = currentLanguageRetriever.Get();
-            var contact = await contactRepository.GetContact(languageName, HttpContext.RequestAborted);
-            var model = ContactViewModel.GetViewModel(contact);
-
-            return View("~/Components/ViewComponents/CompanyAddress/Default.cshtml", model);
-        }
+        return View("~/Components/ViewComponents/CompanyAddress/Default.cshtml", model);
     }
 }

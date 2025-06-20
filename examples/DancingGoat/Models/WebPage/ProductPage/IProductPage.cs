@@ -1,17 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using CMS.Websites;
 
-using CMS.Websites;
+namespace DancingGoat.Models;
 
-namespace DancingGoat.Models
+/// <summary>
+/// Represents a common product page model.
+/// </summary>
+public interface IProductPage : IWebPageFieldsSource
 {
     /// <summary>
-    /// Represents a common product page model.
+    /// Get product related item.
     /// </summary>
-    public interface IProductPage : IWebPageFieldsSource
-    {
-        /// <summary>
-        /// Get product related item.
-        /// </summary>
-        public IEnumerable<IProductFields> RelatedItem { get; }
-    }
+    IEnumerable<IProductFields> RelatedItem { get; }
 }

@@ -32,6 +32,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
       - name: Run dotnet format
         run: dotnet format --exclude ./examples/** --verify-no-changes
 
@@ -48,7 +53,6 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_NOLOGO: 1
       SIGN_FILE: false
-      PROJECT_NAME: Kentico.Xperience.AzureSearch
 
     steps:
       - uses: actions/checkout@v4
@@ -56,7 +60,7 @@ jobs:
       - name: "Install Node.js from package.json version"
         uses: actions/setup-node@v4
         with:
-          node-version-file: ./src/${{ env.PROJECT_NAME }}/Admin/Client/package.json
+          node-version-file: "src/Kentico.Xperience.AzureSearch/Admin/Client/package.json"
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4

@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using CMS.ContentEngine;
+using CMS.DataEngine;
+using CMS.Helpers;
+using CMS.Websites;
 
 using DancingGoat;
 using DancingGoat.Controllers;
@@ -11,27 +14,49 @@ using Microsoft.AspNetCore.Mvc;
 
 [assembly: RegisterWebPageRoute(HomePage.CONTENT_TYPE_NAME, typeof(DancingGoatHomeController), WebsiteChannelNames = new[] { DancingGoatConstants.WEBSITE_CHANNEL_NAME })]
 
-namespace DancingGoat.Controllers
+namespace DancingGoat.Controllers;
+
+public class DancingGoatHomeController : Controller
 {
-    public class DancingGoatHomeController : Controller
+    private readonly IContentRetriever contentRetriever;
+    private readonly ICacheDependencyBuilderFactory cacheDependencyBuilderFactory;
+
+    public DancingGoatHomeController(IContentRetriever contentRetriever, ICacheDependencyBuilderFactory cacheDependencyBuilderFactory)
     {
-        private readonly HomePageRepository homePageRepository;
-        private readonly IWebPageDataContextRetriever webPageDataContextRetriever;
+        this.contentRetriever = contentRetriever;
+        this.cacheDependencyBuilderFactory = cacheDependencyBuilderFactory;
+    }
 
-        public DancingGoatHomeController(HomePageRepository homePageRepository, IWebPageDataContextRetriever webPageDataContextRetriever)
-        {
-            this.homePageRepository = homePageRepository;
-            this.webPageDataContextRetriever = webPageDataContextRetriever;
-        }
+    public async Task<IActionResult> Index()
+    {
+        var homePage = await contentRetriever.RetrieveCurrentPage<HomePage>(
+            new RetrieveCurrentPageParameters { LinkedItemsMaxLevel = 4 },
+            HttpContext.RequestAborted
+        );
 
+        var cafes = await GetCafes(homePage);
 
-        public async Task<IActionResult> Index()
-        {
-            var webPage = webPageDataContextRetriever.Retrieve().WebPage;
+        return View(HomePageViewModel.GetViewModel(homePage, cafes));
+    }
 
-            var homePage = await homePageRepository.GetHomePage(webPage.WebPageItemID, webPage.LanguageName, HttpContext.RequestAborted);
+    private async Task<IEnumerable<Cafe>> GetCafes(HomePage homePage)
+    {
+        var cafeAdditionalDependencies = cacheDependencyBuilderFactory.Create()
+            .ForWebPageItems()
+                .ByIdWithLanguageContext(homePage.SystemFields.WebPageItemID)
+                .Builder()
+            .ForInfoObjects<SmartFolderInfo>()
+                .ByGuid(homePage.HomePageCafesFolder.Identifier)
+                .Builder()
+            .Build();
 
-            return View(HomePageViewModel.GetViewModel(homePage));
-        }
+        return await contentRetriever.RetrieveContent<Cafe>(
+            new RetrieveContentParameters { LinkedItemsMaxLevel = 1 },
+            query => query
+                .InSmartFolder(homePage.HomePageCafesFolder.Identifier)
+                .TopN(3),
+            new RetrievalCacheSettings($"InSmartFolder_{homePage.HomePageCafesFolder.Identifier}_TopN_3", TimeSpan.FromMinutes(5), additionalCacheDependencies: cafeAdditionalDependencies),
+            HttpContext.RequestAborted
+        );
     }
 }
