@@ -52,7 +52,6 @@ internal class AzureSearchSearchModule : Module
         RequestEvents.RunEndRequestTasks.Execute += (sender, eventArgs) => AzureSearchQueueWorker.Current.EnsureRunningThread();
     }
 
-
     /// <summary>
     /// Called when a page is published. Logs an AzureSearch task to be processed later.
     /// </summary>

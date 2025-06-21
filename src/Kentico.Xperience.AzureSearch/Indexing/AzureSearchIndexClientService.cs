@@ -80,6 +80,8 @@ public sealed class AzureSearchIndexClientService : IAzureSearchIndexClientServi
             definition.SemanticSearch = semanticSearchConfiguration.SemanticSearch;
         }
 
+        AzureSearchIndexingEvents.BeforeCreatingOrUpdatingIndex.Execute?.Invoke(this, new OnBeforeCreatingOrUpdatingIndexEventArgs(definition));
+
         try
         {
             await indexClient.CreateOrUpdateIndexAsync(definition, cancellationToken: cancellationToken);
