@@ -29,6 +29,13 @@ public class DancingGoatSearchService
             Size = pageSize,
             Skip = (page - 1) * pageSize
         };
+
+        // Optionally use the custom scoring profile for title boosting
+        if (indexName == "advanced")
+        {
+            options.ScoringProfile = CustomAzureScoringProfileModule.TITLE_SCORING_PROFILE_NAME;
+        }
+
         options.Select.Add(nameof(DancingGoatSearchModel.Title));
         options.Select.Add(nameof(DancingGoatSearchModel.Url));
 

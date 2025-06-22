@@ -15,6 +15,8 @@ namespace DancingGoat.Search;
 
 public class CustomAzureScoringProfileModule : Module
 {
+    public const string TITLE_SCORING_PROFILE_NAME = "titleprofile";
+
     public CustomAzureScoringProfileModule() : base(nameof(CustomAzureScoringProfileModule))
     {
     }
@@ -42,15 +44,13 @@ public class CustomAzureScoringProfileModule : Module
         // Used to determine whether a new scoring profile was created and needs to be added to the index
         bool newScoringProfile = false;
 
-        var titleProfileName = "titleprofile";
-
         // Checks whether the index already contains a scoring profile named 'titleprofile'
-        ScoringProfile scoringProfile = index.ScoringProfiles.FirstOrDefault(sp => sp.Name == titleProfileName);
+        ScoringProfile scoringProfile = index.ScoringProfiles.FirstOrDefault(sp => sp.Name == TITLE_SCORING_PROFILE_NAME);
 
         // Creates a new scoring profile if it does not exist
         if (scoringProfile == null)
         {
-            scoringProfile = new ScoringProfile(titleProfileName)
+            scoringProfile = new ScoringProfile(TITLE_SCORING_PROFILE_NAME)
             {
                 FunctionAggregation = ScoringFunctionAggregation.Sum,
                 TextWeights = new TextWeights(new Dictionary<string, double>())
