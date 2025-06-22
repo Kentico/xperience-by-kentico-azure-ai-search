@@ -45,13 +45,15 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
 
         if (StorageService.GetIndexIds().Exists(x => x == configuration.Id))
         {
-            var oldIndex = StorageService.GetIndexDataOrNull(configuration.Id);
+            var oldIndexConfiguration = StorageService.GetIndexDataOrNull(configuration.Id);
+            var oldIndex = AzureSearchIndexStore.Instance.GetRequiredIndex(oldIndexConfiguration!.IndexName);
+
             bool edited = StorageService.TryEditIndex(configuration);
 
             if (edited)
             {
                 AzureSearchIndexStore.SetIndicies(StorageService);
-                await indexClientService.EditIndex(oldIndex!.IndexName, configuration, default);
+                await indexClientService.EditIndex(oldIndex!, configuration, default);
 
                 return new ModificationResponse(ModificationResult.Success);
             }

@@ -42,13 +42,15 @@ public class CustomAzureScoringProfileModule : Module
         // Used to determine whether a new scoring profile was created and needs to be added to the index
         bool newScoringProfile = false;
 
-        // Checks whether the index already contains a scoring profile named 'productprofile'
-        ScoringProfile scoringProfile = index.ScoringProfiles.FirstOrDefault(sp => sp.Name == "advanced");
+        var titleProfileName = "titleprofile";
+
+        // Checks whether the index already contains a scoring profile named 'titleprofile'
+        ScoringProfile scoringProfile = index.ScoringProfiles.FirstOrDefault(sp => sp.Name == titleProfileName);
 
         // Creates a new scoring profile if it does not exist
         if (scoringProfile == null)
         {
-            scoringProfile = new ScoringProfile("titleprofile")
+            scoringProfile = new ScoringProfile(titleProfileName)
             {
                 FunctionAggregation = ScoringFunctionAggregation.Sum,
                 TextWeights = new TextWeights(new Dictionary<string, double>())
