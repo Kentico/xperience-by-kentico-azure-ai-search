@@ -59,11 +59,11 @@ public class CustomAzureScoringProfileModule : Module
             newScoringProfile = true;
         }
 
-        // Confirms that the index contains the 'skuname' field and its weight is not set yet in the scoring profile
-        // Note: The 'skuname' field must be configured as 'searchable'
+        // Confirms that the index contains the 'Title' field and its weight is not set yet in the scoring profile
+        // Note: The 'Title' field must be configured as 'searchable'
         if (indexFields.ContainsKey(nameof(DancingGoatSearchModel.Title)) && !scoringProfile.TextWeights.Weights.ContainsKey(nameof(DancingGoatSearchModel.Title)))
         {
-            // Increases the scoring weight to '3' for search items with matches in the 'skuname' field
+            // Increases the scoring weight to '3' for search items with matches in the 'Title' field
             scoringProfile.TextWeights.Weights.Add(nameof(DancingGoatSearchModel.Title), 3);
         }
 
