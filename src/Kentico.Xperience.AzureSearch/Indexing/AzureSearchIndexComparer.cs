@@ -33,7 +33,7 @@ internal class AzureSearchIndexComparer : IEqualityComparer<SearchField>
         bool isHiddenEqual = x.IsHidden == y.IsHidden;
         bool searchAnalyzerNameEqual = x.SearchAnalyzerName == y.SearchAnalyzerName;
         bool synonymMapNamesEqual = (x.SynonymMapNames == null && y.SynonymMapNames == null) ||
-                                    (x.SynonymMapNames != null && y.SynonymMapNames != null && x.SynonymMapNames.SequenceEqual(y.SynonymMapNames));
+                                    (x.SynonymMapNames != null && y.SynonymMapNames != null && x.SynonymMapNames.SequenceEqual(y.SynonymMapNames, StringComparer.Ordinal));
         bool vectorSearchDimensionsEqual = x.VectorSearchDimensions == y.VectorSearchDimensions;
         bool vectorSearchProfileNameEqual = x.VectorSearchProfileName == y.VectorSearchProfileName;
 
