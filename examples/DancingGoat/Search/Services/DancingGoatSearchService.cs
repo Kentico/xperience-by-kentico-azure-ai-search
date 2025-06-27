@@ -8,6 +8,8 @@ namespace DancingGoat.Search.Services;
 
 public class DancingGoatSearchService
 {
+    public const string ADVANCED_INDEX_NAME = "advanced";
+
     private readonly IAzureSearchQueryClientService searchClientService;
 
     public DancingGoatSearchService(IAzureSearchQueryClientService searchClientService) => this.searchClientService = searchClientService;
@@ -31,7 +33,7 @@ public class DancingGoatSearchService
         };
 
         // Optionally use the custom scoring profile for title boosting
-        if (indexName == "advanced")
+        if (indexName == ADVANCED_INDEX_NAME)
         {
             options.ScoringProfile = CustomAzureScoringProfileModule.TITLE_SCORING_PROFILE_NAME;
         }

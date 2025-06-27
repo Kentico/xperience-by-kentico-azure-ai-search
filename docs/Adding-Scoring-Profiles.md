@@ -18,7 +18,7 @@ To add a scoring profile for an Azure Search index managed by Xperience, you nee
 
     - c. Prepare a `Azure.Search.Documents.Indexes.Models.ScoringProfile` object according to your requirements and add it to the `ScoringProfiles` list of the processed index.
 
-5. Open the the Search application added by this library. Newly created or edited indexes will use your custom module logic. Already existing indexes for which you want to assign a scoring profile need to be edited in the administration. It is enough to open each index edit page and saving without doing any changes. The system creates the customized Azure AI Search indexes with the specified scoring profile. You can see the profile when viewing index details in the Microsoft Azure portal.
+5. Open the Search application added by this library. Newly created or edited indexes will use your custom module logic. Already existing indexes for which you want to assign a scoring profile need to be edited in the administration. It is enough to open each index edit page and saving without doing any changes. The system creates the customized Azure AI Search indexes with the specified scoring profile. You can see the profile when viewing index details in the Microsoft Azure portal.
 
 ## Example
 
