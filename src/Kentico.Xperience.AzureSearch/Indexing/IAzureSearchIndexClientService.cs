@@ -8,7 +8,7 @@ namespace Kentico.Xperience.AzureSearch.Indexing;
 /// <summary>
 /// Initializes <see cref="SearchClient" /> instances.
 /// </summary>
-internal interface IAzureSearchIndexClientService
+public interface IAzureSearchIndexClientService
 {
     /// <summary>
     /// Initializes a new <see cref="SearchIndex" /> for the given <paramref name="indexName" />
