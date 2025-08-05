@@ -34,6 +34,10 @@ See [Managing search index aliases](Managing-Aliases.md)
 
 See [Search index querying](Search-index-querying.md)
 
+## Adding scoring profiles
+
+See [Adding scoring profiles](Adding-Scoring-Profiles.md)
+
 ## Disable indexing
 
 You can disable indexing. This might be useful if there are any problems with differing Kentico version between this integration

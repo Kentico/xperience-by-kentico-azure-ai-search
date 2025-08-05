@@ -19,21 +19,39 @@ internal class AzureSearchIndexComparer : IEqualityComparer<SearchField>
             return false;
         }
 
-        return x!.IsKey == y!.IsKey &&
-            x!.Name == y!.Name &&
-            x!.IsSearchable == y!.IsSearchable &&
-            x!.IsSortable == y!.IsSortable &&
-            x!.Type == y!.Type &&
-            x!.AnalyzerName == y!.AnalyzerName &&
-            Equals(x!.Fields, y!.Fields) &&
-            x!.IndexAnalyzerName == y!.IndexAnalyzerName &&
-            x!.IsFacetable == y!.IsFacetable &&
-            x!.IsFilterable == y!.IsFilterable &&
-            x!.IsHidden == y!.IsHidden &&
-            x!.SearchAnalyzerName == y!.SearchAnalyzerName &&
-            Equals(x!.SynonymMapNames, y!.SynonymMapNames) &&
-            x!.VectorSearchDimensions == y!.VectorSearchDimensions &&
-            x!.VectorSearchProfileName == y!.VectorSearchProfileName;
+        bool isKeyEqual = x.IsKey == y.IsKey;
+        bool nameEqual = x.Name == y.Name;
+        bool isSearchableEqual = x.IsSearchable == y.IsSearchable;
+        bool isSortableEqual = x.IsSortable == y.IsSortable;
+        bool typeEqual = x.Type == y.Type;
+        bool analyzerNameEqual = x.AnalyzerName == y.AnalyzerName;
+        bool fieldsEqual = (x.Fields == null && y.Fields == null) ||
+                           (x.Fields != null && y.Fields != null && x.Fields.SequenceEqual(y.Fields, this));
+        bool indexAnalyzerNameEqual = x.IndexAnalyzerName == y.IndexAnalyzerName;
+        bool isFacetableEqual = x.IsFacetable == y.IsFacetable;
+        bool isFilterableEqual = x.IsFilterable == y.IsFilterable;
+        bool isHiddenEqual = x.IsHidden == y.IsHidden;
+        bool searchAnalyzerNameEqual = x.SearchAnalyzerName == y.SearchAnalyzerName;
+        bool synonymMapNamesEqual = (x.SynonymMapNames == null && y.SynonymMapNames == null) ||
+                                    (x.SynonymMapNames != null && y.SynonymMapNames != null && x.SynonymMapNames.SequenceEqual(y.SynonymMapNames, StringComparer.Ordinal));
+        bool vectorSearchDimensionsEqual = x.VectorSearchDimensions == y.VectorSearchDimensions;
+        bool vectorSearchProfileNameEqual = x.VectorSearchProfileName == y.VectorSearchProfileName;
+
+        return isKeyEqual &&
+               nameEqual &&
+               isSearchableEqual &&
+               isSortableEqual &&
+               typeEqual &&
+               analyzerNameEqual &&
+               fieldsEqual &&
+               indexAnalyzerNameEqual &&
+               isFacetableEqual &&
+               isFilterableEqual &&
+               isHiddenEqual &&
+               searchAnalyzerNameEqual &&
+               synonymMapNamesEqual &&
+               vectorSearchDimensionsEqual &&
+               vectorSearchProfileNameEqual;
     }
 
     public int GetHashCode(SearchField obj)

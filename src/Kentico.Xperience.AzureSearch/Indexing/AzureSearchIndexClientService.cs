@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kentico.Xperience.AzureSearch.Indexing;
 
-public sealed class AzureSearchIndexClientService : IAzureSearchIndexClientService
+internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
 {
     private readonly SearchIndexClient indexClient;
     private readonly IServiceProvider serviceProvider;
@@ -34,21 +34,19 @@ public sealed class AzureSearchIndexClientService : IAzureSearchIndexClientServi
     }
 
     /// <inheritdoc />
-    public async Task EditIndex(string oldIndexName, AzureSearchConfigurationModel newIndexConfiguration, CancellationToken cancellationToken)
+    public async Task EditIndex(AzureSearchIndex oldIndex, AzureSearchConfigurationModel newIndexConfiguration, CancellationToken cancellationToken)
     {
-        var oldIndex = AzureSearchIndexStore.Instance.GetIndex(oldIndexName) ??
-            throw new InvalidOperationException($"Registered index with name '{oldIndexName}' doesn't exist.");
         var oldStrategy = serviceProvider.GetRequiredStrategy(oldIndex);
         var oldSearchFields = oldStrategy.GetSearchFields();
 
-        var newIndex = AzureSearchIndexStore.Instance.GetIndex(newIndexConfiguration.IndexName) ??
-            throw new InvalidOperationException($"Registered index with name '{oldIndexName}' doesn't exist.");
+        var newIndex = AzureSearchIndexStore.Instance.GetRequiredIndex(newIndexConfiguration.IndexName);
         var newStrategy = serviceProvider.GetRequiredStrategy(newIndex);
         var newSearchFields = newStrategy.GetSearchFields();
 
-        if (Enumerable.SequenceEqual(oldSearchFields, newSearchFields, new AzureSearchIndexComparer()))
+        if (!Enumerable.SequenceEqual(oldSearchFields, newSearchFields, new AzureSearchIndexComparer())
+            || !string.Equals(oldIndex.IndexName, newIndex.IndexName))
         {
-            await DeleteIndex(oldIndexName, cancellationToken);
+            await DeleteIndex(oldIndex.IndexName, cancellationToken);
         }
 
         await CreateOrUpdateIndexInternal(newSearchFields, newStrategy, newIndex.IndexName, cancellationToken);
@@ -79,6 +77,8 @@ public sealed class AzureSearchIndexClientService : IAzureSearchIndexClientServi
 
             definition.SemanticSearch = semanticSearchConfiguration.SemanticSearch;
         }
+
+        AzureSearchIndexingEvents.BeforeCreatingOrUpdatingIndex.Execute?.Invoke(this, new OnBeforeCreatingOrUpdatingIndexEventArgs(definition));
 
         try
         {
