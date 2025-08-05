@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kentico.Xperience.AzureSearch.Indexing;
 
-public sealed class AzureSearchIndexClientService : IAzureSearchIndexClientService
+internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
 {
     private readonly SearchIndexClient indexClient;
     private readonly IServiceProvider serviceProvider;
