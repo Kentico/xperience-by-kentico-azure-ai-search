@@ -154,16 +154,18 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
                     foreach (var contentType in includedPathAttribute.ContentTypes)
                     {
                         queryBuilder.ForContentType(contentType.ContentTypeName, config => config.ForWebsite(azureSearchIndex.WebSiteChannelName, includeUrlPath: true, pathMatch: pathMatch));
+                    }
 
-                        queryBuilder.InLanguage(language);
+                    queryBuilder.InLanguage(language);
 
-                        var webpages = await executor.GetWebPageResult(queryBuilder, container => container, cancellationToken: cancellationToken ?? default);
+                    var webpages = await executor.GetWebPageResult(queryBuilder,
+                        container => container,
+                        cancellationToken: cancellationToken ?? default);
 
-                        foreach (var page in webpages)
-                        {
-                            var item = await MapToEventItem(page);
-                            indexedItems.Add(item);
-                        }
+                    foreach (var page in webpages)
+                    {
+                        var item = await MapToEventItem(page);
+                        indexedItems.Add(item);
                     }
                 }
             }
