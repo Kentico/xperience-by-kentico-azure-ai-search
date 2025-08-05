@@ -142,3 +142,8 @@ segments_2i
 **/App_Data/AzureAISearch/*
 /examples/DancingGoat/App_Data/CIRepository/DancingGoatEmails/cms.contentitemlanguagemetadata/dancinggoatsubscri..firmation-72wdczqk@6fd8c7a9fb/63bd3ac7-c0eb-477b-aaf0-52159ece6efc_en@a1ef42fb32.xml
 /examples/DancingGoat/App_Data/CIRepository/DancingGoatEmails/cms.contentitemlanguagemetadata
+
+# MCP server definitions
+mcp.json
+claude_desktop_config.json
+mcp_config.json
