@@ -1,4 +1,5 @@
 using Azure.Search.Documents.Indexes;
+using Azure.Search.Documents.Indexes.Models;
 using Azure.Search.Documents.Models;
 
 using CMS.ContentEngine;
@@ -125,9 +126,15 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
     private async Task<int> DeleteRecordsInternal(IEnumerable<string> itemGuids, string indexName, CancellationToken cancellationToken)
     {
+        var azureSearchIndex = AzureSearchIndexStore.Instance.GetRequiredIndex(indexName);
+        var azureSearchStrategy = serviceProvider.GetRequiredStrategy(azureSearchIndex);
+
+        var keyField = azureSearchStrategy.GetSearchFields()?.SingleOrDefault(x => x.IsKey is not null && x.IsKey.Value) ??
+            throw new InvalidOperationException($"Your implementation of the {nameof(IAzureSearchModel)} used for {nameof(SearchIndex)} definition and data retrieval from {nameof(IAzureSearchIndexingStrategy)} must have exactly one key field.");
+
         var searchClient = await azureSearchIndexClientService.InitializeIndexClient(indexName, cancellationToken);
 
-        var batch = IndexDocumentsBatch.Delete(nameof(BaseAzureSearchModel.ObjectID), itemGuids);
+        var batch = IndexDocumentsBatch.Delete(keyField.Name, itemGuids);
 
         var result = await searchClient.IndexDocumentsAsync(batch, cancellationToken: cancellationToken);
 
