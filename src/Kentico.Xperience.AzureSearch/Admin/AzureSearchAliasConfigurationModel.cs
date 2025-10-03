@@ -17,19 +17,19 @@ public class AzureSearchAliasConfigurationModel
     [RegularExpression("^(?!-)[a-z0-9-]+(?<!-)$", ErrorMessage = "Alias name must only contain lowercase letters, digits or dashes, cannot start or end with dashes and is limited to 128 characters.")]
     public string AliasName { get; set; } = string.Empty;
 
-    [GeneralSelectorComponent(dataProviderType: typeof(ExistingIndexOptionsProvider), Label = "Index Names", Order = 2)]
-    [MinLength(1, ErrorMessage = "You must select at least one index name")]
-    public IEnumerable<string> IndexNames { get; set; } = Enumerable.Empty<string>();
+    [SingleGeneralSelectorComponent(dataProviderType: typeof(ExistingIndexOptionsProvider), Label = "Index Name", Order = 2)]
+    [Required(ErrorMessage = "You must select an index name")]
+    public string IndexName { get; set; } = string.Empty;
 
     public AzureSearchAliasConfigurationModel()
     { }
 
     public AzureSearchAliasConfigurationModel(
         AzureSearchIndexAliasItemInfo alias,
-        IEnumerable<string> aliasIndexes)
+        string aliasIndex)
     {
         Id = alias.AzureSearchIndexAliasItemId;
         AliasName = alias.AzureSearchIndexAliasItemIndexAliasName;
-        IndexNames = aliasIndexes;
+        IndexName = aliasIndex;
     }
 }

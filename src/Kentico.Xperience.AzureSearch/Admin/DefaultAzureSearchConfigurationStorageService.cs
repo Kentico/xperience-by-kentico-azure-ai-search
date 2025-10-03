@@ -143,24 +143,21 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
             AzureSearchIndexAliasItemIndexAliasName = configuration.AliasName ?? string.Empty,
         };
 
-        var indexIds = indexProvider
+        var indexId = indexProvider
             .Get()
-            .Where(index => configuration.IndexNames.Any(name => index.AzureSearchIndexItemIndexName == name))
+            .WhereEquals(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemIndexName), configuration.IndexName)
             .Select(index => index.AzureSearchIndexItemId)
-            .ToList();
+            .FirstOrDefault();
 
         indexAliasProvider.Set(aliasInfo);
 
-        foreach (int indexId in indexIds)
+        var indexAliasIndexInfo = new AzureSearchIndexAliasIndexItemInfo()
         {
-            var indexAliasIndexInfo = new AzureSearchIndexAliasIndexItemInfo()
-            {
-                AzureSearchIndexAliasIndexItemIndexAliasId = aliasInfo.AzureSearchIndexAliasItemId,
-                AzureSearchIndexAliasIndexItemIndexItemId = indexId
-            };
+            AzureSearchIndexAliasIndexItemIndexAliasId = aliasInfo.AzureSearchIndexAliasItemId,
+            AzureSearchIndexAliasIndexItemIndexItemId = indexId
+        };
 
-            indexAliasIndexProvider.Set(indexAliasIndexInfo);
-        }
+        indexAliasIndexProvider.Set(indexAliasIndexInfo);
 
         configuration.Id = aliasInfo.AzureSearchIndexAliasItemId;
 
@@ -209,17 +206,19 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
             return default;
         }
 
-        var indexAliasIndexIndexInfoIds = indexAliasIndexProvider.Get()
+        var indexAliasIndexIndexInfoId = indexAliasIndexProvider.Get()
             .WhereEquals(nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexAliasId), aliasId)
             .GetEnumerableTypedResult()
-            .Select(indexAliasIndex => indexAliasIndex.AzureSearchIndexAliasIndexItemIndexItemId);
+            .Select(indexAliasIndex => indexAliasIndex.AzureSearchIndexAliasIndexItemIndexItemId)
+            .FirstOrDefault();
 
-        var indexNames = indexProvider.Get()
-            .WhereIn(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemId), indexAliasIndexIndexInfoIds.ToList())
+        var indexName = indexProvider.Get()
+            .WhereEquals(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemId), indexAliasIndexIndexInfoId)
             .GetEnumerableTypedResult()
-            .Select(index => index.AzureSearchIndexItemIndexName);
+            .Select(index => index.AzureSearchIndexItemIndexName)
+            .FirstOrDefault();
 
-        return new AzureSearchAliasConfigurationModel(aliasInfo, indexNames);
+        return new AzureSearchAliasConfigurationModel(aliasInfo, indexName ?? string.Empty);
     }
 
 
@@ -368,22 +367,19 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
         aliasInfo.AzureSearchIndexAliasItemIndexAliasName = configuration.AliasName ?? string.Empty;
 
-        var indexIds = indexProvider
+        var indexId = indexProvider
             .Get()
-            .Where(index => configuration.IndexNames.Any(name => index.AzureSearchIndexItemIndexName == name))
+            .WhereEquals(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemIndexName), configuration.IndexName)
             .Select(index => index.AzureSearchIndexItemId)
-            .ToList();
+            .FirstOrDefault();
 
-        foreach (int indexId in indexIds)
+        var indexAliasIndexInfo = new AzureSearchIndexAliasIndexItemInfo()
         {
-            var indexAliasIndexInfo = new AzureSearchIndexAliasIndexItemInfo()
-            {
-                AzureSearchIndexAliasIndexItemIndexAliasId = aliasInfo.AzureSearchIndexAliasItemId,
-                AzureSearchIndexAliasIndexItemIndexItemId = indexId
-            };
+            AzureSearchIndexAliasIndexItemIndexAliasId = aliasInfo.AzureSearchIndexAliasItemId,
+            AzureSearchIndexAliasIndexItemIndexItemId = indexId
+        };
 
-            indexAliasIndexProvider.Set(indexAliasIndexInfo);
-        }
+        indexAliasIndexProvider.Set(indexAliasIndexInfo);
 
         indexAliasProvider.Set(aliasInfo);
 

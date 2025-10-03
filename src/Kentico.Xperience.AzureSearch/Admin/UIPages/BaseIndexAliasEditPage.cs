@@ -56,7 +56,7 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
             if (edited)
             {
                 AzureSearchIndexAliasStore.SetAliases(StorageService);
-                await azureSearchIndexAliasService.EditAlias(oldAliasName, new SearchAlias(configuration.AliasName, configuration.IndexNames), default);
+                await azureSearchIndexAliasService.EditAlias(oldAliasName, new SearchAlias(configuration.AliasName, configuration.IndexName), default);
 
                 return new ModificationResponse(ModificationResult.Success);
             }
@@ -64,7 +64,7 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
             return new ModificationResponse(ModificationResult.Failure);
         }
 
-        bool created = !configuration.IndexNames.IsNullOrEmpty() && StorageService.TryCreateAlias(configuration);
+        bool created = !string.IsNullOrWhiteSpace(configuration.IndexName) && StorageService.TryCreateAlias(configuration);
 
         if (created)
         {

@@ -115,28 +115,26 @@ internal class IndexAliasListingPage : ListingPage
                 .AddErrorMessage(string.Format("Error loading AzureSearch index alias with identifier {0}.", id));
         }
 
-        foreach (string indexName in alias.IndexNames)
+        var index = AzureSearchIndexStore.Instance.GetIndex(alias.IndexName);
+
+        if (index is null)
         {
-            var index = AzureSearchIndexStore.Instance.GetIndex(indexName);
-
-            if (index is null)
-            {
-                return ResponseFrom(result)
-                    .AddErrorMessage(string.Format("Error loading AzureSearch aliased index with name {0}.", indexName));
-            }
-
-            try
-            {
-                await azureSearchClient.Rebuild(index.IndexName, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                EventLogService.LogException(nameof(IndexAliasListingPage), nameof(Rebuild), ex);
-
-                return ResponseFrom(result)
-                   .AddErrorMessage(string.Format("Errors occurred while rebuilding the '{0}' index. Please check the Event Log for more details.", index.IndexName));
-            }
+            return ResponseFrom(result)
+                .AddErrorMessage(string.Format("Error loading AzureSearch aliased index with name {0}.", alias.IndexName));
         }
+
+        try
+        {
+            await azureSearchClient.Rebuild(index.IndexName, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            EventLogService.LogException(nameof(IndexAliasListingPage), nameof(Rebuild), ex);
+
+            return ResponseFrom(result)
+               .AddErrorMessage(string.Format("Errors occurred while rebuilding the '{0}' index. Please check the Event Log for more details.", index.IndexName));
+        }
+
         return ResponseFrom(result)
                     .AddSuccessMessage("Indexing in progress. Visit your AzureSearch dashboard for details about the indexing process.");
     }
@@ -174,7 +172,7 @@ internal class IndexAliasListingPage : ListingPage
             EventLogService.LogException(nameof(IndexListingPage), nameof(Delete), ex);
 
             return response
-               .AddErrorMessage(string.Format("Errors occurred while deleting the '{0}' index. Please check the Event Log for more details.", alias.IndexNames));
+               .AddErrorMessage(string.Format("Errors occurred while deleting the '{0}' index. Please check the Event Log for more details.", alias.IndexName));
         }
     }
 }
