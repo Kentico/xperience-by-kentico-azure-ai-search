@@ -127,7 +127,7 @@ public class SampleDataGeneratorApplication : OverviewPageBase
     }
 
 
-    private OverviewCard GetGdprCard() => new OverviewCard
+    private OverviewCard GetGdprCard() => new()
     {
         Headline = "Set up data protection (GDPR) demo",
         Actions = new[]

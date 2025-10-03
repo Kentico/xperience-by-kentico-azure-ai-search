@@ -14,7 +14,7 @@ public class CardWidgetProperties : IWidgetProperties
     /// Image to be displayed.
     /// </summary>
     [ContentItemSelectorComponent(Models.Image.CONTENT_TYPE_NAME, Label = "Image", Order = 1)]
-    public IEnumerable<ContentItemReference> Image { get; set; } = new List<ContentItemReference>();
+    public IEnumerable<ContentItemReference> Image { get; set; } = [];
 
     /// <summary>
     /// Text to be displayed.

@@ -7,8 +7,6 @@ using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.AzureSearch.Aliasing;
 
-using Microsoft.IdentityModel.Tokens;
-
 using IFormItemCollectionProvider = Kentico.Xperience.Admin.Base.Forms.Internal.IFormItemCollectionProvider;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
