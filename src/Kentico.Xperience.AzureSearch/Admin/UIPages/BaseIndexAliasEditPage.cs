@@ -69,6 +69,7 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
         if (created)
         {
             AzureSearchIndexAliasStore.Instance.AddAlias(new AzureSearchIndexAlias(configuration));
+            await azureSearchIndexAliasService.CreateAlias(new SearchAlias(configuration.AliasName, configuration.IndexNames), default);
 
             return new ModificationResponse(ModificationResult.Success);
         }
