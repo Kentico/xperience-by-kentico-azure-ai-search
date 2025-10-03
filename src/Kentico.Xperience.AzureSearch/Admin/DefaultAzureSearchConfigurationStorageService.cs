@@ -359,7 +359,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
             .TopN(1)
             .FirstOrDefault();
 
-        indexAliasIndexProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexItemId)} = {configuration.Id}"));
+        indexAliasIndexProvider.BulkDelete(new WhereCondition($"{nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexAliasId)} = {configuration.Id}"));
 
         if (aliasInfo is null)
         {
