@@ -33,6 +33,6 @@ public static class ForbiddenPasswordGenerator
             }
             select forbiddenPassword;
 
-        return new HashSet<string>(forbiddenPasswords);
+        return [.. forbiddenPasswords];
     }
 }

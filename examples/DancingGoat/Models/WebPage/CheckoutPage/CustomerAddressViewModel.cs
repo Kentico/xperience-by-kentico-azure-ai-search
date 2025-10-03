@@ -10,15 +10,15 @@ public sealed record CustomerAddressViewModel
 {
     public CustomerAddressViewModel()
     {
-        Countries = new List<SelectListItem>();
-        States = new List<SelectListItem>();
+        Countries = [];
+        States = [];
     }
 
 
     public CustomerAddressViewModel(IEnumerable<SelectListItem> countries)
     {
         Countries = countries;
-        States = new List<SelectListItem>();
+        States = [];
     }
 
 

@@ -15,7 +15,7 @@ public class HeroImageWidgetProperties : IWidgetProperties
     /// Background image.
     /// </summary>
     [ContentItemSelectorComponent(Models.Image.CONTENT_TYPE_NAME, Label = "Background image", Order = 1)]
-    public IEnumerable<ContentItemReference> Image { get; set; } = new List<ContentItemReference>();
+    public IEnumerable<ContentItemReference> Image { get; set; } = [];
 
 
     /// <summary>

@@ -20,12 +20,12 @@ public sealed class AzureSearchIndexAlias
     /// <summary>
     /// The code name of the AzureSearch index which is aliased.
     /// </summary>
-    public IEnumerable<string> IndexNames { get; }
+    public string IndexName { get; }
 
     internal AzureSearchIndexAlias(AzureSearchAliasConfigurationModel aliasConfiguration)
     {
         Identifier = aliasConfiguration.Id;
-        IndexNames = aliasConfiguration.IndexNames;
+        IndexName = aliasConfiguration.IndexName;
         AliasName = aliasConfiguration.AliasName;
     }
 }

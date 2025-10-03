@@ -7,7 +7,7 @@ public record TaxonomyViewModel(string Name, string CodeName, List<TagViewModel>
     /// <summary>
     /// Maps <see cref="TaxonomyData"/> to a <see cref="TaxonomyViewModel"/>.
     /// </summary>
-    public static TaxonomyViewModel GetViewModel(TaxonomyData taxonomy) => new TaxonomyViewModel(taxonomy.Taxonomy.Title, taxonomy.Taxonomy.Name, TagViewModel.GetViewModels(taxonomy.Tags));
+    public static TaxonomyViewModel GetViewModel(TaxonomyData taxonomy) => new(taxonomy.Taxonomy.Title, taxonomy.Taxonomy.Name, TagViewModel.GetViewModels(taxonomy.Tags));
 
 
     /// <summary>
