@@ -18,10 +18,7 @@ internal class AzureSearchIndexAliasService : IAzureSearchIndexAliasService
     /// <inheritdoc />
     public async Task CreateAlias(SearchAlias alias, CancellationToken cancellationToken)
     {
-        if (alias == null)
-        {
-            throw new ArgumentNullException(nameof(alias));
-        }
+        ArgumentNullException.ThrowIfNull(alias);
 
         await indexClient.CreateOrUpdateAliasAsync(alias.Name, alias, cancellationToken: cancellationToken);
     }
