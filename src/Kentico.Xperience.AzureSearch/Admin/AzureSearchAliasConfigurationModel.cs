@@ -36,6 +36,13 @@ public class AzureSearchAliasConfigurationModel
 
 
     /// <summary>
+    /// Index name to which the alias will point.
+    /// </summary>
+    [Obsolete("Use IndexName property instead. This property will be removed in future versions.")]
+    public IEnumerable<string> IndexNames { get; set; } = Enumerable.Empty<string>();
+
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="AzureSearchAliasConfigurationModel"/> class.
     /// </summary>
     public AzureSearchAliasConfigurationModel()

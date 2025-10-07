@@ -54,12 +54,13 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
     public bool TryCreateIndex(AzureSearchConfigurationModel configuration)
     {
-        var existingIndex = indexProvider.Get()
+        var indexExists = indexProvider.Get()
+            .Column(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemId))
             .WhereEquals(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemIndexName), configuration.IndexName)
             .TopN(1)
-            .FirstOrDefault();
+            .GetScalarResult<int>() > 0;
 
-        if (existingIndex is not null)
+        if (indexExists)
         {
             return false;
         }
@@ -128,12 +129,13 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
     public bool TryCreateAlias(AzureSearchAliasConfigurationModel configuration)
     {
-        var existingAliases = indexAliasProvider.Get()
+        var aliasExists = indexAliasProvider.Get()
+            .Column(nameof(AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemId))
             .WhereEquals(nameof(AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemIndexAliasName), configuration.AliasName)
             .TopN(1)
-            .FirstOrDefault();
+            .GetScalarResult<int>() > 0;
 
-        if (existingAliases is not null)
+        if (aliasExists)
         {
             return false;
         }
@@ -145,9 +147,10 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
         var indexId = indexProvider
             .Get()
+            .TopN(1)
+            .Column(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemId))
             .WhereEquals(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemIndexName), configuration.IndexName)
-            .Select(index => index.AzureSearchIndexItemId)
-            .FirstOrDefault();
+            .GetScalarResult<int>();
 
         indexAliasProvider.Set(aliasInfo);
 
@@ -176,9 +179,9 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         var paths = pathProvider.Get().WhereEquals(nameof(AzureSearchIncludedPathItemInfo.AzureSearchIncludedPathItemIndexItemId), indexInfo.AzureSearchIndexItemId).GetEnumerableTypedResult();
 
         var contentTypesInfoItems = contentTypeProvider
-        .Get()
-        .WhereEquals(nameof(AzureSearchContentTypeItemInfo.AzureSearchContentTypeItemIndexItemId), indexInfo.AzureSearchIndexItemId)
-        .GetEnumerableTypedResult();
+            .Get()
+            .WhereEquals(nameof(AzureSearchContentTypeItemInfo.AzureSearchContentTypeItemIndexItemId), indexInfo.AzureSearchIndexItemId)
+            .GetEnumerableTypedResult();
 
         var contentTypes = DataClassInfoProvider.ProviderObject
             .Get()
@@ -207,18 +210,18 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         }
 
         var indexAliasIndexIndexInfoId = indexAliasIndexProvider.Get()
+            .TopN(1)
             .WhereEquals(nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexAliasId), aliasId)
-            .GetEnumerableTypedResult()
-            .Select(indexAliasIndex => indexAliasIndex.AzureSearchIndexAliasIndexItemIndexItemId)
-            .FirstOrDefault();
+            .Column(nameof(AzureSearchIndexAliasIndexItemInfo.AzureSearchIndexAliasIndexItemIndexItemId))
+            .GetScalarResult<int>();
 
         var indexName = indexProvider.Get()
+            .TopN(1)
             .WhereEquals(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemId), indexAliasIndexIndexInfoId)
-            .GetEnumerableTypedResult()
-            .Select(index => index.AzureSearchIndexItemIndexName)
-            .FirstOrDefault();
+            .Column(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemIndexName))
+            .GetScalarResult<string>();
 
-        return new AzureSearchAliasConfigurationModel(aliasInfo, indexName ?? string.Empty);
+        return new AzureSearchAliasConfigurationModel(aliasInfo, indexName);
     }
 
 
@@ -369,9 +372,10 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
         var indexId = indexProvider
             .Get()
+            .TopN(1)
+            .Column(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemId))
             .WhereEquals(nameof(AzureSearchIndexItemInfo.AzureSearchIndexItemIndexName), configuration.IndexName)
-            .Select(index => index.AzureSearchIndexItemId)
-            .FirstOrDefault();
+            .GetScalarResult<int>();
 
         var indexAliasIndexInfo = new AzureSearchIndexAliasIndexItemInfo()
         {
