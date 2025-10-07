@@ -12,10 +12,12 @@ public class AzureSearchConfigurationModel
     [TextInputComponent(
         Label = "Index Name",
         Order = 1)]
-    [Required]
+    [RequiredValidationRule]
     [MinLength(1)]
     [MaxLength(128)]
     [RegularExpression("^(?!-)[a-z0-9-]+(?<!-)$", ErrorMessage = "Index name must only contain lowercase letters, digits or dashes, cannot start or end with dashes and is limited to 128 characters.")]
+    [UniqueIndexNameValidationRule]
+    [UniqueAliasNameValidationRule]
     public string IndexName { get; set; } = string.Empty;
 
     [AzureSearchIndexConfigurationComponent(Label = "Included Paths", Order = 2)]
@@ -25,15 +27,15 @@ public class AzureSearchConfigurationModel
     public IEnumerable<string> ReusableContentTypeNames { get; set; } = Enumerable.Empty<string>();
 
     [GeneralSelectorComponent(dataProviderType: typeof(LanguageOptionsProvider), Label = "Indexed Languages", Order = 4)]
-    [MinLength(1, ErrorMessage = "You must select at least one Language Name")]
+    [RequiredValidationRule]
     public IEnumerable<string> LanguageNames { get; set; } = Enumerable.Empty<string>();
 
     [DropDownComponent(Label = "Channel Name", DataProviderType = typeof(ChannelOptionsProvider), Order = 5)]
-    [Required]
+    [RequiredValidationRule]
     public string ChannelName { get; set; } = string.Empty;
 
     [DropDownComponent(Label = "Indexing Strategy", DataProviderType = typeof(IndexingStrategyOptionsProvider), Order = 6, ExplanationText = "Changing strategy which has an incompatible configuration will result in deleting indexed items.")]
-    [Required]
+    [RequiredValidationRule]
     public string StrategyName { get; set; } = string.Empty;
 
     [TextInputComponent(Label = "Rebuild Hook", Order = 7)]

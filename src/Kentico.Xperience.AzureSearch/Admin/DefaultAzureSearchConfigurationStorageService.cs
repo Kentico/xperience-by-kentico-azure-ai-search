@@ -1,5 +1,6 @@
 ﻿using System.Text;
 
+using CMS.Core;
 using CMS.DataEngine;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
@@ -13,6 +14,8 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
     private readonly IInfoProvider<AzureSearchContentTypeItemInfo> contentTypeProvider;
     private readonly IInfoProvider<AzureSearchIndexLanguageItemInfo> languageProvider;
     private readonly IInfoProvider<AzureSearchReusableContentTypeItemInfo> reusableContentTypeProvider;
+    private readonly IEventLogService eventLogService;
+
 
     public DefaultAzureSearchConfigurationStorageService(
         IInfoProvider<AzureSearchIndexItemInfo> indexProvider,
@@ -21,7 +24,8 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         IInfoProvider<AzureSearchIncludedPathItemInfo> pathProvider,
         IInfoProvider<AzureSearchContentTypeItemInfo> contentTypeProvider,
         IInfoProvider<AzureSearchIndexLanguageItemInfo> languageProvider,
-        IInfoProvider<AzureSearchReusableContentTypeItemInfo> reusableContentTypeProvider
+        IInfoProvider<AzureSearchReusableContentTypeItemInfo> reusableContentTypeProvider,
+        IEventLogService eventLogService
     )
     {
         this.indexProvider = indexProvider;
@@ -31,6 +35,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
         this.languageProvider = languageProvider;
         this.indexAliasIndexProvider = indexAliasIndexProvider;
         this.reusableContentTypeProvider = reusableContentTypeProvider;
+        this.eventLogService = eventLogService;
     }
 
 
@@ -61,6 +66,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
         if (existingIndex is not null)
         {
+            eventLogService.LogError(nameof(DefaultAzureSearchConfigurationStorageService), nameof(TryCreateIndex), $"Index with name '{configuration.IndexName}' already exists.");
             return false;
         }
 
@@ -135,6 +141,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
         if (existingAliases is not null)
         {
+            eventLogService.LogError(nameof(DefaultAzureSearchConfigurationStorageService), nameof(TryCreateAlias), $"Alias with name '{configuration.AliasName}' already exists.");
             return false;
         }
 
