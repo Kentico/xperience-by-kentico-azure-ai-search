@@ -153,9 +153,10 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
         {
             await azureSearchIndexAliasService.DeleteAlias(aliasName, default);
         }
-        catch
+        catch (Exception ex)
         {
-            EventLogService.LogError(nameof(BaseIndexAliasEditPage), nameof(RollbackCreateAlias), $"Failed to rollback Azure Search alias creation: {aliasName}");
+            EventLogService.LogError(nameof(BaseIndexAliasEditPage), nameof(RollbackCreateAlias),
+                $"Failed to rollback Azure Search alias creation: {aliasName}.{Environment.NewLine}{ex.Message}");
         }
     }
 
@@ -165,9 +166,10 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
         {
             await azureSearchIndexAliasService.EditAlias(newAliasName, new SearchAlias(oldAliasName, oldIndexNames), default);
         }
-        catch
+        catch (Exception ex)
         {
-            EventLogService.LogError(nameof(BaseIndexAliasEditPage), nameof(RollbackEditAlias), $"Failed to rollback Azure Search alias edit: {newAliasName} back to {oldAliasName}");
+            EventLogService.LogError(nameof(BaseIndexAliasEditPage), nameof(RollbackEditAlias),
+                $"Failed to rollback Azure Search alias edit: {newAliasName} back to {oldAliasName}.{Environment.NewLine}{ex.Message}");
         }
     }
 }
