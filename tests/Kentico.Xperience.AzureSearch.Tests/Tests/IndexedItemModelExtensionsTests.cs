@@ -24,7 +24,7 @@ internal class IndexedItemModelExtensionsTests
         var item = fixture.Create<IndexEventWebPageItemModel>();
 
         var model = MockDataProvider.WebModel(item);
-        Assert.That(model.IsIndexedByIndex(log, MockDataProvider.DefaultIndex, MockDataProvider.EventName));
+        Assert.That(model.IsIndexedByIndex(log, MockDataProvider.DEFAULT_INDEX, MockDataProvider.EVENT_NAME));
     }
 
     [Test]
@@ -46,7 +46,7 @@ internal class IndexedItemModelExtensionsTests
         AzureSearchIndexStore.Instance.SetIndicies([]);
         AzureSearchIndexStore.Instance.AddIndex(index);
 
-        Assert.That(model.IsIndexedByIndex(log, MockDataProvider.DefaultIndex, MockDataProvider.EventName));
+        Assert.That(model.IsIndexedByIndex(log, MockDataProvider.DEFAULT_INDEX, MockDataProvider.EVENT_NAME));
     }
 
     [Test]
@@ -68,7 +68,7 @@ internal class IndexedItemModelExtensionsTests
         AzureSearchIndexStore.Instance.SetIndicies([]);
         AzureSearchIndexStore.Instance.AddIndex(index);
 
-        Assert.That(!model.IsIndexedByIndex(log, MockDataProvider.DefaultIndex, MockDataProvider.EventName));
+        Assert.That(!model.IsIndexedByIndex(log, MockDataProvider.DEFAULT_INDEX, MockDataProvider.EVENT_NAME));
     }
 
     [Test]
@@ -90,7 +90,7 @@ internal class IndexedItemModelExtensionsTests
         AzureSearchIndexStore.Instance.SetIndicies([]);
         AzureSearchIndexStore.Instance.AddIndex(index);
 
-        Assert.That(!model.IsIndexedByIndex(log, MockDataProvider.DefaultIndex, MockDataProvider.EventName));
+        Assert.That(!model.IsIndexedByIndex(log, MockDataProvider.DEFAULT_INDEX, MockDataProvider.EVENT_NAME));
     }
 
     [Test]
@@ -108,7 +108,7 @@ internal class IndexedItemModelExtensionsTests
         AzureSearchIndexStore.Instance.SetIndicies([]);
         AzureSearchIndexStore.Instance.AddIndex(MockDataProvider.Index);
 
-        Assert.That(!model.IsIndexedByIndex(log, MockDataProvider.DefaultIndex, MockDataProvider.EventName));
+        Assert.That(!model.IsIndexedByIndex(log, MockDataProvider.DEFAULT_INDEX, MockDataProvider.EVENT_NAME));
     }
 
     [Test]
@@ -125,7 +125,7 @@ internal class IndexedItemModelExtensionsTests
         AzureSearchIndexStore.Instance.SetIndicies([]);
         AzureSearchIndexStore.Instance.AddIndex(MockDataProvider.Index);
 
-        Assert.That(!MockDataProvider.WebModel(model).IsIndexedByIndex(log, "NewIndex", MockDataProvider.EventName));
+        Assert.That(!MockDataProvider.WebModel(model).IsIndexedByIndex(log, "NewIndex", MockDataProvider.EVENT_NAME));
     }
 
     [Test]
@@ -143,6 +143,6 @@ internal class IndexedItemModelExtensionsTests
         AzureSearchIndexStore.Instance.SetIndicies([]);
         AzureSearchIndexStore.Instance.AddIndex(MockDataProvider.Index);
 
-        Assert.That(!model.IsIndexedByIndex(log, MockDataProvider.DefaultIndex, MockDataProvider.EventName));
+        Assert.That(!model.IsIndexedByIndex(log, MockDataProvider.DEFAULT_INDEX, MockDataProvider.EVENT_NAME));
     }
 }

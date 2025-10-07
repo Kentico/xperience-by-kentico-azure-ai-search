@@ -17,7 +17,7 @@ internal class IndexStoreTests
         Assert.Multiple(() =>
         {
             Assert.That(AzureSearchIndexStore.Instance.GetIndex("TestIndex") is not null);
-            Assert.That(AzureSearchIndexStore.Instance.GetIndex(MockDataProvider.DefaultIndex) is not null);
+            Assert.That(AzureSearchIndexStore.Instance.GetIndex(MockDataProvider.DEFAULT_INDEX) is not null);
         });
     }
 
