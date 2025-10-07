@@ -161,9 +161,9 @@ public sealed class OrderService
         // Do not cancel the request while a write operation is already in process
         var customerAddress = await customerDataRetriever.GetCustomerAddress(customer.CustomerID, CancellationToken.None);
         customerAddress ??= new CustomerAddressInfo()
-            {
-                CustomerAddressCustomerID = customer.CustomerID
-            };
+        {
+            CustomerAddressCustomerID = customer.CustomerID
+        };
 
         // Update the customer address with the data from the checkout form
         // (Dancing Goat sample operates only with a single customer address)

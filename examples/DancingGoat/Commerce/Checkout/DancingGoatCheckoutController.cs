@@ -109,7 +109,7 @@ public sealed class DancingGoatCheckoutController : Controller
                 Value = x.StateID.ToString(),
             }).ToList();
         }
-        return new List<SelectListItem>();
+        return [];
     }
 
 

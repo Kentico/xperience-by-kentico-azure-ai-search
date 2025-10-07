@@ -1,4 +1,3 @@
-using Azure;
 using Azure.Search.Documents;
 
 using Kentico.Xperience.AzureSearch.Search;

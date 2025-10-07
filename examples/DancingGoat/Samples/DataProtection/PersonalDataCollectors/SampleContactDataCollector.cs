@@ -68,12 +68,9 @@ internal class SampleContactDataCollector : IPersonalDataCollector
     }
 
 
-    private IPersonalDataWriter CreateWriter(string outputFormat)
+    private IPersonalDataWriter CreateWriter(string outputFormat) => outputFormat.ToLowerInvariant() switch
     {
-        return outputFormat.ToLowerInvariant() switch
-        {
-            PersonalDataFormat.MACHINE_READABLE => new XmlPersonalDataWriter(),
-            _ => new HumanReadablePersonalDataWriter(),
-        };
-    }
+        PersonalDataFormat.MACHINE_READABLE => new XmlPersonalDataWriter(),
+        _ => new HumanReadablePersonalDataWriter(),
+    };
 }

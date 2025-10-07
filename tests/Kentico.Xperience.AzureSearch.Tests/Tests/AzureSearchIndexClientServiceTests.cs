@@ -1,12 +1,6 @@
-using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
-using Azure.Search.Documents.Indexes.Models;
 
-using Kentico.Xperience.AzureSearch.Admin;
 using Kentico.Xperience.AzureSearch.Indexing;
-using Kentico.Xperience.AzureSearch.Tests.Base;
-
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Kentico.Xperience.AzureSearch.Tests.Tests;
 
@@ -30,8 +24,5 @@ internal class AzureSearchIndexClientServiceTests
 
 
     [TearDown]
-    public void TearDown()
-    {
-        AzureSearchIndexStore.Instance.SetIndicies([]);
-    }
+    public void TearDown() => AzureSearchIndexStore.Instance.SetIndicies([]);
 }

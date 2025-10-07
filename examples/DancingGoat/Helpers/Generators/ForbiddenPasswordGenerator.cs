@@ -5,8 +5,8 @@
 /// </summary>
 public static class ForbiddenPasswordGenerator
 {
-    private static readonly List<char> SpecialChars = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '.', '?', '-', '_', '=', '+', '[', ']', '{', '}', '\\', '|', ';', ':', '\'', '"', ',', '<', '>', '/', '~', '`'];
-    private static readonly List<string> Numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+    private static readonly List<char> specialChars = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '.', '?', '-', '_', '=', '+', '[', ']', '{', '}', '\\', '|', ';', ':', '\'', '"', ',', '<', '>', '/', '~', '`'];
+    private static readonly List<string> numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
     /// <summary>
     /// Generates forbidden passwords based on company-specific keywords and specific number combinations.
@@ -18,12 +18,12 @@ public static class ForbiddenPasswordGenerator
     /// <param name="specificNumberCombinations">Specific number combinations</param>
     public static HashSet<string> Generate(List<string> companySpecificKeywords, List<string> specificNumberCombinations)
     {
-        var numbers = Numbers.Concat(specificNumberCombinations);
+        var numbersToUse = numbers.Concat(specificNumberCombinations);
 
         var forbiddenPasswords =
             from keyword in companySpecificKeywords
-            from specialChar in SpecialChars
-            from number in numbers
+            from specialChar in specialChars
+            from number in numbersToUse
             from forbiddenPassword in new[]
             {
                 keyword + specialChar + number,
@@ -33,6 +33,6 @@ public static class ForbiddenPasswordGenerator
             }
             select forbiddenPassword;
 
-        return new HashSet<string>(forbiddenPasswords);
+        return [.. forbiddenPasswords];
     }
 }

@@ -11,8 +11,8 @@ namespace Samples.DancingGoat;
 /// </summary>
 internal sealed class HumanReadablePersonalDataWriter : IPersonalDataWriter
 {
-    private static readonly string DECIMAL_PRECISION = new('#', 26);
-    private static readonly string DECIMAL_FORMAT = "{0:0.00" + DECIMAL_PRECISION + "}";
+    private static readonly string decimalPrecision = new('#', 26);
+    private static readonly string decimalFormat = "{0:0.00" + decimalPrecision + "}";
 
     private readonly StringBuilder stringBuilder;
     private int indentationLevel;
@@ -127,7 +127,7 @@ internal sealed class HumanReadablePersonalDataWriter : IPersonalDataWriter
 
         if (value is decimal)
         {
-            format = DECIMAL_FORMAT;
+            format = decimalFormat;
         }
 
         stringBuilder.AppendFormat(Culture, format, value);
