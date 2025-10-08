@@ -12,6 +12,32 @@ internal class AzureSearchIndexAliasServiceTests
 
 
     [Test]
+    public async Task CreateAlias_WithValidParameters_CreatesAlias()
+    {
+        var mockIndexClient = Substitute.For<SearchIndexClient>();
+        var service = new AzureSearchIndexAliasService(mockIndexClient);
+        var alias = new SearchAlias(MockDataProvider.ALIAS_NAME, [TEST_INDEX_NAME]);
+        var cancellationToken = CancellationToken.None;
+
+        await service.CreateAlias(alias, cancellationToken);
+
+        await mockIndexClient.Received(1).CreateOrUpdateAliasAsync(MockDataProvider.ALIAS_NAME, alias, cancellationToken: cancellationToken);
+    }
+
+
+    [Test]
+    public void CreateAlias_WithNullAlias_ThrowsArgumentNullException()
+    {
+        var mockIndexClient = Substitute.For<SearchIndexClient>();
+        var service = new AzureSearchIndexAliasService(mockIndexClient);
+        var cancellationToken = CancellationToken.None;
+
+        Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await service.CreateAlias(null!, cancellationToken));
+    }
+
+
+    [Test]
     public async Task EditAlias_WithValidParameters_DeletesOldAndCreatesNew()
     {
         var mockIndexClient = Substitute.For<SearchIndexClient>();
