@@ -43,21 +43,18 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
         if (!valid)
         {
             return new ModificationResponse(ModificationResult.Failure,
-                validationResults
+                [.. validationResults
                     .Where(result => result.ErrorMessage is not null)
-                    .Select(result => result.ErrorMessage!)
-                    .ToList()
+                    .Select(result => result.ErrorMessage!)]
             );
         }
 
         if (StorageService.GetAliasIds().Exists(x => x == configuration.Id))
         {
-            // Editing existing alias - Azure first, then local storage
             return await ProcessEditAlias(configuration);
         }
         else
         {
-            // Creating new alias - Azure first, then local storage
             return await ProcessCreateAlias(configuration);
         }
     }
@@ -72,20 +69,16 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
 
         try
         {
-            // Step 1: Update Azure first
-            await azureSearchIndexAliasService.EditAlias(oldAliasName, new SearchAlias(configuration.AliasName, configuration.IndexNames), default);
+            await azureSearchIndexAliasService.EditAlias(oldAliasName, new SearchAlias(configuration.AliasName, configuration.IndexName), default);
 
-            // Step 2: Update local storage only if Azure operation succeeded
             bool edited = StorageService.TryEditAlias(configuration);
             if (!edited)
             {
-                // Rollback Azure changes if local storage failed
-                var oldIndexNames = StorageService.GetAliasDataOrNull(configuration.Id)?.IndexNames ?? [];
-                await RollbackEditAlias(oldAliasName, configuration.AliasName, oldIndexNames);
+                var oldIndexName = StorageService.GetAliasDataOrNull(configuration.Id)?.IndexName ?? string.Empty;
+                await RollbackEditAlias(oldAliasName, configuration.AliasName, oldIndexName);
                 return new ModificationResponse(ModificationResult.Failure, ["Failed to update local storage."]);
             }
 
-            // Step 3: Update in-memory store only if both Azure and local storage succeeded
             AzureSearchIndexAliasStore.SetAliases(StorageService);
 
             return new ModificationResponse(ModificationResult.Success);
@@ -99,26 +92,22 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
 
     private async Task<ModificationResponse> ProcessCreateAlias(AzureSearchAliasConfigurationModel configuration)
     {
-        if (configuration.IndexNames.IsNullOrEmpty())
+        if (configuration.IndexName.IsNullOrEmpty())
         {
-            return new ModificationResponse(ModificationResult.Failure, ["Index names cannot be empty."]);
+            return new ModificationResponse(ModificationResult.Failure, ["Index name cannot be empty."]);
         }
 
         try
         {
-            // Step 1: Create in Azure first
-            await azureSearchIndexAliasService.CreateAlias(new SearchAlias(configuration.AliasName, configuration.IndexNames), default);
+            await azureSearchIndexAliasService.CreateAlias(new SearchAlias(configuration.AliasName, configuration.IndexName), default);
 
-            // Step 2: Create in local storage only if Azure operation succeeded
             bool created = StorageService.TryCreateAlias(configuration);
             if (!created)
             {
-                // Rollback Azure changes if local storage failed
                 await RollbackCreateAlias(configuration.AliasName);
                 return new ModificationResponse(ModificationResult.Failure, ["Failed to create alias in local storage."]);
             }
 
-            // Step 3: Update in-memory store only if both Azure and local storage succeeded
             AzureSearchIndexAliasStore.Instance.AddAlias(new AzureSearchIndexAlias(configuration));
 
             return new ModificationResponse(ModificationResult.Success);
@@ -160,11 +149,11 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
         }
     }
 
-    private async Task RollbackEditAlias(string oldAliasName, string newAliasName, IEnumerable<string> oldIndexNames)
+    private async Task RollbackEditAlias(string oldAliasName, string newAliasName, string oldIndexName)
     {
         try
         {
-            await azureSearchIndexAliasService.EditAlias(newAliasName, new SearchAlias(oldAliasName, oldIndexNames), default);
+            await azureSearchIndexAliasService.EditAlias(newAliasName, new SearchAlias(oldAliasName, oldIndexName), default);
         }
         catch (Exception ex)
         {
