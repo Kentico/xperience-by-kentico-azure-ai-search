@@ -151,30 +151,37 @@ internal class IndexAliasListingPage : ListingPage
             return response
                 .AddErrorMessage(string.Format("Error deleting AzureSearch index alias with identifier {0}.", id));
         }
+
         try
         {
+            // Step 1: Delete from Azure first
+            await azureSearchIndexAliasService.DeleteAlias(alias.AliasName, cancellationToken);
+
+            // Step 2: Delete from local storage only if Azure operation succeeded
             bool res = configurationStorageService.TryDeleteAlias(id);
-
-            if (res)
+            if (!res)
             {
-                AzureSearchIndexAliasStore.SetAliases(configurationStorageService);
+                // Rollback Azure changes if local storage failed
+                // Note: We can't easily restore the exact same alias configuration without storing it first,
+                // so we'll log this as a critical inconsistency that needs manual intervention
+                EventLogService.LogError(nameof(IndexAliasListingPage), nameof(Delete),
+                    $"Critical inconsistency: Alias '{alias.AliasName}' was deleted from Azure but failed to delete from local storage. Manual cleanup required.");
 
-                await azureSearchIndexAliasService.DeleteAlias(alias.AliasName, cancellationToken);
-            }
-            else
-            {
                 return response
-                    .AddErrorMessage(string.Format("Error deleting AzureSearch index with identifier {0}.", id));
+                    .AddErrorMessage($"Error deleting alias from local storage. The alias was removed from Azure but still exists locally. Please contact your administrator to resolve this inconsistency.");
             }
 
-            return response.AddSuccessMessage("Index deletion in progress. Visit your Azure dashboard for details about your indexes.");
+            // Step 3: Update in-memory store only if both Azure and local storage succeeded
+            AzureSearchIndexAliasStore.SetAliases(configurationStorageService);
+
+            return response.AddSuccessMessage("Alias deletion completed successfully.");
         }
         catch (Exception ex)
         {
-            EventLogService.LogException(nameof(IndexListingPage), nameof(Delete), ex);
+            EventLogService.LogException(nameof(IndexAliasListingPage), nameof(Delete), ex);
 
             return response
-               .AddErrorMessage(string.Format("Errors occurred while deleting the '{0}' index. Please check the Event Log for more details.", alias.IndexNames));
+               .AddErrorMessage(string.Format("Errors occurred while deleting the '{0}' alias. Please check the Event Log for more details.", alias.AliasName));
         }
     }
 }
