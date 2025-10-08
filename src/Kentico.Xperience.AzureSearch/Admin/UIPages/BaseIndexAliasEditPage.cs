@@ -3,6 +3,8 @@ using System.Text;
 
 using Azure.Search.Documents.Indexes.Models;
 
+using CMS.Core;
+
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.AzureSearch.Aliasing;
@@ -22,7 +24,8 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
         IFormItemCollectionProvider formItemCollectionProvider,
         IFormDataBinder formDataBinder,
         IAzureSearchIndexAliasService azureSearchIndexAliasService,
-        IAzureSearchConfigurationStorageService storageService)
+        IAzureSearchConfigurationStorageService storageService
+        )
         : base(formItemCollectionProvider, formDataBinder)
     {
         StorageService = storageService;
@@ -40,40 +43,80 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
         if (!valid)
         {
             return new ModificationResponse(ModificationResult.Failure,
-                validationResults
+                [.. validationResults
                     .Where(result => result.ErrorMessage is not null)
-                    .Select(result => result.ErrorMessage!)
-                    .ToList()
+                    .Select(result => result.ErrorMessage!)]
             );
         }
 
         if (StorageService.GetAliasIds().Exists(x => x == configuration.Id))
         {
-            string oldAliasName = StorageService.GetAliasDataOrNull(configuration.Id)!.AliasName;
+            return await ProcessEditAlias(configuration);
+        }
+        else
+        {
+            return await ProcessCreateAlias(configuration);
+        }
+    }
 
-            bool edited = StorageService.TryEditAlias(configuration);
-
-            if (edited)
-            {
-                AzureSearchIndexAliasStore.SetAliases(StorageService);
-                await azureSearchIndexAliasService.EditAlias(oldAliasName, new SearchAlias(configuration.AliasName, configuration.IndexNames), default);
-
-                return new ModificationResponse(ModificationResult.Success);
-            }
-
-            return new ModificationResponse(ModificationResult.Failure);
+    private async Task<ModificationResponse> ProcessEditAlias(AzureSearchAliasConfigurationModel configuration)
+    {
+        string? oldAliasName = StorageService.GetAliasDataOrNull(configuration.Id)?.AliasName;
+        if (oldAliasName == null)
+        {
+            return new ModificationResponse(ModificationResult.Failure, ["Alias not found."]);
         }
 
-        bool created = !configuration.IndexNames.IsNullOrEmpty() && StorageService.TryCreateAlias(configuration);
-
-        if (created)
+        try
         {
+            await azureSearchIndexAliasService.EditAlias(oldAliasName, new SearchAlias(configuration.AliasName, configuration.IndexName), default);
+
+            bool edited = StorageService.TryEditAlias(configuration);
+            if (!edited)
+            {
+                var oldIndexName = StorageService.GetAliasDataOrNull(configuration.Id)?.IndexName ?? string.Empty;
+                await RollbackEditAlias(oldAliasName, configuration.AliasName, oldIndexName);
+                return new ModificationResponse(ModificationResult.Failure, ["Failed to update local storage."]);
+            }
+
+            AzureSearchIndexAliasStore.SetAliases(StorageService);
+
+            return new ModificationResponse(ModificationResult.Success);
+        }
+        catch (Exception ex)
+        {
+            EventLogService.LogError(nameof(BaseIndexAliasEditPage), nameof(ProcessEditAlias), $"Exception during alias edit: {ex.Message}");
+            return new ModificationResponse(ModificationResult.Failure, [$"Failed to update Azure Search alias. See error log for more details."]);
+        }
+    }
+
+    private async Task<ModificationResponse> ProcessCreateAlias(AzureSearchAliasConfigurationModel configuration)
+    {
+        if (configuration.IndexName.IsNullOrEmpty())
+        {
+            return new ModificationResponse(ModificationResult.Failure, ["Index name cannot be empty."]);
+        }
+
+        try
+        {
+            await azureSearchIndexAliasService.CreateAlias(new SearchAlias(configuration.AliasName, configuration.IndexName), default);
+
+            bool created = StorageService.TryCreateAlias(configuration);
+            if (!created)
+            {
+                await RollbackCreateAlias(configuration.AliasName);
+                return new ModificationResponse(ModificationResult.Failure, ["Failed to create alias in local storage."]);
+            }
+
             AzureSearchIndexAliasStore.Instance.AddAlias(new AzureSearchIndexAlias(configuration));
 
             return new ModificationResponse(ModificationResult.Success);
         }
-
-        return new ModificationResponse(ModificationResult.Failure);
+        catch (Exception ex)
+        {
+            EventLogService.LogError(nameof(BaseIndexAliasEditPage), nameof(ProcessCreateAlias), $"Exception during alias creation: {ex.Message}");
+            return new ModificationResponse(ModificationResult.Failure, [$"Failed to create Azure Search alias. See error log for more details."]);
+        }
     }
 
     protected static string RemoveWhitespacesUsingStringBuilder(string source)
@@ -91,5 +134,31 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
         }
 
         return source.Length == builder.Length ? source : builder.ToString();
+    }
+
+    private async Task RollbackCreateAlias(string aliasName)
+    {
+        try
+        {
+            await azureSearchIndexAliasService.DeleteAlias(aliasName, default);
+        }
+        catch (Exception ex)
+        {
+            EventLogService.LogError(nameof(BaseIndexAliasEditPage), nameof(RollbackCreateAlias),
+                $"Failed to rollback Azure Search alias creation: {aliasName}.{Environment.NewLine}{ex.Message}");
+        }
+    }
+
+    private async Task RollbackEditAlias(string oldAliasName, string newAliasName, string oldIndexName)
+    {
+        try
+        {
+            await azureSearchIndexAliasService.EditAlias(newAliasName, new SearchAlias(oldAliasName, oldIndexName), default);
+        }
+        catch (Exception ex)
+        {
+            EventLogService.LogError(nameof(BaseIndexAliasEditPage), nameof(RollbackEditAlias),
+                $"Failed to rollback Azure Search alias edit: {newAliasName} back to {oldAliasName}.{Environment.NewLine}{ex.Message}");
+        }
     }
 }
