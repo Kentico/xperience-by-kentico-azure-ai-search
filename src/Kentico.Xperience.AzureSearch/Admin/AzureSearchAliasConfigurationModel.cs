@@ -24,6 +24,8 @@ public class AzureSearchAliasConfigurationModel
     [RequiredValidationRule]
     [MaxLength(128)]
     [RegularExpression("^(?!-)[a-z0-9-]+(?<!-)$", ErrorMessage = "Alias name must only contain lowercase letters, digits or dashes, cannot start or end with dashes and is limited to 128 characters.")]
+    [UniqueIndexNameValidationRule]
+    [UniqueAliasNameValidationRule]
     public string AliasName { get; set; } = string.Empty;
 
 
