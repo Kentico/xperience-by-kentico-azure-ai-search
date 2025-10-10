@@ -24,7 +24,7 @@ public record RelatedPageViewModel(string Title, string TeaserUrl, string Summar
     }
 
 
-    private static RelatedPageViewModel GetViewModelFromArticlePage(ArticlePage articlePage) => new        (
+    private static RelatedPageViewModel GetViewModelFromArticlePage(ArticlePage articlePage) => new(
             articlePage.ArticleTitle,
             articlePage.ArticlePageTeaser.FirstOrDefault()?.ImageFile.Url,
             WebUtility.HtmlEncode(articlePage.ArticlePageSummary),

@@ -1,11 +1,14 @@
 using System.Text.Json.Serialization;
 using Azure.Search.Documents.Indexes;
+using CMS.Tests;
 using Kentico.Xperience.AzureSearch.Indexing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Kentico.Xperience.AzureSearch.Tests.Tests;
+namespace Kentico.Xperience.AzureSearch.Tests.Indexing;
 
+[TestFixture]
+[Category.Unit]
 internal class AzureSearchBuilderTests
 {
     [Test]

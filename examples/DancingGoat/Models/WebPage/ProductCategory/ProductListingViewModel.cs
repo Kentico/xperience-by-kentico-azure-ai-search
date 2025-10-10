@@ -13,7 +13,7 @@ public record ProductListingViewModel(ProductSectionListViewModel SelectionProdu
     /// Validates and maps <see cref="ProductCategory"/> to a <see cref="ProductListingViewModel"/>.
     /// </summary>
     public static ProductListingViewModel GetViewModel(ProductCategory productCategory, IEnumerable<IProductFields> products, IDictionary<int, string> productPageUrls, TaxonomyData productTagsTaxonomy,
-        IEnumerable<NavigationItemViewModel> categoryMenu, string languageName)
+        IEnumerable<NavigationItemViewModel> categoryMenu, string _)
     {
         if (productCategory == null)
         {

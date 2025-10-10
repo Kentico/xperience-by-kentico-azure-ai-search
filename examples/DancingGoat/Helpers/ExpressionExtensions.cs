@@ -7,10 +7,10 @@ namespace DancingGoat.Helpers;
 
 internal static class ExpressionExtensions
 {
-    private static readonly ModelExpressionProvider ModelExpressionProvider = new(new EmptyModelMetadataProvider());
+    private static readonly ModelExpressionProvider modelExpressionProvider = new(new EmptyModelMetadataProvider());
 
     /// <summary>
     /// Returns the expression text for the specified expression.
     /// </summary>
-    public static string GetExpressionText<TEntity, TProperty>(this Expression<Func<TEntity, TProperty>> expression) => ModelExpressionProvider.GetExpressionText(expression);
+    public static string GetExpressionText<TEntity, TProperty>(this Expression<Func<TEntity, TProperty>> expression) => modelExpressionProvider.GetExpressionText(expression);
 }
