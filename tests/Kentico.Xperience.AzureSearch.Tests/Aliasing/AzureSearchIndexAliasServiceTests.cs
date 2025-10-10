@@ -9,7 +9,7 @@ using Kentico.Xperience.AzureSearch.Tests.Base;
 namespace Kentico.Xperience.AzureSearch.Tests.Aliasing;
 
 [TestFixture]
-[Category(Category.Unit)]
+[Category.Unit]
 internal class AzureSearchIndexAliasServiceTests
 {
     private const string TEST_INDEX_NAME = "test-index";

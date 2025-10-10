@@ -10,7 +10,7 @@ using Kentico.Xperience.AzureSearch.Indexing;
 namespace Kentico.Xperience.AzureSearch.Tests.Indexing;
 
 [TestFixture]
-[Category(Category.Unit)]
+[Category.Unit]
 public class Tests : UnitTests
 {
     private const string DEFAULT_LANGUAGE_NAME = "en-US";

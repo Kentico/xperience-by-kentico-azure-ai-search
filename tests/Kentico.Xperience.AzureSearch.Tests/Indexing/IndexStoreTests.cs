@@ -7,7 +7,7 @@ using Kentico.Xperience.AzureSearch.Tests.Base;
 namespace Kentico.Xperience.AzureSearch.Tests.Indexing;
 
 [TestFixture]
-[Category(Category.Unit)]
+[Category.Unit]
 internal class IndexStoreTests
 {
 
