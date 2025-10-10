@@ -17,9 +17,9 @@ public record StoreViewModel(IEnumerable<ProductSectionListViewModel> SelectionP
     /// <param name="productPageUrls">Product page URLs.</param>
     /// <param name="productSectionTagNames">Tag names that define separate sets of product to be displayed.</param>
     /// <param name="productTagsTaxonomy">"Product tags" taxonomy data</param>
-    /// <param name="languageName">Language name to map.</param>
+    /// <param name="_">Unused parameter.</param>
     /// <param name="categoryMenuViewModel">Category menu view model to map.</param>
-    public static StoreViewModel GetViewModel(Store store, IEnumerable<IProductFields> products, IDictionary<int, string> productPageUrls, IEnumerable<string> productSectionTagNames, TaxonomyData productTagsTaxonomy, string languageName, IEnumerable<NavigationItemViewModel> categoryMenuViewModel)
+    public static StoreViewModel GetViewModel(Store store, IEnumerable<IProductFields> products, IDictionary<int, string> productPageUrls, IEnumerable<string> productSectionTagNames, TaxonomyData productTagsTaxonomy, string _, IEnumerable<NavigationItemViewModel> categoryMenuViewModel)
     {
         var productSections = new List<ProductSectionListViewModel>();
 

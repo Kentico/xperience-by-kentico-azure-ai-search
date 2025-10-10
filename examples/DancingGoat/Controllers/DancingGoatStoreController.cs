@@ -26,7 +26,7 @@ public class DancingGoatStoreController : Controller
 
 
     private const string PRODUCT_TAGS_FIELD_NAME = "ProductFieldTags";
-    private readonly string[] PRODUCT_TAGS_TO_DISPLAY = [TAG_NAME_BESTSELLER, TAG_NAME_HOT_TIPS];
+    private readonly string[] productTagsToDisplay = [TAG_NAME_BESTSELLER, TAG_NAME_HOT_TIPS];
 
 
     public DancingGoatStoreController(IContentRetriever contentRetriever, NavigationService navigationService,
@@ -46,7 +46,7 @@ public class DancingGoatStoreController : Controller
         var storePage = await contentRetriever.RetrieveCurrentPage<Store>(cancellationToken);
         var languageName = currentLanguageRetriever.Get();
 
-        var tagCollection = await TagCollection.Create(PRODUCT_TAGS_TO_DISPLAY);
+        var tagCollection = await TagCollection.Create(productTagsToDisplay);
         var products = await GetProductsByTags(tagCollection, cancellationToken);
 
         var productPageUrls = await productRepository.GetProductPageUrls(products.Cast<IContentItemFieldsSource>().Select(p => p.SystemFields.ContentItemID), cancellationToken);
@@ -55,7 +55,7 @@ public class DancingGoatStoreController : Controller
 
         var productTagsTaxonomy = await taxonomyRetriever.RetrieveTaxonomy(DancingGoatTaxonomyConstants.PRODUCT_TAGS_TAXONOMY_NAME, languageName, cancellationToken);
 
-        return View(StoreViewModel.GetViewModel(storePage, products, productPageUrls, PRODUCT_TAGS_TO_DISPLAY, productTagsTaxonomy, languageName, categoryMenu));
+        return View(StoreViewModel.GetViewModel(storePage, products, productPageUrls, productTagsToDisplay, productTagsTaxonomy, languageName, categoryMenu));
     }
 
 
@@ -69,7 +69,7 @@ public class DancingGoatStoreController : Controller
                 WorkspaceNames = [DancingGoatConstants.COMMERCE_WORKSPACE_NAME]
             },
             query => query.Where(where => where.WhereContainsTags(PRODUCT_TAGS_FIELD_NAME, tagCollection)),
-            new RetrievalCacheSettings($"WhereContainsTags_{PRODUCT_TAGS_FIELD_NAME}_{string.Join("_", PRODUCT_TAGS_TO_DISPLAY)}"),
+            new RetrievalCacheSettings($"WhereContainsTags_{PRODUCT_TAGS_FIELD_NAME}_{string.Join("_", productTagsToDisplay)}"),
             cancellationToken
         );
 
