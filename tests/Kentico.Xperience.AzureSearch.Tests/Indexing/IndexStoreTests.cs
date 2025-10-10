@@ -1,8 +1,13 @@
-﻿using Kentico.Xperience.AzureSearch.Admin;
+﻿using CMS.Tests;
+
+using Kentico.Xperience.AzureSearch.Admin;
 using Kentico.Xperience.AzureSearch.Indexing;
 using Kentico.Xperience.AzureSearch.Tests.Base;
 
-namespace Kentico.Xperience.AzureSearch.Tests.Tests;
+namespace Kentico.Xperience.AzureSearch.Tests.Indexing;
+
+[TestFixture]
+[Category.Unit]
 internal class IndexStoreTests
 {
 
@@ -17,7 +22,7 @@ internal class IndexStoreTests
         Assert.Multiple(() =>
         {
             Assert.That(AzureSearchIndexStore.Instance.GetIndex("TestIndex") is not null);
-            Assert.That(AzureSearchIndexStore.Instance.GetIndex(MockDataProvider.DefaultIndex) is not null);
+            Assert.That(AzureSearchIndexStore.Instance.GetIndex(MockDataProvider.DEFAULT_INDEX) is not null);
         });
     }
 
