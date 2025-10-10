@@ -104,7 +104,7 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
         }
         catch (Exception ex)
         {
-            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(ValidateAndProcess), $"Failed to create Azure Search index: {ex.Message}");
+            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(ValidateAndProcess), $"Failed to edit Azure Search index: {ex.Message}");
             return new ModificationResponse(ModificationResult.Failure);
         }
 
