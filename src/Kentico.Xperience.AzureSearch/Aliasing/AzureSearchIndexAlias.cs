@@ -20,12 +20,21 @@ public sealed class AzureSearchIndexAlias
     /// <summary>
     /// The code name of the AzureSearch index which is aliased.
     /// </summary>
+    public string IndexName { get; }
+
+    /// <summary>
+    /// The code name of the AzureSearch index which is aliased.
+    /// </summary>
+    [Obsolete("Use IndexName property instead. This property will be removed in future versions.")]
     public IEnumerable<string> IndexNames { get; }
 
     internal AzureSearchIndexAlias(AzureSearchAliasConfigurationModel aliasConfiguration)
     {
         Identifier = aliasConfiguration.Id;
-        IndexNames = aliasConfiguration.IndexNames;
+        IndexName = aliasConfiguration.IndexName;
         AliasName = aliasConfiguration.AliasName;
+#pragma warning disable CS0618 // Type or member is obsolete
+        IndexNames = aliasConfiguration.IndexNames;
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

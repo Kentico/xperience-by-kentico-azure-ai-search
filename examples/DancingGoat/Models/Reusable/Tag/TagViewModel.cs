@@ -6,7 +6,7 @@ public record TagViewModel(string Name, int Level, Guid Value, bool IsChecked = 
 {
     private const int ROOT_TAG_ID = 0;
 
-    public static TagViewModel GetViewModel(Tag tag, int level = 0) => new TagViewModel(tag.Title, level, tag.Identifier);
+    public static TagViewModel GetViewModel(Tag tag, int level = 0) => new(tag.Title, level, tag.Identifier);
 
 
     public static List<TagViewModel> GetViewModels(IEnumerable<Tag> tags)
