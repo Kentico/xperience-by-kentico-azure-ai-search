@@ -4,7 +4,7 @@ using Azure.Search.Documents.Indexes.Models;
 using Kentico.Xperience.AzureSearch.Aliasing;
 using Kentico.Xperience.AzureSearch.Tests.Base;
 
-namespace Kentico.Xperience.AzureSearch.Tests.Tests;
+namespace Kentico.Xperience.AzureSearch.Tests.Aliasing;
 
 [TestFixture]
 [Category(Category.Unit)]

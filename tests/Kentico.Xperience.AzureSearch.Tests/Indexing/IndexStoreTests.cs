@@ -2,7 +2,7 @@
 using Kentico.Xperience.AzureSearch.Indexing;
 using Kentico.Xperience.AzureSearch.Tests.Base;
 
-namespace Kentico.Xperience.AzureSearch.Tests.Tests;
+namespace Kentico.Xperience.AzureSearch.Tests.Indexing;
 
 [TestFixture]
 [Category(Category.Unit)]

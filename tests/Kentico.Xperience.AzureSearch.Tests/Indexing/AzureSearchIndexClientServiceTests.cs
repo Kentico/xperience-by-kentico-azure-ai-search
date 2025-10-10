@@ -2,7 +2,7 @@ using Azure.Search.Documents.Indexes;
 
 using Kentico.Xperience.AzureSearch.Indexing;
 
-namespace Kentico.Xperience.AzureSearch.Tests.Tests;
+namespace Kentico.Xperience.AzureSearch.Tests.Indexing;
 
 [TestFixture]
 [Category(Category.Unit)]

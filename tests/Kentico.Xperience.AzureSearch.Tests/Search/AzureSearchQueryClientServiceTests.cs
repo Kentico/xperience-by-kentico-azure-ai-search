@@ -3,7 +3,7 @@ using Azure.Search.Documents;
 using Kentico.Xperience.AzureSearch.Search;
 using Kentico.Xperience.AzureSearch.Tests.Base;
 
-namespace Kentico.Xperience.AzureSearch.Tests.Tests;
+namespace Kentico.Xperience.AzureSearch.Tests.Search;
 
 [TestFixture]
 [Category(Category.Unit)]
