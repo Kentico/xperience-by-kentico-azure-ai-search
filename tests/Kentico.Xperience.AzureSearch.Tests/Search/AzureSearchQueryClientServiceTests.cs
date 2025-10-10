@@ -1,5 +1,7 @@
 using Azure.Search.Documents;
 
+using CMS.Tests;
+
 using Kentico.Xperience.AzureSearch.Search;
 using Kentico.Xperience.AzureSearch.Tests.Base;
 

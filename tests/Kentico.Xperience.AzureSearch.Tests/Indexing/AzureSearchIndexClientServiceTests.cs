@@ -1,5 +1,7 @@
 using Azure.Search.Documents.Indexes;
 
+using CMS.Tests;
+
 using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace Kentico.Xperience.AzureSearch.Tests.Indexing;

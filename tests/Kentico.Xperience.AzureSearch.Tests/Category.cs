@@ -1,4 +1,4 @@
-namespace Kentico.Xperience.AzureSearch.Tests;
+namespace CMS.Tests;
 
 /// <summary>
 /// Test categories for organizing test execution.

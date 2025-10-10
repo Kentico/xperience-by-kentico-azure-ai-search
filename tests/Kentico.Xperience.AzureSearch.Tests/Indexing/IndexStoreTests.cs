@@ -1,4 +1,6 @@
-﻿using Kentico.Xperience.AzureSearch.Admin;
+﻿using CMS.Tests;
+
+using Kentico.Xperience.AzureSearch.Admin;
 using Kentico.Xperience.AzureSearch.Indexing;
 using Kentico.Xperience.AzureSearch.Tests.Base;
 
