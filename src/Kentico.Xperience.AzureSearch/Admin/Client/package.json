@@ -46,8 +46,7 @@
   },
   "overrides": {
     "react": "$react",
-    "react-dom": "$react",
-    "pdfmake": "^0.3.0-beta.17"
+    "react-dom": "$react"
   },
   "browserslist": [
     "> .2% and last 3 versions",
