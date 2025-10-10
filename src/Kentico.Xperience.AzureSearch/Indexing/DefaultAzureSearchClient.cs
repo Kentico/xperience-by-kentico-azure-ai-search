@@ -20,13 +20,28 @@ namespace Kentico.Xperience.AzureSearch.Indexing;
 internal class DefaultAzureSearchClient : IAzureSearchClient
 {
     private readonly IAzureSearchIndexClientService azureSearchIndexClientService;
+
+
     private readonly IContentQueryExecutor executor;
+
+
     private readonly IServiceProvider serviceProvider;
+
+
     private readonly IInfoProvider<ContentLanguageInfo> languageProvider;
+
+
     private readonly IInfoProvider<ChannelInfo> channelProvider;
+
+
     private readonly IConversionService conversionService;
+
+
     private readonly IProgressiveCache cache;
+
+
     private readonly SearchIndexClient searchIndexClient;
+
 
     public DefaultAzureSearchClient(
         IAzureSearchIndexClientService azureSearchIndexClientService,
@@ -47,6 +62,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         this.cache = cache;
         this.searchIndexClient = searchIndexClient;
     }
+
 
     /// <inheritdoc />
     public async Task<int> DeleteRecords(IEnumerable<string> itemGuids, string indexName, CancellationToken cancellationToken)
@@ -70,20 +86,26 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
     {
         var indices = AzureSearchIndexStore.Instance.GetAllIndices();
 
+        var existingIndexNamesInAzure = searchIndexClient.GetIndexNamesAsync(cancellationToken: cancellationToken);
+
         var stats = new List<AzureSearchIndexStatisticsViewModel>();
 
-        foreach (var index in indices)
+        await foreach (var indexName in existingIndexNamesInAzure)
         {
-            var indexClient = await azureSearchIndexClientService.InitializeIndexClient(index.IndexName, cancellationToken);
-            stats.Add(new AzureSearchIndexStatisticsViewModel()
+            if (indices.Any(x => x.IndexName == indexName))
             {
-                Name = index.IndexName,
-                Entries = await indexClient.GetDocumentCountAsync(cancellationToken)
-            });
+                var indexClient = await azureSearchIndexClientService.InitializeIndexClient(indexName, cancellationToken);
+                stats.Add(new AzureSearchIndexStatisticsViewModel()
+                {
+                    Name = indexName,
+                    Entries = await indexClient.GetDocumentCountAsync(cancellationToken)
+                });
+            }
         }
 
         return stats;
     }
+
 
     /// <inheritdoc />
     public Task Rebuild(string indexName, CancellationToken? cancellationToken)
@@ -97,6 +119,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         return RebuildInternal(azureSearchIndex, cancellationToken);
     }
 
+
     /// <inheritdoc />
     public async Task DeleteIndex(string indexName, CancellationToken cancellationToken)
     {
@@ -107,6 +130,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
         await searchIndexClient.DeleteIndexAsync(indexName, cancellationToken);
     }
+
 
     /// <inheritdoc />
     public Task<int> UpsertRecords(IEnumerable<IAzureSearchModel> models, string indexName, CancellationToken cancellationToken)
@@ -123,6 +147,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
         return UpsertRecordsInternal(models, indexName, cancellationToken);
     }
+
 
     private async Task<int> DeleteRecordsInternal(IEnumerable<string> itemGuids, string indexName, CancellationToken cancellationToken)
     {
@@ -141,9 +166,13 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         return result.Value.Results.Count(model => model.Succeeded);
     }
 
+
     private async Task RebuildInternal(AzureSearchIndex azureSearchIndex, CancellationToken? cancellationToken)
     {
         var indexedItems = new List<IIndexEventItemModel>();
+
+        var indexResponse = await searchIndexClient.GetIndexAsync(azureSearchIndex.IndexName, cancellationToken ?? default);
+        var index = indexResponse.Value;
 
         foreach (var includedPathAttribute in azureSearchIndex.IncludedPaths)
         {
@@ -200,10 +229,14 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
             }
         }
 
-        await searchIndexClient.DeleteIndexAsync(azureSearchIndex.IndexName, cancellationToken ?? default);
+        await searchIndexClient.DeleteIndexAsync(index, onlyIfUnchanged: true, cancellationToken: cancellationToken ?? default);
+
+        var indexModel = AzureSearchIndexStore.Instance.GetRequiredIndex(azureSearchIndex.IndexName);
+        await azureSearchIndexClientService.CreateIndex(indexModel, cancellationToken ?? default);
 
         indexedItems.ForEach(item => AzureSearchQueueWorker.EnqueueAzureSearchQueueItem(new AzureSearchQueueItem(item, AzureSearchTaskType.PUBLISH_INDEX, azureSearchIndex.IndexName)));
     }
+
 
     private async Task<IndexEventWebPageItemModel> MapToEventItem(IWebPageContentQueryDataContainer content)
     {
@@ -231,6 +264,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         return item;
     }
 
+
     private async Task<IndexEventReusableItemModel> MapToEventReusableItem(IContentQueryDataContainer content)
     {
         var languages = await GetAllLanguages();
@@ -250,6 +284,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         return item;
     }
 
+
     private async Task<int> UpsertRecordsInternal(IEnumerable<IAzureSearchModel> models, string indexName, CancellationToken cancellationToken)
     {
         int upsertedCount = 0;
@@ -265,6 +300,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         return upsertedCount;
     }
 
+
     private Task<IEnumerable<ContentLanguageInfo>> GetAllLanguages() =>
         cache.LoadAsync(async cs =>
         {
@@ -274,6 +310,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
             return results;
         }, new CacheSettings(5, nameof(DefaultAzureSearchClient), nameof(GetAllLanguages)));
+
 
     private Task<IEnumerable<(int WebsiteChannelID, string ChannelName)>> GetAllWebsiteChannels() =>
         cache.LoadAsync(async cs =>
