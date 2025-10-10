@@ -1,3 +1,6 @@
+using Azure.Search.Documents.Indexes;
+
+using CMS.Core;
 using CMS.Membership;
 
 using Kentico.Xperience.Admin.Base;
@@ -21,15 +24,21 @@ namespace Kentico.Xperience.AzureSearch.Admin;
 internal class IndexCreatePage : BaseIndexEditPage
 {
     private readonly IPageLinkGenerator pageLinkGenerator;
+
+
     private AzureSearchConfigurationModel? model = null;
+
 
     public IndexCreatePage(
         IFormItemCollectionProvider formItemCollectionProvider,
         IFormDataBinder formDataBinder,
         IAzureSearchConfigurationStorageService storageService,
         IPageLinkGenerator pageLinkGenerator,
-        IAzureSearchIndexClientService searchClientService)
-        : base(formItemCollectionProvider, formDataBinder, storageService, searchClientService) => this.pageLinkGenerator = pageLinkGenerator;
+        IAzureSearchIndexClientService searchClientService,
+        SearchIndexClient indexClient,
+        IEventLogService eventLogService)
+        : base(formItemCollectionProvider, formDataBinder, storageService, searchClientService, indexClient, eventLogService) => this.pageLinkGenerator = pageLinkGenerator;
+
 
     protected override AzureSearchConfigurationModel Model
     {
@@ -40,6 +49,7 @@ internal class IndexCreatePage : BaseIndexEditPage
             return model;
         }
     }
+
 
     protected override async Task<ICommandResponse> ProcessFormData(AzureSearchConfigurationModel model, ICollection<IFormItem> formItems)
     {
@@ -68,7 +78,7 @@ internal class IndexCreatePage : BaseIndexEditPage
         }
         else
         {
-            errorResponse.AddErrorMessage("Could not create index.");
+            errorResponse.AddErrorMessage("Could not create index. See event log for details.");
         }
 
         return errorResponse;

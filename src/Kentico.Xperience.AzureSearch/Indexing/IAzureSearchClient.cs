@@ -21,6 +21,7 @@ public interface IAzureSearchClient
     /// <returns>The number of records deleted.</returns>
     Task<int> DeleteRecords(IEnumerable<string> itemGuids, string indexName, CancellationToken cancellationToken);
 
+
     /// <summary>
     /// Gets the indices of the AzureSearch application with basic statistics.
     /// </summary>
@@ -28,7 +29,11 @@ public interface IAzureSearchClient
     /// 
     /// <exception cref="OperationCanceledException" />
     /// <exception cref="ObjectDisposedException" />
+    /// <exception cref="Azure.RequestFailedException">Thrown when a failure is returned by the Search service.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the Search service is not properly configured.</exception>
+    /// <exception cref="ArgumentNullException">Thrown when the Search service is not properly configured.</exception>
     Task<ICollection<AzureSearchIndexStatisticsViewModel>> GetStatistics(CancellationToken cancellationToken);
+
 
     /// <summary>
     /// Updates the AzureSearch index with the dynamic data in each object of the passed <paramref name="models"/>.
@@ -44,6 +49,7 @@ public interface IAzureSearchClient
     /// <returns>The number of objects processed.</returns>
     Task<int> UpsertRecords(IEnumerable<IAzureSearchModel> models, string indexName, CancellationToken cancellationToken);
 
+
     /// <summary>
     /// Rebuilds the AzureSearch index by removing existing data from AzureSearch and indexing all
     /// pages in the content tree included in the index.
@@ -54,7 +60,9 @@ public interface IAzureSearchClient
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="OperationCanceledException" />
     /// <exception cref="ObjectDisposedException" />
+    /// <exception cref="Azure.RequestFailedException">Thrown when a failure is returned by the Search service.</exception>
     Task Rebuild(string indexName, CancellationToken? cancellationToken);
+
 
     /// <summary>
     /// Deletes the AzureSearch index by removing existing index data from Azure.

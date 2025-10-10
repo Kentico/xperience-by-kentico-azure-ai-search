@@ -23,7 +23,7 @@ internal class AzureSearchIndexClientServiceTests
         var exception = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await service.InitializeIndexClient("NonExistentIndex", cancellationToken));
 
-        Assert.That(exception!.Message, Is.EqualTo("Registered index with name 'NonExistentIndex' doesn't exist."));
+        Assert.That(exception!.Message, Is.EqualTo("The index 'NonExistentIndex' is not registered."));
     }
 
 

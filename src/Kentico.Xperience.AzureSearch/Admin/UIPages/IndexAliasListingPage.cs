@@ -25,12 +25,22 @@ namespace Kentico.Xperience.AzureSearch.Admin;
 internal class IndexAliasListingPage : ListingPage
 {
     private readonly IAzureSearchClient azureSearchClient;
+
+
     private readonly IPageLinkGenerator pageLinkGenerator;
+
+
     private readonly IAzureSearchIndexAliasService azureSearchIndexAliasService;
+
+
     private readonly IAzureSearchConfigurationStorageService configurationStorageService;
+
+
     private readonly AzureSearchOptions azureSearchOptions;
 
+
     protected override string ObjectType => AzureSearchIndexAliasItemInfo.OBJECT_TYPE;
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="IndexListingPage"/> class.
@@ -48,6 +58,7 @@ internal class IndexAliasListingPage : ListingPage
         this.configurationStorageService = configurationStorageService;
         this.azureSearchOptions = azureSearchOptions.Value;
     }
+
 
     /// <inheritdoc/>
     public override async Task ConfigurePage()
@@ -97,6 +108,7 @@ internal class IndexAliasListingPage : ListingPage
         await base.ConfigurePage();
     }
 
+
     /// <summary>
     /// A page command which rebuilds an AzureSearch index.
     /// </summary>
@@ -127,6 +139,24 @@ internal class IndexAliasListingPage : ListingPage
         {
             await azureSearchClient.Rebuild(index.IndexName, cancellationToken);
         }
+        catch (Azure.RequestFailedException ex)
+        {
+            EventLogService.LogException(nameof(IndexAliasListingPage), nameof(Rebuild), ex);
+
+            string errorMessage = ex.Status switch
+            {
+                404 => string.Format("Index '{0}' was not found in Azure Search.", index.IndexName),
+                403 => string.Format("Access denied when rebuilding index '{0}'. Please check your Azure Search service permissions.", index.IndexName),
+                409 => string.Format("Index '{0}' is currently being modified by another operation. Please try again later.", index.IndexName),
+                412 => string.Format("Index '{0}' has been modified since the rebuild started. Please try again.", index.IndexName),
+                429 => string.Format("Azure Search service is currently throttling requests. Please try rebuilding index '{0}' again later.", index.IndexName),
+                500 => string.Format("Azure Search service encountered an internal error while rebuilding index '{0}'. Please try again later.", index.IndexName),
+                503 => string.Format("Azure Search service is temporarily unavailable. Please try rebuilding index '{0}' again later.", index.IndexName),
+                _ => string.Format("Failed to rebuild index '{0}' due to an Azure Search service error (Status: {1}). Please check the Event Log for details.", index.IndexName, ex.Status)
+            };
+
+            return ResponseFrom(result).AddErrorMessage(errorMessage);
+        }
         catch (Exception ex)
         {
             EventLogService.LogException(nameof(IndexAliasListingPage), nameof(Rebuild), ex);
@@ -139,6 +169,13 @@ internal class IndexAliasListingPage : ListingPage
                     .AddSuccessMessage("Indexing in progress. Visit your AzureSearch dashboard for details about the indexing process.");
     }
 
+
+    /// <summary>
+    /// A page command which deletes an AzureSearch index alias.
+    /// </summary>
+    /// <param name="id">The ID of the row whose action was performed, which corresponds with the internal
+    /// <see cref="AzureSearchIndexAliasItemInfo.AzureSearchIndexAliasItemId"/> to delete.</param>
+    /// <param name="cancellationToken">The cancellation token for the action.</param>
     [PageCommand(Permission = SystemPermissions.DELETE)]
     public async Task<INavigateResponse> Delete(int id, CancellationToken cancellationToken)
     {
