@@ -125,7 +125,9 @@ internal class AzureSearchBuilder : IAzureSearchBuilder
     {
         var type = typeof(TSearchModel);
 
-        var propertiesWithAttributes = type.GetProperties().Select(x => new
+        var propertiesWithAttributes = type.GetProperties()
+            .Where(x => x.GetCustomAttributes<SimpleFieldAttribute>().Any())
+            .Select(x => new
         {
             Attribute = x.GetCustomAttributes<SimpleFieldAttribute>().SingleOrDefault()
                 ?? throw new InvalidOperationException(ErrorMessage),
