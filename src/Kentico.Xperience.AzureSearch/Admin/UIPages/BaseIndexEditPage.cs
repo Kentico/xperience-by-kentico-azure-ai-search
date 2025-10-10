@@ -95,6 +95,12 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
     private async Task<ModificationResponse> EditIndex(AzureSearchConfigurationModel configuration)
     {
         var oldIndexConfiguration = StorageService.GetIndexDataOrNull(configuration.Id);
+        if (oldIndexConfiguration == null || oldIndexConfiguration.IndexName == null)
+        {
+            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(EditIndex), "The index to edit could not be found.");
+            return new ModificationResponse(ModificationResult.Failure, ["The index to edit could not be found."]);
+        }
+
         var oldIndex = AzureSearchIndexStore.Instance.GetRequiredIndex(oldIndexConfiguration!.IndexName);
 
         SearchIndex editedSearchIndex;
@@ -102,9 +108,14 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
         {
             editedSearchIndex = await indexClientService.EditIndex(oldIndex!, configuration, default);
         }
-        catch (Exception ex)
+        catch (OperationCanceledException ex)
         {
-            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(ValidateAndProcess), $"Failed to create Azure Search index: {ex.Message}");
+            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(EditIndex), $"Index edit operation was cancelled: {ex.Message}");
+            return new ModificationResponse(ModificationResult.Failure);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentNullException or Azure.RequestFailedException)
+        {
+            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(EditIndex), $"Failed to edit Azure Search index: {ex.Message}");
             return new ModificationResponse(ModificationResult.Failure);
         }
 
@@ -112,17 +123,30 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
 
         if (edited)
         {
-            AzureSearchIndexStore.SetIndicies(StorageService);
-            return new ModificationResponse(ModificationResult.Success);
+            try
+            {
+                AzureSearchIndexStore.Instance.AddIndex(new AzureSearchIndex(configuration, StrategyStorage.Strategies));
+                return new ModificationResponse(ModificationResult.Success);
+            }
+            catch (Exception ex) when (ex is InvalidOperationException or ArgumentNullException)
+            {
+                eventLogService.LogError(nameof(BaseIndexEditPage), nameof(EditIndex), $"Failed to edit Azure Search index. Local storage and Azure Search storage will be rolled back.{ex.Message}");
+            }
+
+            // Rollback local storage if adding to the index store fails.
+            if (!StorageService.TryDeleteIndex(configuration.Id))
+            {
+                eventLogService.LogError(nameof(BaseIndexEditPage), nameof(CreateIndex), $"Failed to rollback local index storage. Manual cleanup may be required. Please check the local storage and remove the index if necessary.");
+            }
         }
         try
         {
             // Rollback index edit in Azure if local storage fails.
             await indexClient.DeleteIndexAsync(editedSearchIndex, onlyIfUnchanged: true);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is ArgumentNullException or InvalidOperationException)
         {
-            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(ValidateAndProcess), $"Failed to rollback index edit. {ex.Message}");
+            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(CreateIndex), $"Failed to rollback index edit. Manual cleanup may be required. Please check the Azure AI Search in Azure portal and delete the index if necessary. {ex.Message}");
         }
 
         return new ModificationResponse(ModificationResult.Failure);
@@ -141,9 +165,14 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
         {
             searchIndex = await indexClientService.CreateIndex(configuration, default);
         }
-        catch (Exception ex)
+        catch (OperationCanceledException ex)
         {
-            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(ValidateAndProcess), ex.Message);
+            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(CreateIndex), $"Index creation operation was cancelled: {ex.Message}");
+            return new ModificationResponse(ModificationResult.Failure);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentNullException or Azure.RequestFailedException)
+        {
+            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(CreateIndex), $"Failed to create Azure Search index: {ex.Message}");
             return new ModificationResponse(ModificationResult.Failure);
         }
 
@@ -151,9 +180,22 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
 
         if (created)
         {
-            AzureSearchIndexStore.Instance.AddIndex(new AzureSearchIndex(configuration, StrategyStorage.Strategies));
+            try
+            {
+                AzureSearchIndexStore.Instance.AddIndex(new AzureSearchIndex(configuration, StrategyStorage.Strategies));
+                return new ModificationResponse(ModificationResult.Success);
+            }
+            catch (Exception ex) when (ex is InvalidOperationException or ArgumentNullException)
+            {
+                // We do not return yet, as we still need to rollback the index creation in Azure.
+                eventLogService.LogError(nameof(BaseIndexEditPage), nameof(CreateIndex), $"Failed to create Azure Search index locally. Local storage and Azure Search storage will be rolled back. {ex.Message}");
+            }
 
-            return new ModificationResponse(ModificationResult.Success);
+            // Rollback local storage if adding to the index store fails.
+            if (!StorageService.TryDeleteIndex(configuration.Id))
+            {
+                eventLogService.LogError(nameof(BaseIndexEditPage), nameof(CreateIndex), $"Failed to rollback local index storage. Manual cleanup may be required. Please check the local storage and remove the index if necessary.");
+            }
         }
 
         try
@@ -161,9 +203,9 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
             // Rollback index creation in Azure if local storage fails.
             await indexClient.DeleteIndexAsync(searchIndex, onlyIfUnchanged: true);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is ArgumentNullException or Azure.RequestFailedException)
         {
-            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(ValidateAndProcess), $"Failed to rollback index creation. {ex.Message}");
+            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(CreateIndex), $"Failed to rollback index creation. Manual cleanup may be required. Please check the Azure AI Search in Azure portal and delete the index if necessary. {ex.Message}");
         }
 
         return new ModificationResponse(ModificationResult.Failure);

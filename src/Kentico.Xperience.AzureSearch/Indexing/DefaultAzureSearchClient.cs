@@ -43,6 +43,9 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
     private readonly SearchIndexClient searchIndexClient;
 
 
+    private readonly IEventLogService eventLogService;
+
+
     public DefaultAzureSearchClient(
         IAzureSearchIndexClientService azureSearchIndexClientService,
         IContentQueryExecutor executor,
@@ -51,7 +54,8 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         IInfoProvider<ChannelInfo> channelProvider,
         IConversionService conversionService,
         IProgressiveCache cache,
-        SearchIndexClient searchIndexClient)
+        SearchIndexClient searchIndexClient,
+        IEventLogService eventLogService)
     {
         this.azureSearchIndexClientService = azureSearchIndexClientService;
         this.executor = executor;
@@ -61,6 +65,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         this.conversionService = conversionService;
         this.cache = cache;
         this.searchIndexClient = searchIndexClient;
+        this.eventLogService = eventLogService;
     }
 
 
@@ -157,13 +162,21 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         var keyField = azureSearchStrategy.GetSearchFields()?.SingleOrDefault(x => x.IsKey is not null && x.IsKey.Value) ??
             throw new InvalidOperationException($"Your implementation of the {nameof(IAzureSearchModel)} used for {nameof(SearchIndex)} definition and data retrieval from {nameof(IAzureSearchIndexingStrategy)} must have exactly one key field.");
 
-        var searchClient = await azureSearchIndexClientService.InitializeIndexClient(indexName, cancellationToken);
+        try
+        {
+            var searchClient = await azureSearchIndexClientService.InitializeIndexClient(indexName, cancellationToken);
 
-        var batch = IndexDocumentsBatch.Delete(keyField.Name, itemGuids);
+            var batch = IndexDocumentsBatch.Delete(keyField.Name, itemGuids);
 
-        var result = await searchClient.IndexDocumentsAsync(batch, cancellationToken: cancellationToken);
+            var result = await searchClient.IndexDocumentsAsync(batch, cancellationToken: cancellationToken);
 
-        return result.Value.Results.Count(model => model.Succeeded);
+            return result.Value.Results.Count(model => model.Succeeded);
+        }
+        catch (Exception ex) when (ex is Azure.RequestFailedException or InvalidOperationException or ArgumentNullException)
+        {
+            eventLogService.LogException(nameof(DefaultAzureSearchClient), nameof(DeleteRecordsInternal), ex, $"Failed to delete records from Azure Search index '{indexName}': {ex.Message}");
+            return 0;
+        }
     }
 
 
@@ -288,16 +301,25 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
     private async Task<int> UpsertRecordsInternal(IEnumerable<IAzureSearchModel> models, string indexName, CancellationToken cancellationToken)
     {
         int upsertedCount = 0;
-        var searchClient = await azureSearchIndexClientService.InitializeIndexClient(indexName, cancellationToken);
 
-        var azureIndex = AzureSearchIndexStore.Instance.GetIndex(indexName) ??
-            throw new InvalidOperationException($"Registered index with name '{indexName}' doesn't exist.");
+        try
+        {
+            var searchClient = await azureSearchIndexClientService.InitializeIndexClient(indexName, cancellationToken);
 
-        var strategy = serviceProvider.GetRequiredStrategy(azureIndex);
+            var azureIndex = AzureSearchIndexStore.Instance.GetIndex(indexName) ??
+                throw new InvalidOperationException($"Registered index with name '{indexName}' doesn't exist.");
 
-        upsertedCount += await strategy.UploadDocuments(models, searchClient);
+            var strategy = serviceProvider.GetRequiredStrategy(azureIndex);
 
-        return upsertedCount;
+            upsertedCount += await strategy.UploadDocuments(models, searchClient);
+
+            return upsertedCount;
+        }
+        catch (Exception ex) when (ex is Azure.RequestFailedException or InvalidOperationException or ArgumentNullException)
+        {
+            eventLogService.LogException(nameof(DefaultAzureSearchClient), nameof(UpsertRecordsInternal), ex, $"Failed to upsert records to Azure Search index '{indexName}': {ex.Message}");
+            return upsertedCount;
+        }
     }
 
 

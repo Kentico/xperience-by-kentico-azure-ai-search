@@ -30,7 +30,7 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
         // Ensure the index exists locally.
         AzureSearchIndexStore.Instance.GetRequiredIndex(indexName);
 
-        // Ensure the index exists in Azure.
+        // Ensure the index exists in Azure. .
         await indexClient.GetIndexAsync(indexName, cancellationToken);
         return indexClient.GetSearchClient(indexName);
     }
