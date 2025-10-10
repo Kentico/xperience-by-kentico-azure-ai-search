@@ -5,6 +5,8 @@ using Kentico.Xperience.AzureSearch.Tests.Base;
 
 namespace Kentico.Xperience.AzureSearch.Tests.Tests;
 
+[TestFixture]
+[Category(Category.Unit)]
 internal class AzureSearchQueryClientServiceTests
 {
     [Test]
