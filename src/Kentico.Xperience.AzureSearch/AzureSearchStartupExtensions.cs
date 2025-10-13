@@ -128,11 +128,11 @@ internal class AzureSearchBuilder : IAzureSearchBuilder
         var propertiesWithAttributes = type.GetProperties()
             .Where(x => x.GetCustomAttributes<SimpleFieldAttribute>().Any())
             .Select(x => new
-        {
-            Attribute = x.GetCustomAttributes<SimpleFieldAttribute>().SingleOrDefault()
+            {
+                Attribute = x.GetCustomAttributes<SimpleFieldAttribute>().SingleOrDefault()
                 ?? throw new InvalidOperationException(ErrorMessage),
-            Type = x.PropertyType
-        });
+                Type = x.PropertyType
+            });
 
         var keyAttribute = propertiesWithAttributes.SingleOrDefault(x => x.Attribute.IsKey)
             ?? throw new InvalidOperationException(ErrorMessage);

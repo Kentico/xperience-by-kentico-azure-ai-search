@@ -1,7 +1,11 @@
 using System.Text.Json.Serialization;
+
 using Azure.Search.Documents.Indexes;
+
 using CMS.Tests;
+
 using Kentico.Xperience.AzureSearch.Indexing;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,13 +31,7 @@ internal class AzureSearchBuilderTests
             .Build();
 
         // Act & Assert - This should not throw because properties without SimpleFieldAttribute/SearchableFieldAttribute are now allowed
-        Assert.DoesNotThrow(() =>
-        {
-            serviceCollection.AddKenticoAzureSearch(builder =>
-            {
-                builder.RegisterStrategy<TestSearchModelWithAdditionalPropertiesStrategy, TestSearchModelWithAdditionalProperties>("TestStrategyWithAdditionalProps");
-            }, configuration);
-        });
+        Assert.DoesNotThrow(() => serviceCollection.AddKenticoAzureSearch(builder => builder.RegisterStrategy<TestSearchModelWithAdditionalPropertiesStrategy, TestSearchModelWithAdditionalProperties>("TestStrategyWithAdditionalProps"), configuration));
     }
 
     [Test]
@@ -52,13 +50,7 @@ internal class AzureSearchBuilderTests
             .Build();
 
         // Act
-        var exception = Assert.Throws<InvalidOperationException>(() =>
-        {
-            serviceCollection.AddKenticoAzureSearch(builder =>
-            {
-                builder.RegisterStrategy<InvalidTestSearchModelStrategy, InvalidTestSearchModel>("InvalidTestStrategy");
-            }, configuration);
-        });
+        var exception = Assert.Throws<InvalidOperationException>(() => serviceCollection.AddKenticoAzureSearch(builder => builder.RegisterStrategy<InvalidTestSearchModelStrategy, InvalidTestSearchModel>("InvalidTestStrategy"), configuration));
 
         // Assert
         Assert.That(exception, Is.Not.Null);
@@ -91,10 +83,10 @@ internal class InvalidTestSearchModel : IAzureSearchModel
     public string ContentTypeName { get; set; } = string.Empty;
     public string LanguageName { get; set; } = string.Empty;
     public string ItemGuid { get; set; } = string.Empty;
-    
+
     // No key field defined
     public string ObjectID { get; set; } = string.Empty;
-    
+
     public string Name { get; set; } = string.Empty;
 
     [SearchableField]
