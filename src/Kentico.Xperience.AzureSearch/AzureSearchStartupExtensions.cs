@@ -13,14 +13,20 @@ using Microsoft.Extensions.Options;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
+/// <summary>
+/// Provides extension methods for registering Azure Search services and custom modules in an application.
+/// </summary>
+/// <remarks>This class contains methods to configure Azure Search services using either default strategies or
+/// custom options. These methods extend the <see cref="IServiceCollection"/> to simplify the integration of Azure
+/// Search functionality into an application.</remarks>
 public static class AzureSearchStartupExtensions
 {
     /// <summary>
-    /// Adds Azure search services and custom module to application using the <see cref="BaseAzureSearchIndexingStrategy{BaseAzureSearchModel}"/> for all indexes
+    /// Adds Azure search services and custom module to application using the <see cref="BaseAzureSearchIndexingStrategy{BaseAzureSearchModel}"/> for all indexes.
     /// </summary>
-    /// <param name="serviceCollection"></param>
-    /// <param name="configuration"></param>
-    /// <returns></returns>
+    /// <param name="serviceCollection">Service collection to add services to.</param>
+    /// <param name="configuration">The application configuration.</param>
+    /// <returns>Collection of services with Azure Search services added.</returns>
     public static IServiceCollection AddKenticoAzureSearch(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
         serviceCollection.AddAzureSearchServicesInternal(configuration);
@@ -28,12 +34,13 @@ public static class AzureSearchStartupExtensions
         return serviceCollection;
     }
 
+
     /// <summary>
     /// Adds AzureSearch services and custom module to application with customized options provided by the <see cref="IAzureSearchBuilder"/>
     /// in the <paramref name="configure" /> action.
     /// </summary>
-    /// <param name="serviceCollection"></param>
-    /// <param name="configure"></param>
+    /// <param name="serviceCollection">Service collection to add services to.</param>
+    /// <param name="configure">Configuration action for the Azure Search builder.</param>
     /// <param name="configuration">The application configuration.</param>
     /// <returns></returns>
     public static IServiceCollection AddKenticoAzureSearch(this IServiceCollection serviceCollection, Action<IAzureSearchBuilder> configure, IConfiguration configuration)
@@ -52,6 +59,7 @@ public static class AzureSearchStartupExtensions
 
         return serviceCollection;
     }
+
 
     private static IServiceCollection AddAzureSearchServicesInternal(this IServiceCollection services, IConfiguration configuration) =>
         services
@@ -75,21 +83,32 @@ public static class AzureSearchStartupExtensions
             .AddSingleton<IAzureSearchIndexAliasService, AzureSearchIndexAliasService>();
 }
 
+
+/// <summary>
+/// Provides methods for configuring and registering Azure Search strategies and models.
+/// </summary>
+/// <remarks>This interface is designed to facilitate the dynamic assignment of indexing strategies to Azure
+/// Search indexes. Implementations of this interface allow for the registration of custom indexing strategies and their
+/// association with unique strategy names.</remarks>
 public interface IAzureSearchBuilder
 {
     /// <summary>
-    /// Registers the given <typeparamref name="TStrategy" /> as a transient service under <paramref name="strategyName" />
+    /// Registers the given <typeparamref name="TStrategy" /> as a transient service under <paramref name="strategyName" />.
     /// </summary>
-    /// <typeparam name="TStrategy">The custom type of <see cref="IAzureSearchIndexingStrategy"/> </typeparam>
-    /// <typeparam name="TSearchModel">The custom rype of <see cref="IAzureSearchModel"/> used to create and use an index.</typeparam>
+    /// <typeparam name="TStrategy">The custom type of <see cref="IAzureSearchIndexingStrategy"/>.</typeparam>
+    /// <typeparam name="TSearchModel">The custom type of <see cref="IAzureSearchModel"/> used to create and use an index.</typeparam>
     /// <param name="strategyName">Used internally <typeparamref name="TStrategy" /> to enable dynamic assignment of strategies to search indexes. Names must be unique.</param>
     /// <exception cref="ArgumentException">
-    ///     Thrown if an strategy has already been registered with the given <paramref name="strategyName"/>
+    ///     Thrown if an strategy has already been registered with the given <paramref name="strategyName"/>.
     /// </exception>
-    /// <returns></returns>
+    /// <returns>Azure Search builder for chaining.</returns>
     IAzureSearchBuilder RegisterStrategy<TStrategy, TSearchModel>(string strategyName) where TStrategy : BaseAzureSearchIndexingStrategy<TSearchModel> where TSearchModel : IAzureSearchModel, new();
 }
 
+
+/// <summary>
+/// Builder for configuring and registering Azure Search strategies and models.
+/// </summary>
 internal class AzureSearchBuilder : IAzureSearchBuilder
 {
     private readonly IServiceCollection serviceCollection;
@@ -97,20 +116,25 @@ internal class AzureSearchBuilder : IAzureSearchBuilder
 
     /// <summary>
     /// If true, the <see cref="BaseAzureSearchIndexingStrategy{BaseAzureSearchModel}" /> will be available as an explicitly selectable indexing strategy
-    /// within the Admin UI. Defaults to <c>true</c>
+    /// within the Admin UI. Defaults to <c>true</c>.
     /// </summary>
     public bool IncludeDefaultStrategy { get; set; } = true;
 
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AzureSearchBuilder"/> class.
+    /// </summary>
     public AzureSearchBuilder(IServiceCollection serviceCollection) => this.serviceCollection = serviceCollection;
+
 
     /// <summary>
     /// Registers the <see cref="IAzureSearchIndexingStrategy"/> strategy <typeparamref name="TStrategy" /> in DI and
-    /// as a selectable strategy in the Admin UI
+    /// as a selectable strategy in the Admin UI.
     /// </summary>
-    /// <typeparam name="TStrategy"></typeparam>
-    /// <typeparam name="TSearchModel">The custom rype of <see cref="IAzureSearchModel"/> used to create and use an index.</typeparam>
-    /// <param name="strategyName"></param>
-    /// <returns></returns>
+    /// <typeparam name="TStrategy">The custom type of <see cref="IAzureSearchIndexingStrategy"/>.</typeparam>
+    /// <typeparam name="TSearchModel">The custom type of <see cref="IAzureSearchModel"/> used to create and use an index.</typeparam>
+    /// <param name="strategyName">Strategy name used internally to enable dynamic assignment of strategies to search indexes. Names must be unique.</param>
+    /// <returns>Azure Search builder for chaining.</returns>
     public IAzureSearchBuilder RegisterStrategy<TStrategy, TSearchModel>(string strategyName) where TStrategy : BaseAzureSearchIndexingStrategy<TSearchModel> where TSearchModel : IAzureSearchModel, new()
     {
         ValidateIndexSearchModelProperties<TSearchModel>();
@@ -121,16 +145,19 @@ internal class AzureSearchBuilder : IAzureSearchBuilder
         return this;
     }
 
-    private void ValidateIndexSearchModelProperties<TSearchModel>() where TSearchModel : IAzureSearchModel, new()
+
+    private static void ValidateIndexSearchModelProperties<TSearchModel>() where TSearchModel : IAzureSearchModel, new()
     {
         var type = typeof(TSearchModel);
 
-        var propertiesWithAttributes = type.GetProperties().Select(x => new
-        {
-            Attribute = x.GetCustomAttributes<SimpleFieldAttribute>().SingleOrDefault()
+        var propertiesWithAttributes = type.GetProperties()
+            .Where(x => x.GetCustomAttributes<SimpleFieldAttribute>().Any())
+            .Select(x => new
+            {
+                Attribute = x.GetCustomAttributes<SimpleFieldAttribute>().SingleOrDefault()
                 ?? throw new InvalidOperationException(ErrorMessage),
-            Type = x.PropertyType
-        });
+                Type = x.PropertyType
+            });
 
         var keyAttribute = propertiesWithAttributes.SingleOrDefault(x => x.Attribute.IsKey)
             ?? throw new InvalidOperationException(ErrorMessage);
