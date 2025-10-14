@@ -68,7 +68,9 @@ dotnet add package Kentico.Xperience.AzureSearch
 
 ## Use DancingGoat sample
 
-You can restore database with configured samples. View [DancingGoat Sample Database](./database/DancingGoat_AzureAISearch.bak).
+To use the DancingGoat sample project, you need to create a new Xperience by Kentico database using the included template.
+
+Follow the instructions in the [Contributing Setup](./docs/Contributing-Setup.md#database-setup) guide to set up the sample database.
 
 ## Full Instructions
 
