@@ -25,7 +25,7 @@ public static class AzureSearchStartupExtensions
     /// Adds Azure search services and custom module to application using the <see cref="BaseAzureSearchIndexingStrategy{BaseAzureSearchModel}"/> for all indexes.
     /// </summary>
     /// <param name="serviceCollection">Service collection to add services to.</param>
-    /// <param name="configuration">he application configuration.</param>
+    /// <param name="configuration">The application configuration.</param>
     /// <returns>Collection of services with Azure Search services added.</returns>
     public static IServiceCollection AddKenticoAzureSearch(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
