@@ -61,20 +61,20 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
 
 
     /// <inheritdoc />
-    public async Task<SearchIndex> CreateIndex(AzureSearchConfigurationModel configurationModel, CancellationToken cancellationToken)
+    public Task<SearchIndex> CreateIndex(AzureSearchConfigurationModel configurationModel, CancellationToken cancellationToken)
     {
         var index = new AzureSearchIndex(configurationModel, StrategyStorage.Strategies);
-        return await CreateIndex(index, cancellationToken);
+        return CreateIndex(index, cancellationToken);
     }
 
 
     /// <inheritdoc />
-    public async Task<SearchIndex> CreateIndex(AzureSearchIndex azuresearchindex, CancellationToken cancellationToken)
+    public Task<SearchIndex> CreateIndex(AzureSearchIndex azureSearchIndex, CancellationToken cancellationToken)
     {
-        var strategy = serviceProvider.GetRequiredStrategy(azuresearchindex);
+        var strategy = serviceProvider.GetRequiredStrategy(azureSearchIndex);
         var searchFields = strategy.GetSearchFields();
 
-        return await CreateIndexInternal(searchFields, strategy, azuresearchindex.IndexName, cancellationToken);
+        return CreateIndexInternal(searchFields, strategy, azureSearchIndex.IndexName, cancellationToken);
     }
 
 

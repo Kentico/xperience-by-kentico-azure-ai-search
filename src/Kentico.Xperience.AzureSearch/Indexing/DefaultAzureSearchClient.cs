@@ -99,12 +99,19 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         {
             if (indices.Any(x => x.IndexName == indexName))
             {
-                var indexClient = await azureSearchIndexClientService.InitializeIndexClient(indexName, cancellationToken);
-                stats.Add(new AzureSearchIndexStatisticsViewModel()
+                try
                 {
-                    Name = indexName,
-                    Entries = await indexClient.GetDocumentCountAsync(cancellationToken)
-                });
+                    var indexClient = await azureSearchIndexClientService.InitializeIndexClient(indexName, cancellationToken);
+                    stats.Add(new AzureSearchIndexStatisticsViewModel()
+                    {
+                        Name = indexName,
+                        Entries = await indexClient.GetDocumentCountAsync(cancellationToken)
+                    });
+                }
+                catch (Exception ex) when (ex is Azure.RequestFailedException or InvalidOperationException or ArgumentNullException)
+                {
+                    eventLogService.LogException(nameof(DefaultAzureSearchClient), nameof(GetStatistics), ex, $"Failed to get statistics for Azure Search index '{indexName}': {ex.Message}");
+                }
             }
         }
 

@@ -52,12 +52,12 @@ internal interface IAzureSearchIndexClientService
     /// <summary>
     /// Creates a new AzureSearch index in Azure.
     /// </summary>
-    /// <param name="azuresearchindex">The AzureSearch index to create.</param>
+    /// <param name="azureSearchIndex">The AzureSearch index to create.</param>
     /// <param name="cancellationToken">The cancellation token for the task.</param>
     /// <exception cref="InvalidOperationException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="OperationCanceledException" />
     /// <exception cref="Azure.RequestFailedException">Thrown when a failure is returned by the Search service.</exception>
     /// <returns>The created <see cref="SearchIndex" />.</returns>
-    Task<SearchIndex> CreateIndex(AzureSearchIndex azuresearchindex, CancellationToken cancellationToken);
+    Task<SearchIndex> CreateIndex(AzureSearchIndex azureSearchIndex, CancellationToken cancellationToken);
 }
