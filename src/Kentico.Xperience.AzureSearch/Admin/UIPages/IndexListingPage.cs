@@ -24,12 +24,22 @@ namespace Kentico.Xperience.AzureSearch.Admin;
 internal class IndexListingPage : ListingPage
 {
     private readonly AzureSearchOptions azureSearchOptions;
+
+
     private readonly IAzureSearchClient azureSearchClient;
+
+
     private readonly IPageLinkGenerator pageLinkGenerator;
+
+
     private readonly IAzureSearchConfigurationStorageService configurationStorageService;
+
+
     private readonly IConversionService conversionService;
 
+
     protected override string ObjectType => AzureSearchIndexItemInfo.OBJECT_TYPE;
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="IndexListingPage"/> class.
@@ -47,6 +57,7 @@ internal class IndexListingPage : ListingPage
         this.configurationStorageService = configurationStorageService;
         this.conversionService = conversionService;
     }
+
 
     /// <inheritdoc/>
     public override async Task ConfigurePage()
@@ -100,6 +111,7 @@ internal class IndexListingPage : ListingPage
         await base.ConfigurePage();
     }
 
+
     protected override async Task<LoadDataResult> LoadData(LoadDataSettings settings, CancellationToken cancellationToken)
     {
         if (!azureSearchOptions.SearchServiceEnabled)
@@ -109,7 +121,17 @@ internal class IndexListingPage : ListingPage
 
         var result = await base.LoadData(settings, cancellationToken);
 
-        var statistics = await azureSearchClient.GetStatistics(default);
+        ICollection<AzureSearchIndexStatisticsViewModel> statistics;
+        try
+        {
+            statistics = await azureSearchClient.GetStatistics(default);
+        }
+        catch (Exception ex) when (ex is Azure.RequestFailedException or InvalidOperationException or ArgumentNullException)
+        {
+            EventLogService.LogException(nameof(IndexListingPage), nameof(LoadData), ex, $"There is a mismatch between the local and AzureSearch index definitions: {ex.Message}");
+            statistics = [];
+        }
+
         // Add statistics for indexes that are registered but not created in AzureSearch
         AddMissingStatistics(ref statistics);
 
@@ -143,6 +165,7 @@ internal class IndexListingPage : ListingPage
         return result;
     }
 
+
     private AzureSearchIndexStatisticsViewModel? GetStatistic(Row row, ICollection<AzureSearchIndexStatisticsViewModel> statistics)
     {
         int indexId = conversionService.GetInteger(row.Identifier, 0);
@@ -152,6 +175,7 @@ internal class IndexListingPage : ListingPage
 
         return statistics.FirstOrDefault(s => string.Equals(s.Name, indexName, StringComparison.OrdinalIgnoreCase));
     }
+
 
     /// <summary>
     /// A page command which rebuilds an AzureSearch index.
@@ -177,6 +201,14 @@ internal class IndexListingPage : ListingPage
             return ResponseFrom(result)
                 .AddSuccessMessage("Indexing in progress. Visit your AzureSearch dashboard for details about the indexing process.");
         }
+        catch (Azure.RequestFailedException ex)
+        {
+            EventLogService.LogException(nameof(IndexListingPage), nameof(Rebuild), ex);
+
+            string errorMessage = AzureSearchErrorMessageHelper.GetErrorMessage(ex, index.IndexName, "rebuilding");
+
+            return ResponseFrom(result).AddErrorMessage(errorMessage);
+        }
         catch (Exception ex)
         {
             EventLogService.LogException(nameof(IndexListingPage), nameof(Rebuild), ex);
@@ -185,6 +217,7 @@ internal class IndexListingPage : ListingPage
                .AddErrorMessage(string.Format("Errors occurred while rebuilding the '{0}' index. Please check the Event Log for more details.", index.IndexName));
         }
     }
+
 
     [PageCommand(Permission = SystemPermissions.DELETE)]
     public async Task<INavigateResponse> Delete(int id, CancellationToken cancellationToken)
@@ -219,6 +252,7 @@ internal class IndexListingPage : ListingPage
                .AddErrorMessage(string.Format("Errors occurred while deleting the '{0}' index. Please check the Event Log for more details.", index.IndexName));
         }
     }
+
 
     private static void AddMissingStatistics(ref ICollection<AzureSearchIndexStatisticsViewModel> statistics)
     {
