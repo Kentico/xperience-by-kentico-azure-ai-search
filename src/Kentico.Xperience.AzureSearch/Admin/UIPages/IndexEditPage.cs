@@ -1,4 +1,7 @@
-﻿using CMS.Membership;
+﻿using Azure.Search.Documents.Indexes;
+
+using CMS.Core;
+using CMS.Membership;
 
 using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
@@ -20,16 +23,22 @@ internal class IndexEditPage : BaseIndexEditPage
 {
     private AzureSearchConfigurationModel? model = null;
 
+
     [PageParameter(typeof(IntPageModelBinder))]
     public int IndexIdentifier { get; set; }
+
 
     public IndexEditPage(
         Xperience.Admin.Base.Forms.Internal.IFormItemCollectionProvider formItemCollectionProvider,
         IFormDataBinder formDataBinder,
         IAzureSearchConfigurationStorageService storageService,
-        IAzureSearchIndexClientService indexClientService)
-        : base(formItemCollectionProvider, formDataBinder, storageService, indexClientService) { }
+        IAzureSearchIndexClientService indexClientService,
+        SearchIndexClient indexClient,
+        IEventLogService eventLogService)
+        : base(formItemCollectionProvider, formDataBinder, storageService, indexClientService, indexClient, eventLogService) { }
 
+
+    /// <inheritdoc/>
     protected override AzureSearchConfigurationModel Model
     {
         get
@@ -40,6 +49,8 @@ internal class IndexEditPage : BaseIndexEditPage
         }
     }
 
+
+    /// <inheritdoc/>
     protected override async Task<ICommandResponse> ProcessFormData(AzureSearchConfigurationModel model, ICollection<IFormItem> formItems)
     {
         var result = await ValidateAndProcess(model);
@@ -57,7 +68,7 @@ internal class IndexEditPage : BaseIndexEditPage
             }
             else
             {
-                response.AddErrorMessage("Could not create index.");
+                response.AddErrorMessage("Could not edit index. See event log for details.");
             }
         }
         else
