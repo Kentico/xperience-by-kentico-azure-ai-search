@@ -125,7 +125,7 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
         {
             try
             {
-                AzureSearchIndexStore.Instance.AddIndex(new AzureSearchIndex(configuration, StrategyStorage.Strategies));
+                AzureSearchIndexStore.SetIndicies(StorageService);
                 return new ModificationResponse(ModificationResult.Success);
             }
             catch (Exception ex) when (ex is InvalidOperationException or ArgumentNullException)
@@ -139,6 +139,7 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
                 eventLogService.LogError(nameof(BaseIndexEditPage), nameof(CreateIndex), $"Failed to rollback local index storage. Manual cleanup may be required. Please check the local storage and remove the index if necessary.");
             }
         }
+
         try
         {
             // Rollback index edit in Azure if local storage fails.
