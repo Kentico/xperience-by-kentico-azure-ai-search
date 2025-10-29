@@ -113,4 +113,49 @@ public class AzureSearchConfigurationModel
             .Where(p => p.AzureSearchIncludedPathItemIndexItemId == index.AzureSearchIndexItemId)
             .Select(p => new AzureSearchIndexIncludedPath(p, contentTypes))];
     }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AzureSearchConfigurationModel"/> class with content type filtering by path.
+    /// </summary>
+    /// <param name="index">Index information.</param>
+    /// <param name="indexLanguages">Languages to index.</param>
+    /// <param name="indexPaths">Included paths for the index.</param>
+    /// <param name="contentTypes">Content types for the index.</param>
+    /// <param name="contentTypeItems">Content type items containing path associations.</param>
+    /// <param name="reusableContentTypes">Reusable content types for the index.</param>
+    internal AzureSearchConfigurationModel(
+        AzureSearchIndexItemInfo index,
+        IEnumerable<AzureSearchIndexLanguageItemInfo> indexLanguages,
+        IEnumerable<AzureSearchIncludedPathItemInfo> indexPaths,
+        IEnumerable<AzureSearchIndexContentType> contentTypes,
+        IEnumerable<AzureSearchContentTypeItemInfo> contentTypeItems,
+        IEnumerable<AzureSearchReusableContentTypeItemInfo> reusableContentTypes
+    )
+    {
+        Id = index.AzureSearchIndexItemId;
+        IndexName = index.AzureSearchIndexItemIndexName;
+        ChannelName = index.AzureSearchIndexItemChannelName;
+        RebuildHook = index.AzureSearchIndexItemRebuildHook;
+        StrategyName = index.AzureSearchIndexItemStrategyName;
+        ReusableContentTypeNames = [.. reusableContentTypes
+             .Where(c => c.AzureSearchReusableContentTypeItemIndexItemId == index.AzureSearchIndexItemId)
+             .Select(c => c.AzureSearchReusableContentTypeItemContentTypeName)];
+        LanguageNames = [.. indexLanguages
+            .Where(l => l.AzureSearchIndexLanguageItemIndexItemId == index.AzureSearchIndexItemId)
+            .Select(l => l.AzureSearchIndexLanguageItemName)];
+        
+        // Create a dictionary to map content type names to their full objects
+        var contentTypeDict = contentTypes.ToDictionary(ct => ct.ContentTypeName, ct => ct);
+        
+        Paths = [.. indexPaths
+            .Where(p => p.AzureSearchIncludedPathItemIndexItemId == index.AzureSearchIndexItemId)
+            .Select(p => new AzureSearchIndexIncludedPath(
+                p,
+                contentTypeItems
+                    .Where(cti => cti.AzureSearchContentTypeItemIncludedPathItemId == p.AzureSearchIncludedPathItemId)
+                    .Select(cti => cti.AzureSearchContentTypeItemContentTypeName)
+                    .Where(name => contentTypeDict.ContainsKey(name))
+                    .Select(name => contentTypeDict[name])
+            ))];
+    }
 }
