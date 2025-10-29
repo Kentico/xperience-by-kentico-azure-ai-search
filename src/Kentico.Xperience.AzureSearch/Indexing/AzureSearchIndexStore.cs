@@ -78,10 +78,10 @@ public sealed class AzureSearchIndexStore
     }
 
     /// <summary>
-    /// Resets all indicies
+    /// Resets all indices.
     /// </summary>
-    /// <param name="models"></param>
-    internal void SetIndicies(IEnumerable<AzureSearchConfigurationModel> models)
+    /// <param name="models">Models to set indices from.</param>
+    internal void SetIndices(IEnumerable<AzureSearchConfigurationModel> models)
     {
         registeredIndexes.Clear();
 
@@ -92,13 +92,13 @@ public sealed class AzureSearchIndexStore
     }
 
     /// <summary>
-    /// Sets the current indicies to those provided by <paramref name="configurationService"/>
+    /// Sets the current indices to those provided by <paramref name="configurationService"/>.
     /// </summary>
-    /// <param name="configurationService"></param>
-    internal static void SetIndicies(IAzureSearchConfigurationStorageService configurationService)
+    /// <param name="configurationService">Configuration service to retrieve index data from.</param>
+    internal static void SetIndices(IAzureSearchConfigurationStorageService configurationService)
     {
         var indices = configurationService.GetAllIndexData();
 
-        Instance.SetIndicies(indices);
+        Instance.SetIndices(indices);
     }
 }

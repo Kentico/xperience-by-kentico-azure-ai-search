@@ -125,7 +125,7 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
         {
             try
             {
-                AzureSearchIndexStore.SetIndicies(StorageService);
+                AzureSearchIndexStore.SetIndices(StorageService);
                 return new ModificationResponse(ModificationResult.Success);
             }
             catch (Exception ex) when (ex is InvalidOperationException or ArgumentNullException)
