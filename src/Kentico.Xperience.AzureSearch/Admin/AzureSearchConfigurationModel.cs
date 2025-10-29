@@ -159,9 +159,8 @@ public class AzureSearchConfigurationModel
             .Select(p => new AzureSearchIndexIncludedPath(
                 p,
                 contentTypesByPath[p.AzureSearchIncludedPathItemId]
-                    .Select(cti => cti.AzureSearchContentTypeItemContentTypeName)
-                    .Where(name => contentTypeDict.TryGetValue(name, out _))
-                    .Select(name => contentTypeDict[name])
+                    .Select(cti => contentTypeDict.TryGetValue(cti.AzureSearchContentTypeItemContentTypeName, out var contentType) ? contentType : null)
+                    .Where(ct => ct is not null)!
             ))];
     }
 }
