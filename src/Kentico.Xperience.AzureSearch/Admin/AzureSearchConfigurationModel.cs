@@ -143,10 +143,10 @@ public class AzureSearchConfigurationModel
         LanguageNames = [.. indexLanguages
             .Where(l => l.AzureSearchIndexLanguageItemIndexItemId == index.AzureSearchIndexItemId)
             .Select(l => l.AzureSearchIndexLanguageItemName)];
-        
+
         // Create a dictionary to map content type names to their full objects
         var contentTypeDict = contentTypes.ToDictionary(ct => ct.ContentTypeName, ct => ct);
-        
+
         Paths = [.. indexPaths
             .Where(p => p.AzureSearchIncludedPathItemIndexItemId == index.AzureSearchIndexItemId)
             .Select(p => new AzureSearchIndexIncludedPath(
