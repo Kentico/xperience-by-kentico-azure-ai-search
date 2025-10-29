@@ -144,17 +144,23 @@ public class AzureSearchConfigurationModel
             .Where(l => l.AzureSearchIndexLanguageItemIndexItemId == index.AzureSearchIndexItemId)
             .Select(l => l.AzureSearchIndexLanguageItemName)];
 
-        // Create a dictionary to map content type names to their full objects
-        var contentTypeDict = contentTypes.ToDictionary(ct => ct.ContentTypeName, ct => ct);
+        // Create a dictionary to map content type names to their full objects for efficient lookup
+        // Use GroupBy to handle potential duplicate content type names
+        var contentTypeDict = contentTypes
+            .GroupBy(ct => ct.ContentTypeName)
+            .ToDictionary(g => g.Key, g => g.First());
+
+        // Group content type items by path ID for efficient filtering
+        var contentTypesByPath = contentTypeItems
+            .ToLookup(cti => cti.AzureSearchContentTypeItemIncludedPathItemId);
 
         Paths = [.. indexPaths
             .Where(p => p.AzureSearchIncludedPathItemIndexItemId == index.AzureSearchIndexItemId)
             .Select(p => new AzureSearchIndexIncludedPath(
                 p,
-                contentTypeItems
-                    .Where(cti => cti.AzureSearchContentTypeItemIncludedPathItemId == p.AzureSearchIncludedPathItemId)
+                contentTypesByPath[p.AzureSearchIncludedPathItemId]
                     .Select(cti => cti.AzureSearchContentTypeItemContentTypeName)
-                    .Where(name => contentTypeDict.ContainsKey(name))
+                    .Where(name => contentTypeDict.TryGetValue(name, out _))
                     .Select(name => contentTypeDict[name])
             ))];
     }
