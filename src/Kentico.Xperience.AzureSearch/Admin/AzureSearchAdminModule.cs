@@ -49,7 +49,7 @@ internal class AzureSearchAdminModule : AdminModule
     {
         installer.Install();
 
-        AzureSearchIndexStore.SetIndicies(storageService);
+        AzureSearchIndexStore.SetIndices(storageService);
         AzureSearchIndexAliasStore.SetAliases(storageService);
     }
 }
