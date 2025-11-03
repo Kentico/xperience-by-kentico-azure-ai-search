@@ -235,7 +235,7 @@ internal class IndexListingPage : ListingPage
             bool res = configurationStorageService.TryDeleteIndex(id);
             if (res)
             {
-                AzureSearchIndexStore.SetIndicies(configurationStorageService);
+                AzureSearchIndexStore.SetIndices(configurationStorageService);
             }
             else
             {

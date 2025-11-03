@@ -163,7 +163,7 @@ public class Tests : UnitTests
     }
 
     [TearDown]
-    public void TearDown() => AzureSearchIndexStore.Instance.SetIndicies([]);
+    public void TearDown() => AzureSearchIndexStore.Instance.SetIndices([]);
 
     private IndexEventWebPageItemModel GetDefaultIndexEventWebPageItemModel()
     {

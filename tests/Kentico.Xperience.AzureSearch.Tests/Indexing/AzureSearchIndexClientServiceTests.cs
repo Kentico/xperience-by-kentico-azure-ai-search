@@ -18,7 +18,7 @@ internal class AzureSearchIndexClientServiceTests
         var service = new AzureSearchIndexClientService(mockIndexClient, mockServiceProvider);
         var cancellationToken = CancellationToken.None;
 
-        AzureSearchIndexStore.Instance.SetIndicies([]);
+        AzureSearchIndexStore.Instance.SetIndices([]);
 
         var exception = Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await service.InitializeIndexClient("NonExistentIndex", cancellationToken));
@@ -28,5 +28,5 @@ internal class AzureSearchIndexClientServiceTests
 
 
     [TearDown]
-    public void TearDown() => AzureSearchIndexStore.Instance.SetIndicies([]);
+    public void TearDown() => AzureSearchIndexStore.Instance.SetIndices([]);
 }

@@ -418,7 +418,7 @@ export const AzureSearchIndexConfigurationFormComponent = (
                     <Select
                         isMulti
                         closeMenuOnSelect={false}
-                        defaultValue={contentTypesValue}
+                        value={contentTypesValue}
                         options={options}
                         onChange={selectContentTypes}
                         placeholder="Select content types"
