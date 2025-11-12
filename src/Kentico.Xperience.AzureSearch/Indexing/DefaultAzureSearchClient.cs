@@ -191,8 +191,16 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
     {
         var indexedItems = new List<IIndexEventItemModel>();
 
-        var indexResponse = await searchIndexClient.GetIndexAsync(azureSearchIndex.IndexName, cancellationToken ?? default);
-        var index = indexResponse.Value;
+        SearchIndex? index = null;
+        try
+        {
+            var indexResponse = await searchIndexClient.GetIndexAsync(azureSearchIndex.IndexName, cancellationToken ?? default);
+            index = indexResponse.Value;
+        }
+        catch (Azure.RequestFailedException)
+        {
+            // Index doesn't exist, which is fine - we'll create it later
+        }
 
         foreach (var includedPathAttribute in azureSearchIndex.IncludedPaths)
         {
@@ -249,7 +257,10 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
             }
         }
 
-        await searchIndexClient.DeleteIndexAsync(index, onlyIfUnchanged: true, cancellationToken: cancellationToken ?? default);
+        if (index is not null)
+        {
+            await searchIndexClient.DeleteIndexAsync(index, onlyIfUnchanged: true, cancellationToken: cancellationToken ?? default);
+        }
 
         var indexModel = AzureSearchIndexStore.Instance.GetRequiredIndex(azureSearchIndex.IndexName);
         await azureSearchIndexClientService.CreateIndex(indexModel, cancellationToken ?? default);
