@@ -71,7 +71,7 @@ internal interface IAzureSearchIndexClientService
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <param name="onlyIfUnchanged">If <see langword="true"/>, the index will only be deleted if it has not changed since it was last retrieved;
     /// otherwise, it will be deleted regardless of changes.</param>
-    /// <returns><see langword="true"/> if the index was successfully deleted or did not exist; otherwise, <see
+    /// <returns><see langword="true"/> if the index was successfully deleted; otherwise, <see
     /// langword="false"/>.</returns>
     Task<bool> TryDeleteIndexIfExists(string indexName, CancellationToken cancellationToken, bool onlyIfUnchanged = false);
 }

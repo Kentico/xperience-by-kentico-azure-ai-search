@@ -99,14 +99,12 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
 
     private async Task<SearchIndex> EditIndexInternal(IAzureSearchIndexingStrategy strategy, AzureSearchIndex azureSearchIndex, CancellationToken cancellationToken)
     {
-        var index = await GetIndexIfExists(azureSearchIndex.IndexName, cancellationToken);
-
-        if (index is null)
+        if (await GetIndexIfExists(azureSearchIndex.IndexName, cancellationToken) is SearchIndex searchIndex)
         {
-            return await CreateIndex(azureSearchIndex, cancellationToken);
+            return await CreateOrUpdateIndexInternal(searchIndex, strategy, cancellationToken);
         }
 
-        return await CreateOrUpdateIndexInternal(index, strategy, cancellationToken);
+        return await CreateIndex(azureSearchIndex, cancellationToken);
     }
 
 
