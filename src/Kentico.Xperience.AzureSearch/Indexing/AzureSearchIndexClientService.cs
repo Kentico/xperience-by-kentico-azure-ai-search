@@ -1,4 +1,5 @@
-﻿using Azure.Search.Documents;
+﻿using Azure;
+using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
 
@@ -39,9 +40,6 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
     /// <inheritdoc />
     public async Task<SearchIndex> EditIndex(AzureSearchIndex oldIndex, AzureSearchConfigurationModel newIndexConfiguration, CancellationToken cancellationToken)
     {
-        var searchIndexResponse = await indexClient.GetIndexAsync(oldIndex.IndexName, cancellationToken);
-        var searchIndex = searchIndexResponse.Value;
-
         var oldStrategy = serviceProvider.GetRequiredStrategy(oldIndex);
         var oldSearchFields = oldStrategy.GetSearchFields();
 
@@ -52,11 +50,11 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
         if (!Enumerable.SequenceEqual(oldSearchFields, newSearchFields, new AzureSearchIndexComparer())
             || !string.Equals(oldIndex.IndexName, newIndex.IndexName))
         {
-            await indexClient.DeleteIndexAsync(searchIndex, onlyIfUnchanged: true, cancellationToken: cancellationToken);
+            await TryDeleteIndexIfExistsInternal(oldIndex.IndexName, cancellationToken, onlyIfUnchanged: true);
             return await CreateIndexInternal(newSearchFields, newStrategy, newIndex.IndexName, cancellationToken);
         }
 
-        return await EditIndexInternal(newStrategy, newIndex.IndexName, cancellationToken);
+        return await EditIndexInternal(newStrategy, newIndex, cancellationToken);
     }
 
 
@@ -78,6 +76,18 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
     }
 
 
+    /// <inheritdoc />
+    public Task<bool> TryDeleteIndexIfExists(string indexName, CancellationToken cancellationToken, bool onlyIfUnchanged = false)
+    {
+        if (string.IsNullOrWhiteSpace(indexName))
+        {
+            throw new ArgumentException("Value must not be null or empty", nameof(indexName));
+        }
+
+        return TryDeleteIndexIfExistsInternal(indexName, cancellationToken, onlyIfUnchanged);
+    }
+
+
     private async Task<SearchIndex> CreateIndexInternal(IList<SearchField>? searchFields, IAzureSearchIndexingStrategy strategy, string indexName, CancellationToken cancellationToken)
     {
         var definition = new SearchIndex(indexName, searchFields);
@@ -87,10 +97,14 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
     }
 
 
-    private async Task<SearchIndex> EditIndexInternal(IAzureSearchIndexingStrategy strategy, string indexName, CancellationToken cancellationToken)
+    private async Task<SearchIndex> EditIndexInternal(IAzureSearchIndexingStrategy strategy, AzureSearchIndex azureSearchIndex, CancellationToken cancellationToken)
     {
-        var indexResponse = await indexClient.GetIndexAsync(indexName, cancellationToken);
-        var index = indexResponse.Value;
+        var index = await GetIndexIfExists(azureSearchIndex.IndexName, cancellationToken);
+
+        if (index is null)
+        {
+            return await CreateIndex(azureSearchIndex, cancellationToken);
+        }
 
         return await CreateOrUpdateIndexInternal(index, strategy, cancellationToken);
     }
@@ -103,6 +117,38 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
         AzureSearchIndexingEvents.BeforeCreatingOrUpdatingIndex.Execute?.Invoke(this, new OnBeforeCreatingOrUpdatingIndexEventArgs(index));
 
         return (await indexClient.CreateOrUpdateIndexAsync(index, onlyIfUnchanged: true, cancellationToken: cancellationToken)).Value;
+    }
+
+
+    private async Task<SearchIndex?> GetIndexIfExists(string indexName, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var indexResponse = await indexClient.GetIndexAsync(indexName, cancellationToken);
+            return indexResponse.Value;
+        }
+        catch (RequestFailedException ex) when (ex.Status == 404)
+        {
+            return null;
+        }
+    }
+
+
+    private async Task<bool> TryDeleteIndexIfExistsInternal(string indexName, CancellationToken cancellationToken, bool onlyIfUnchanged = false)
+    {
+        try
+        {
+            if (await GetIndexIfExists(indexName, cancellationToken) is SearchIndex index)
+            {
+                await indexClient.DeleteIndexAsync(index, onlyIfUnchanged: onlyIfUnchanged, cancellationToken: cancellationToken);
+            }
+
+            return true;
+        }
+        catch (RequestFailedException e) when (e.Status == 404)
+        {
+            return false;
+        }
     }
 
 
