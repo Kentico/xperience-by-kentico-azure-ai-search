@@ -246,7 +246,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
             }
         }
 
-        await azureSearchIndexClientService.TryDeleteIndexIfExists(azureSearchIndex.IndexName, cancellationToken ?? default, onlyIfUnchanged: true);
+        await azureSearchIndexClientService.TryDeleteIndexIfExists(azureSearchIndex.IndexName, onlyIfUnchanged: true, cancellationToken ?? default);
 
         var indexModel = AzureSearchIndexStore.Instance.GetRequiredIndex(azureSearchIndex.IndexName);
         await azureSearchIndexClientService.CreateIndex(indexModel, cancellationToken ?? default);

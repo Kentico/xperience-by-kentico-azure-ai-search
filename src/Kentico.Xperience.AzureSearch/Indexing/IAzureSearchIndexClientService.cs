@@ -68,10 +68,10 @@ internal interface IAzureSearchIndexClientService
     /// <remarks>This method is useful for safely attempting to delete an index without throwing an exception
     /// if the index does not exist.</remarks>
     /// <param name="indexName">The name of the index to delete. Cannot be null or empty.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <param name="onlyIfUnchanged">If <see langword="true"/>, the index will only be deleted if it has not changed since it was last retrieved;
     /// otherwise, it will be deleted regardless of changes.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns><see langword="true"/> if the index was successfully deleted; otherwise, <see
     /// langword="false"/>.</returns>
-    Task<bool> TryDeleteIndexIfExists(string indexName, CancellationToken cancellationToken, bool onlyIfUnchanged = false);
+    Task<bool> TryDeleteIndexIfExists(string indexName, bool onlyIfUnchanged, CancellationToken cancellationToken);
 }
