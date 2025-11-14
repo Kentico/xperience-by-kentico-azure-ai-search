@@ -50,11 +50,19 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
         if (!Enumerable.SequenceEqual(oldSearchFields, newSearchFields, new AzureSearchIndexComparer())
             || !string.Equals(oldIndex.IndexName, newIndex.IndexName))
         {
-            await TryDeleteIndexIfExistsInternal(oldIndex.IndexName, cancellationToken, onlyIfUnchanged: true);
+            await TryDeleteIndexIfExists(oldIndex.IndexName, true, cancellationToken);
             return await CreateIndexInternal(newSearchFields, newStrategy, newIndex.IndexName, cancellationToken);
         }
 
-        return await EditIndexInternal(newStrategy, newIndex, cancellationToken);
+        // Index exists and schema hasn't changed, just update it
+        var existingIndex = await GetIndexIfExists(newIndex.IndexName, cancellationToken);
+        if (existingIndex is null)
+        {
+            // Index was deleted outside of the application - recreate it
+            return await CreateIndexInternal(newSearchFields, newStrategy, newIndex.IndexName, cancellationToken);
+        }
+
+        return await CreateOrUpdateIndexInternal(existingIndex, newStrategy, cancellationToken);
     }
 
 
@@ -77,14 +85,20 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
 
 
     /// <inheritdoc />
-    public Task<bool> TryDeleteIndexIfExists(string indexName, CancellationToken cancellationToken, bool onlyIfUnchanged = false)
+    public async Task<bool> TryDeleteIndexIfExists(string indexName, bool onlyIfUnchanged, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(indexName))
         {
             throw new ArgumentException("Value must not be null or empty", nameof(indexName));
         }
 
-        return TryDeleteIndexIfExistsInternal(indexName, cancellationToken, onlyIfUnchanged);
+        if (await GetIndexIfExists(indexName, cancellationToken) is SearchIndex index)
+        {
+            await indexClient.DeleteIndexAsync(index, onlyIfUnchanged: onlyIfUnchanged, cancellationToken: cancellationToken);
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -94,17 +108,6 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
 
         await CreateOrUpdateIndexInternal(definition, strategy, cancellationToken);
         return definition;
-    }
-
-
-    private async Task<SearchIndex> EditIndexInternal(IAzureSearchIndexingStrategy strategy, AzureSearchIndex azureSearchIndex, CancellationToken cancellationToken)
-    {
-        if (await GetIndexIfExists(azureSearchIndex.IndexName, cancellationToken) is SearchIndex searchIndex)
-        {
-            return await CreateOrUpdateIndexInternal(searchIndex, strategy, cancellationToken);
-        }
-
-        return await CreateIndex(azureSearchIndex, cancellationToken);
     }
 
 
@@ -132,25 +135,7 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
     }
 
 
-    private async Task<bool> TryDeleteIndexIfExistsInternal(string indexName, CancellationToken cancellationToken, bool onlyIfUnchanged = false)
-    {
-        try
-        {
-            if (await GetIndexIfExists(indexName, cancellationToken) is SearchIndex index)
-            {
-                await indexClient.DeleteIndexAsync(index, onlyIfUnchanged: onlyIfUnchanged, cancellationToken: cancellationToken);
-            }
-
-            return true;
-        }
-        catch (RequestFailedException e) when (e.Status == 404)
-        {
-            return false;
-        }
-    }
-
-
-    private SearchIndex AddSemanticSearchConfigurationIfAny(SearchIndex definition, IAzureSearchIndexingStrategy strategy)
+    private static SearchIndex AddSemanticSearchConfigurationIfAny(SearchIndex definition, IAzureSearchIndexingStrategy strategy)
     {
         var semanticSearchConfiguration = strategy.CreateSemanticRankingConfigurationOrNull();
 
