@@ -1,4 +1,5 @@
-﻿using Azure.Search.Documents;
+﻿using Azure;
+using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
 
@@ -39,9 +40,6 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
     /// <inheritdoc />
     public async Task<SearchIndex> EditIndex(AzureSearchIndex oldIndex, AzureSearchConfigurationModel newIndexConfiguration, CancellationToken cancellationToken)
     {
-        var searchIndexResponse = await indexClient.GetIndexAsync(oldIndex.IndexName, cancellationToken);
-        var searchIndex = searchIndexResponse.Value;
-
         var oldStrategy = serviceProvider.GetRequiredStrategy(oldIndex);
         var oldSearchFields = oldStrategy.GetSearchFields();
 
@@ -52,11 +50,18 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
         if (!Enumerable.SequenceEqual(oldSearchFields, newSearchFields, new AzureSearchIndexComparer())
             || !string.Equals(oldIndex.IndexName, newIndex.IndexName))
         {
-            await indexClient.DeleteIndexAsync(searchIndex, onlyIfUnchanged: true, cancellationToken: cancellationToken);
+            await TryDeleteIndexIfExists(oldIndex.IndexName, true, cancellationToken);
             return await CreateIndexInternal(newSearchFields, newStrategy, newIndex.IndexName, cancellationToken);
         }
 
-        return await EditIndexInternal(newStrategy, newIndex.IndexName, cancellationToken);
+        var existingIndex = await GetIndexIfExists(newIndex.IndexName, cancellationToken);
+        if (existingIndex is null)
+        {
+            // Index was deleted outside of the application - recreate it
+            return await CreateIndexInternal(newSearchFields, newStrategy, newIndex.IndexName, cancellationToken);
+        }
+
+        return await CreateOrUpdateIndexInternal(existingIndex, newStrategy, cancellationToken);
     }
 
 
@@ -78,21 +83,30 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
     }
 
 
+    /// <inheritdoc />
+    public async Task<bool> TryDeleteIndexIfExists(string indexName, bool onlyIfUnchanged, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(indexName))
+        {
+            throw new ArgumentException("Value must not be null or empty", nameof(indexName));
+        }
+
+        if (await GetIndexIfExists(indexName, cancellationToken) is SearchIndex index)
+        {
+            await indexClient.DeleteIndexAsync(index, onlyIfUnchanged: onlyIfUnchanged, cancellationToken: cancellationToken);
+            return true;
+        }
+
+        return false;
+    }
+
+
     private async Task<SearchIndex> CreateIndexInternal(IList<SearchField>? searchFields, IAzureSearchIndexingStrategy strategy, string indexName, CancellationToken cancellationToken)
     {
         var definition = new SearchIndex(indexName, searchFields);
 
         await CreateOrUpdateIndexInternal(definition, strategy, cancellationToken);
         return definition;
-    }
-
-
-    private async Task<SearchIndex> EditIndexInternal(IAzureSearchIndexingStrategy strategy, string indexName, CancellationToken cancellationToken)
-    {
-        var indexResponse = await indexClient.GetIndexAsync(indexName, cancellationToken);
-        var index = indexResponse.Value;
-
-        return await CreateOrUpdateIndexInternal(index, strategy, cancellationToken);
     }
 
 
@@ -106,7 +120,21 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
     }
 
 
-    private SearchIndex AddSemanticSearchConfigurationIfAny(SearchIndex definition, IAzureSearchIndexingStrategy strategy)
+    private async Task<SearchIndex?> GetIndexIfExists(string indexName, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var indexResponse = await indexClient.GetIndexAsync(indexName, cancellationToken);
+            return indexResponse.Value;
+        }
+        catch (RequestFailedException ex) when (ex.Status == 404)
+        {
+            return null;
+        }
+    }
+
+
+    private static SearchIndex AddSemanticSearchConfigurationIfAny(SearchIndex definition, IAzureSearchIndexingStrategy strategy)
     {
         var semanticSearchConfiguration = strategy.CreateSemanticRankingConfigurationOrNull();
 
