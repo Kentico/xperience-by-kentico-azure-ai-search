@@ -54,7 +54,6 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
             return await CreateIndexInternal(newSearchFields, newStrategy, newIndex.IndexName, cancellationToken);
         }
 
-        // Index exists and schema hasn't changed, just update it
         var existingIndex = await GetIndexIfExists(newIndex.IndexName, cancellationToken);
         if (existingIndex is null)
         {
