@@ -116,7 +116,7 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
         }
     }
 
-    private static IEnumerable<string?> GetIdsToDelete(IEnumerable<AzureSearchQueueItem> deleteTasks) => deleteTasks.Select(queueItem => queueItem.ItemToIndex.ItemGuid.ToString());
+    private static IEnumerable<string?> GetIdsToDelete(IEnumerable<AzureSearchQueueItem> deleteTasks) => deleteTasks.Select(queueItem => $"{queueItem.ItemToIndex.ItemGuid}_{queueItem.ItemToIndex.LanguageName}");
 
     private async Task<IAzureSearchModel?> GetSearchModel(AzureSearchQueueItem queueItem)
     {
@@ -141,7 +141,7 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
         model.ContentTypeName = item.ContentTypeName;
         model.LanguageName = item.LanguageName;
         model.ItemGuid = item.ItemGuid.ToString();
-        model.ObjectID = item.ItemGuid.ToString();
+        model.ObjectID = $"{item.ItemGuid}_{item.LanguageName}";
 
         if (item is IndexEventWebPageItemModel webpageItem && string.IsNullOrEmpty(model.Url))
         {
