@@ -204,7 +204,7 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
         var languages = languageProvider.Get().WhereEquals(nameof(AzureSearchIndexLanguageItemInfo.AzureSearchIndexLanguageItemIndexItemId), indexInfo.AzureSearchIndexItemId).GetEnumerableTypedResult();
 
-        return new AzureSearchConfigurationModel(indexInfo, languages, paths, contentTypes, reusableContentTypes);
+        return new AzureSearchConfigurationModel(indexInfo, languages, paths, contentTypes, contentTypesInfoItems, reusableContentTypes);
     }
 
 
@@ -250,7 +250,8 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
 
         var contentTypesInfoItems = contentTypeProvider
            .Get()
-           .GetEnumerableTypedResult();
+           .GetEnumerableTypedResult()
+           .ToList();
 
         var contentTypes = DataClassInfoProvider.ProviderObject
             .Get()
@@ -260,13 +261,14 @@ internal class DefaultAzureSearchConfigurationStorageService : IAzureSearchConfi
                     .Select(x => x.AzureSearchContentTypeItemContentTypeName)
                     .ToArray()
             ).GetEnumerableTypedResult()
-            .Select(x => new AzureSearchIndexContentType(x.ClassName, x.ClassDisplayName));
+            .Select(x => new AzureSearchIndexContentType(x.ClassName, x.ClassDisplayName))
+            .ToList();
 
         var languages = languageProvider.Get().ToList();
 
         var reusableContentTypes = reusableContentTypeProvider.Get().ToList();
 
-        return indexInfos.Select(index => new AzureSearchConfigurationModel(index, languages, paths, contentTypes, reusableContentTypes));
+        return indexInfos.Select(index => new AzureSearchConfigurationModel(index, languages, paths, contentTypes, contentTypesInfoItems, reusableContentTypes));
     }
 
 
