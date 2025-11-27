@@ -4,6 +4,7 @@ using Kentico.Xperience.AzureSearch.Admin;
 using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace Kentico.Xperience.AzureSearch.Tests.Base;
+
 internal static class MockDataProvider
 {
     // String constants
