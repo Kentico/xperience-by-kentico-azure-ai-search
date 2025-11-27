@@ -163,7 +163,7 @@ public class AzureSearchConfigurationModel
                 pathInfo,
                 contentTypesByPath[pathInfo.AzureSearchIncludedPathItemId]
                     .Select(cti => contentTypeDict.TryGetValue(cti.AzureSearchContentTypeItemContentTypeName, out var contentType) ? contentType : null)
-                    .Where(contentType => contentType is not null)!
+                    .OfType<AzureSearchIndexContentType>()
             ))];
     }
 }
