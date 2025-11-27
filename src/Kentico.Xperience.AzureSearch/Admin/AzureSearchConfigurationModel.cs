@@ -76,6 +76,7 @@ public class AzureSearchConfigurationModel
     [TextInputComponent(Label = "Rebuild Hook", Order = 7)]
     public string RebuildHook { get; set; } = string.Empty;
 
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AzureSearchConfigurationModel"/> class.
     /// </summary>
@@ -90,6 +91,7 @@ public class AzureSearchConfigurationModel
     /// <param name="indexPaths">Included paths for the index.</param>
     /// <param name="contentTypes">Content types for the index.</param>
     /// <param name="reusableContentTypes">Reusable content types for the index.</param>
+    [Obsolete("This constructor does not support content type filtering by path. Use the constructor with contentTypeItems parameter instead.")]
     public AzureSearchConfigurationModel(
         AzureSearchIndexItemInfo index,
         IEnumerable<AzureSearchIndexLanguageItemInfo> indexLanguages,
@@ -114,16 +116,17 @@ public class AzureSearchConfigurationModel
             .Select(p => new AzureSearchIndexIncludedPath(p, contentTypes))];
     }
 
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AzureSearchConfigurationModel"/> class with content type filtering by path.
     /// </summary>
     /// <param name="index">Index information.</param>
     /// <param name="indexLanguages">Languages to index.</param>
     /// <param name="indexPaths">Included paths for the index.</param>
-    /// <param name="contentTypes">Content types for the index.</param>
+    /// <param name="contentTypes">All content types for the index.</param>
     /// <param name="contentTypeItems">Content type items containing path associations.</param>
     /// <param name="reusableContentTypes">Reusable content types for the index.</param>
-    internal AzureSearchConfigurationModel(
+    public AzureSearchConfigurationModel(
         AzureSearchIndexItemInfo index,
         IEnumerable<AzureSearchIndexLanguageItemInfo> indexLanguages,
         IEnumerable<AzureSearchIncludedPathItemInfo> indexPaths,
@@ -155,12 +158,12 @@ public class AzureSearchConfigurationModel
             .ToLookup(cti => cti.AzureSearchContentTypeItemIncludedPathItemId);
 
         Paths = [.. indexPaths
-            .Where(p => p.AzureSearchIncludedPathItemIndexItemId == index.AzureSearchIndexItemId)
-            .Select(p => new AzureSearchIndexIncludedPath(
-                p,
-                contentTypesByPath[p.AzureSearchIncludedPathItemId]
+            .Where(pathInfo => pathInfo.AzureSearchIncludedPathItemIndexItemId == index.AzureSearchIndexItemId)
+            .Select(pathInfo => new AzureSearchIndexIncludedPath(
+                pathInfo,
+                contentTypesByPath[pathInfo.AzureSearchIncludedPathItemId]
                     .Select(cti => contentTypeDict.TryGetValue(cti.AzureSearchContentTypeItemContentTypeName, out var contentType) ? contentType : null)
-                    .Where(ct => ct is not null)!
+                    .Where(contentType => contentType is not null)!
             ))];
     }
 }
