@@ -155,7 +155,7 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
 
     private static SearchIndex AddVectorEmbeddingConfigurationIfAny(SearchIndex definition, IAzureSearchIndexingStrategy strategy)
     {
-        var vectorEmbeddingSearchConfiguration = strategy.CreateVectorEmbeddinghConfigurationOrNull();
+        var vectorEmbeddingSearchConfiguration = strategy.CreateVectorEmbeddingConfigurationOrNull();
 
         if (vectorEmbeddingSearchConfiguration is not null)
         {
