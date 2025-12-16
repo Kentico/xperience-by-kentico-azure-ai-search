@@ -35,7 +35,7 @@ public interface IAzureSearchIndexingStrategy
     /// <summary>
     /// Called when creating a SearchIndex to optionally add Vector Embedding Configuration
     /// </summary>
-    /// <returns><see cref="SemanticRankingConfiguration"/></returns>
+    /// <returns><see cref="VectorSearch"/></returns>
     VectorSearch? CreateVectorEmbeddingConfigurationOrNull();
 
     /// <summary>
