@@ -46,12 +46,12 @@ public class MultiLanguageIndexingTests : UnitTests
         // Assert - Both items should have the same ItemGuid but different language names
         englishItem.ItemGuid.Should().Be(frenchItem.ItemGuid, "both language variants share the same ItemGuid");
         englishItem.LanguageName.Should().NotBe(frenchItem.LanguageName, "language variants have different language names");
-        
+
         // The expected ObjectID format should be "{ItemGuid}_{LanguageName}"
         var expectedEnglishObjectID = $"{itemGuid}_{englishLanguage}";
         var expectedFrenchObjectID = $"{itemGuid}_{frenchLanguage}";
-        
-        expectedEnglishObjectID.Should().NotBe(expectedFrenchObjectID, 
+
+        expectedEnglishObjectID.Should().NotBe(expectedFrenchObjectID,
             "ObjectIDs should be unique for different language variants to prevent overwriting in the index");
     }
 
@@ -94,12 +94,12 @@ public class MultiLanguageIndexingTests : UnitTests
         // Assert - Both items should have the same ItemGuid but different language names
         englishItem.ItemGuid.Should().Be(germanItem.ItemGuid, "both language variants share the same ItemGuid");
         englishItem.LanguageName.Should().NotBe(germanItem.LanguageName, "language variants have different language names");
-        
+
         // The expected ObjectID format should be "{ItemGuid}_{LanguageName}"
         var expectedEnglishObjectID = $"{itemGuid}_{englishLanguage}";
         var expectedGermanObjectID = $"{itemGuid}_{germanLanguage}";
-        
-        expectedEnglishObjectID.Should().NotBe(expectedGermanObjectID, 
+
+        expectedEnglishObjectID.Should().NotBe(expectedGermanObjectID,
             "ObjectIDs should be unique for different language variants to prevent overwriting in the index");
     }
 
@@ -109,10 +109,10 @@ public class MultiLanguageIndexingTests : UnitTests
         // Arrange
         var itemGuid = Guid.NewGuid();
         var languageName = "en-US";
-        
+
         // The ObjectID format used for indexing should match the format used for deletion
         var expectedObjectID = $"{itemGuid}_{languageName}";
-        
+
         // Assert - This test documents the expected format for ObjectID
         expectedObjectID.Should().Contain(itemGuid.ToString());
         expectedObjectID.Should().Contain(languageName);
