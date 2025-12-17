@@ -122,7 +122,7 @@ public class CustomItemsReindexingSearchStrategy : BaseAzureSearchIndexingStrate
                 return null;
             }
 
-            if (page.HomePageBanner.IsNullOrEmpty())
+            if (page.HomePageBanner == null || !page.HomePageBanner.Any())
             {
                 return null;
             }

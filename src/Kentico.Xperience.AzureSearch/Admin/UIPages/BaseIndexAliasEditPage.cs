@@ -92,7 +92,7 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
 
     private async Task<ModificationResponse> ProcessCreateAlias(AzureSearchAliasConfigurationModel configuration)
     {
-        if (configuration.IndexName.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(configuration.IndexName))
         {
             return new ModificationResponse(ModificationResult.Failure, ["Index name cannot be empty."]);
         }
