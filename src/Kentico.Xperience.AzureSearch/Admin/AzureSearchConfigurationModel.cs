@@ -76,6 +76,7 @@ public class AzureSearchConfigurationModel
     [TextInputComponent(Label = "Rebuild Hook", Order = 7)]
     public string RebuildHook { get; set; } = string.Empty;
 
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AzureSearchConfigurationModel"/> class.
     /// </summary>
@@ -90,6 +91,7 @@ public class AzureSearchConfigurationModel
     /// <param name="indexPaths">Included paths for the index.</param>
     /// <param name="contentTypes">Content types for the index.</param>
     /// <param name="reusableContentTypes">Reusable content types for the index.</param>
+    [Obsolete("This constructor does not support content type filtering by path. Use the constructor with contentTypeItems parameter instead.")]
     public AzureSearchConfigurationModel(
         AzureSearchIndexItemInfo index,
         IEnumerable<AzureSearchIndexLanguageItemInfo> indexLanguages,
@@ -112,5 +114,56 @@ public class AzureSearchConfigurationModel
         Paths = [.. indexPaths
             .Where(p => p.AzureSearchIncludedPathItemIndexItemId == index.AzureSearchIndexItemId)
             .Select(p => new AzureSearchIndexIncludedPath(p, contentTypes))];
+    }
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AzureSearchConfigurationModel"/> class with content type filtering by path.
+    /// </summary>
+    /// <param name="index">Index information.</param>
+    /// <param name="indexLanguages">Languages to index.</param>
+    /// <param name="indexPaths">Included paths for the index.</param>
+    /// <param name="contentTypes">All content types for the index.</param>
+    /// <param name="contentTypeItems">Content type items containing path associations.</param>
+    /// <param name="reusableContentTypes">Reusable content types for the index.</param>
+    public AzureSearchConfigurationModel(
+        AzureSearchIndexItemInfo index,
+        IEnumerable<AzureSearchIndexLanguageItemInfo> indexLanguages,
+        IEnumerable<AzureSearchIncludedPathItemInfo> indexPaths,
+        IEnumerable<AzureSearchIndexContentType> contentTypes,
+        IEnumerable<AzureSearchContentTypeItemInfo> contentTypeItems,
+        IEnumerable<AzureSearchReusableContentTypeItemInfo> reusableContentTypes
+    )
+    {
+        Id = index.AzureSearchIndexItemId;
+        IndexName = index.AzureSearchIndexItemIndexName;
+        ChannelName = index.AzureSearchIndexItemChannelName;
+        RebuildHook = index.AzureSearchIndexItemRebuildHook;
+        StrategyName = index.AzureSearchIndexItemStrategyName;
+        ReusableContentTypeNames = [.. reusableContentTypes
+             .Where(c => c.AzureSearchReusableContentTypeItemIndexItemId == index.AzureSearchIndexItemId)
+             .Select(c => c.AzureSearchReusableContentTypeItemContentTypeName)];
+        LanguageNames = [.. indexLanguages
+            .Where(l => l.AzureSearchIndexLanguageItemIndexItemId == index.AzureSearchIndexItemId)
+            .Select(l => l.AzureSearchIndexLanguageItemName)];
+
+        // Create a dictionary to map content type names to their full objects for efficient lookup
+        // Use GroupBy to handle potential duplicate content type names
+        var contentTypeDict = contentTypes
+            .GroupBy(ct => ct.ContentTypeName)
+            .ToDictionary(g => g.Key, g => g.First());
+
+        // Group content type items by path ID for efficient filtering
+        var contentTypesByPath = contentTypeItems
+            .ToLookup(cti => cti.AzureSearchContentTypeItemIncludedPathItemId);
+
+        Paths = [.. indexPaths
+            .Where(pathInfo => pathInfo.AzureSearchIncludedPathItemIndexItemId == index.AzureSearchIndexItemId)
+            .Select(pathInfo => new AzureSearchIndexIncludedPath(
+                pathInfo,
+                contentTypesByPath[pathInfo.AzureSearchIncludedPathItemId]
+                    .Select(cti => contentTypeDict.TryGetValue(cti.AzureSearchContentTypeItemContentTypeName, out var contentType) ? contentType : null)
+                    .OfType<AzureSearchIndexContentType>()
+            ))];
     }
 }
