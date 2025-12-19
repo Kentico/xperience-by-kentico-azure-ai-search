@@ -29,7 +29,8 @@ public sealed class DancingGoatCheckoutController : Controller
 {
     private readonly CountryStateRepository countryStateRepository;
     private readonly WebPageUrlProvider webPageUrlProvider;
-    private readonly ICurrentShoppingCartService currentShoppingCartService;
+    private readonly ICurrentShoppingCartRetriever currentShoppingCartRetriever;
+    private readonly ICurrentShoppingCartDiscardHandler currentShoppingCartDiscardHandler;
     private readonly UserManager<ApplicationUser> userManager;
     private readonly CustomerDataRetriever customerDataRetriever;
     private readonly IPreferredLanguageRetriever currentLanguageRetriever;
@@ -41,7 +42,8 @@ public sealed class DancingGoatCheckoutController : Controller
     public DancingGoatCheckoutController(
         CountryStateRepository countryStateRepository,
         WebPageUrlProvider webPageUrlProvider,
-        ICurrentShoppingCartService currentShoppingCartService,
+        ICurrentShoppingCartRetriever currentShoppingCartRetriever,
+        ICurrentShoppingCartDiscardHandler currentShoppingCartDiscardHandler,
         UserManager<ApplicationUser> userManager,
         CustomerDataRetriever customerDataRetriever,
         IPreferredLanguageRetriever currentLanguageRetriever,
@@ -52,7 +54,8 @@ public sealed class DancingGoatCheckoutController : Controller
     {
         this.countryStateRepository = countryStateRepository;
         this.webPageUrlProvider = webPageUrlProvider;
-        this.currentShoppingCartService = currentShoppingCartService;
+        this.currentShoppingCartRetriever = currentShoppingCartRetriever;
+        this.currentShoppingCartDiscardHandler = currentShoppingCartDiscardHandler;
         this.userManager = userManager;
         this.customerDataRetriever = customerDataRetriever;
         this.currentLanguageRetriever = currentLanguageRetriever;
@@ -84,7 +87,7 @@ public sealed class DancingGoatCheckoutController : Controller
             return View(await GetCheckoutViewModel(CheckoutStep.CheckoutCustomer, customer, customerAddress, null, cancellationToken));
         }
 
-        var shoppingCart = await currentShoppingCartService.Get(cancellationToken);
+        var shoppingCart = await currentShoppingCartRetriever.Get(cancellationToken);
         if (shoppingCart == null)
         {
             return View(await GetCheckoutViewModel(CheckoutStep.OrderConfirmation, customer, customerAddress, new ShoppingCartViewModel([], 0), cancellationToken));
@@ -128,7 +131,7 @@ public sealed class DancingGoatCheckoutController : Controller
 
         var user = await GetAuthenticatedUser();
 
-        var shoppingCart = await currentShoppingCartService.Get(cancellationToken);
+        var shoppingCart = await currentShoppingCartRetriever.Get(cancellationToken);
         if (shoppingCart == null)
         {
             return Content(localizer["Order not created. The shopping cart could not be found."]);
@@ -139,7 +142,7 @@ public sealed class DancingGoatCheckoutController : Controller
 
         var orderNumber = await orderService.CreateOrder(shoppingCartData, customerDto, user?.Id ?? 0, cancellationToken);
 
-        await currentShoppingCartService.Discard(cancellationToken);
+        await currentShoppingCartDiscardHandler.Discard(cancellationToken);
 
         return View(new ConfirmOrderViewModel(orderNumber));
     }

@@ -66,7 +66,7 @@ public class DancingGoatSearchStrategy : BaseAzureSearchIndexingStrategy<Dancing
                 return null;
             }
 
-            if (page.HomePageBanner.IsNullOrEmpty())
+            if (page.HomePageBanner == null || !page.HomePageBanner.Any())
             {
                 return null;
             }

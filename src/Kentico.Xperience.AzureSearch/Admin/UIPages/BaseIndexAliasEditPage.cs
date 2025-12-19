@@ -9,8 +9,6 @@ using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.AzureSearch.Aliasing;
 
-using Microsoft.IdentityModel.Tokens;
-
 using IFormItemCollectionProvider = Kentico.Xperience.Admin.Base.Forms.Internal.IFormItemCollectionProvider;
 
 namespace Kentico.Xperience.AzureSearch.Admin;
@@ -92,7 +90,7 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
 
     private async Task<ModificationResponse> ProcessCreateAlias(AzureSearchAliasConfigurationModel configuration)
     {
-        if (configuration.IndexName.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(configuration.IndexName))
         {
             return new ModificationResponse(ModificationResult.Failure, ["Index name cannot be empty."]);
         }
