@@ -106,12 +106,12 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
                 }
                 else
                 {
-                    eventLogService.LogError(nameof(DefaultAzureSearchTaskProcessor), nameof(ProcessAzureSearchTasks), "Index instance not exists");
+                    eventLogService.LogError(nameof(DefaultAzureSearchTaskProcessor), nameof(ProcessAzureSearchTasks), $"The index '{group.Key}' is not registered.");
                 }
             }
             catch (Exception ex)
             {
-                eventLogService.LogError(nameof(DefaultAzureSearchTaskProcessor), nameof(ProcessAzureSearchTasks), ex.Message);
+                eventLogService.LogException(nameof(DefaultAzureSearchTaskProcessor), nameof(ProcessAzureSearchTasks), ex);
             }
         }
     }
