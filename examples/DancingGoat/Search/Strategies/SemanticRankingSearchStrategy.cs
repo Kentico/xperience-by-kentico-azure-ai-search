@@ -96,7 +96,7 @@ public class SemanticRankingSearchStrategy : BaseAzureSearchIndexingStrategy<Dan
                 return null;
             }
 
-            if (page.HomePageBanner.IsNullOrEmpty())
+            if (page.HomePageBanner == null || !page.HomePageBanner.Any())
             {
                 return null;
             }
