@@ -106,17 +106,17 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
                 }
                 else
                 {
-                    eventLogService.LogError(nameof(DefaultAzureSearchTaskProcessor), nameof(ProcessAzureSearchTasks), "Index instance not exists");
+                    eventLogService.LogError(nameof(DefaultAzureSearchTaskProcessor), nameof(ProcessAzureSearchTasks), $"The index '{group.Key}' is not registered.");
                 }
             }
             catch (Exception ex)
             {
-                eventLogService.LogError(nameof(DefaultAzureSearchTaskProcessor), nameof(ProcessAzureSearchTasks), ex.Message);
+                eventLogService.LogException(nameof(DefaultAzureSearchTaskProcessor), nameof(ProcessAzureSearchTasks), ex);
             }
         }
     }
 
-    private static IEnumerable<string?> GetIdsToDelete(IEnumerable<AzureSearchQueueItem> deleteTasks) => deleteTasks.Select(queueItem => queueItem.ItemToIndex.ItemGuid.ToString());
+    private static IEnumerable<string?> GetIdsToDelete(IEnumerable<AzureSearchQueueItem> deleteTasks) => deleteTasks.Select(queueItem => $"{queueItem.ItemToIndex.ItemGuid}_{queueItem.ItemToIndex.LanguageName}");
 
     private async Task<IAzureSearchModel?> GetSearchModel(AzureSearchQueueItem queueItem)
     {
@@ -141,7 +141,7 @@ internal class DefaultAzureSearchTaskProcessor : IAzureSearchTaskProcessor
         model.ContentTypeName = item.ContentTypeName;
         model.LanguageName = item.LanguageName;
         model.ItemGuid = item.ItemGuid.ToString();
-        model.ObjectID = item.ItemGuid.ToString();
+        model.ObjectID = $"{item.ItemGuid}_{item.LanguageName}";
 
         if (item is IndexEventWebPageItemModel webpageItem && string.IsNullOrEmpty(model.Url))
         {

@@ -60,4 +60,18 @@ internal interface IAzureSearchIndexClientService
     /// <exception cref="Azure.RequestFailedException">Thrown when a failure is returned by the Search service.</exception>
     /// <returns>The created <see cref="SearchIndex" />.</returns>
     Task<SearchIndex> CreateIndex(AzureSearchIndex azureSearchIndex, CancellationToken cancellationToken);
+
+
+    /// <summary>
+    /// Attempts to delete the specified index if it exists.
+    /// </summary>
+    /// <remarks>This method is useful for safely attempting to delete an index without throwing an exception
+    /// if the index does not exist.</remarks>
+    /// <param name="indexName">The name of the index to delete. Cannot be null or empty.</param>
+    /// <param name="onlyIfUnchanged">If <see langword="true"/>, the index will only be deleted if it has not changed since it was last retrieved;
+    /// otherwise, it will be deleted regardless of changes.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns><see langword="true"/> if the index was successfully deleted; otherwise, <see
+    /// langword="false"/>.</returns>
+    Task<bool> TryDeleteIndexIfExists(string indexName, bool onlyIfUnchanged, CancellationToken cancellationToken);
 }

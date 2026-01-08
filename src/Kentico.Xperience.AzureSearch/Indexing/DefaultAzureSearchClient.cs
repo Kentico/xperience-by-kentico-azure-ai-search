@@ -191,9 +191,6 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
     {
         var indexedItems = new List<IIndexEventItemModel>();
 
-        var indexResponse = await searchIndexClient.GetIndexAsync(azureSearchIndex.IndexName, cancellationToken ?? default);
-        var index = indexResponse.Value;
-
         foreach (var includedPathAttribute in azureSearchIndex.IncludedPaths)
         {
             var pathMatch =
@@ -249,7 +246,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
             }
         }
 
-        await searchIndexClient.DeleteIndexAsync(index, onlyIfUnchanged: true, cancellationToken: cancellationToken ?? default);
+        await azureSearchIndexClientService.TryDeleteIndexIfExists(azureSearchIndex.IndexName, onlyIfUnchanged: true, cancellationToken ?? default);
 
         var indexModel = AzureSearchIndexStore.Instance.GetRequiredIndex(azureSearchIndex.IndexName);
         await azureSearchIndexClientService.CreateIndex(indexModel, cancellationToken ?? default);
