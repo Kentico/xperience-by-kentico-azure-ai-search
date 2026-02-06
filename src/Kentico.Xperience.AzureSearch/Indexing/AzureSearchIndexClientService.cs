@@ -142,7 +142,11 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
         {
             foreach (var suggester in semanticSearchConfiguration.Suggesters)
             {
-                definition.Suggesters.Add(suggester);
+                // Only add suggester if it doesn't already exist to avoid duplicates
+                if (!definition.Suggesters.Any(s => s.Name == suggester.Name))
+                {
+                    definition.Suggesters.Add(suggester);
+                }
             }
 
             definition.SemanticSearch = semanticSearchConfiguration.SemanticSearch;
