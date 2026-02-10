@@ -110,12 +110,12 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
         }
         catch (OperationCanceledException ex)
         {
-            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(EditIndex), $"Index edit operation was cancelled: {ex.Message}");
+            eventLogService.LogException(nameof(BaseIndexEditPage), nameof(EditIndex), ex, $"Index edit operation was cancelled: {ex.Message}");
             return new ModificationResponse(ModificationResult.Failure);
         }
         catch (Exception ex) when (ex is InvalidOperationException or ArgumentNullException or Azure.RequestFailedException)
         {
-            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(EditIndex), $"Failed to edit Azure Search index: {ex.Message}");
+            eventLogService.LogException(nameof(BaseIndexEditPage), nameof(EditIndex), ex, $"Failed to edit Azure Search index: {ex.Message}");
             return new ModificationResponse(ModificationResult.Failure);
         }
 

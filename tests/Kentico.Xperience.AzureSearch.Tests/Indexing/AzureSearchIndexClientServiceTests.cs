@@ -112,7 +112,7 @@ internal class AzureSearchIndexClientServiceTests
         var cancellationToken = CancellationToken.None;
         var indexName = "test-index";
         var suggesterName = "test-suggester";
-        
+
         // Create a strategy that returns a semantic ranking configuration with a suggester
         var mockStrategy = Substitute.For<IAzureSearchIndexingStrategy>();
         var suggester = new SearchSuggester(suggesterName, "field1");
@@ -120,8 +120,8 @@ internal class AzureSearchIndexClientServiceTests
         var semanticConfig = new SemanticRankingConfiguration(semanticSearch);
         semanticConfig.Suggesters.Add(suggester);
         mockStrategy.CreateSemanticRankingConfigurationOrNull().Returns(semanticConfig);
-        mockStrategy.GetSearchFields().Returns(new List<SearchField> { new SearchField("field1", SearchFieldDataType.String) { IsKey = true } });
-        
+        mockStrategy.GetSearchFields().Returns([new SearchField("field1", SearchFieldDataType.String) { IsKey = true }]);
+
         // Create index
         var azureSearchIndex = new AzureSearchIndex(
             new Admin.AzureSearchConfigurationModel
@@ -133,20 +133,20 @@ internal class AzureSearchIndexClientServiceTests
             },
             StrategyStorage.Strategies
         );
-        
+
         // Register the index and mock service provider to return strategy
         AzureSearchIndexStore.Instance.SetIndices([]);
         AzureSearchIndexStore.Instance.AddIndex(azureSearchIndex);
         mockServiceProvider.GetService(Arg.Any<Type>()).Returns(mockStrategy);
-        
+
         // Mock CreateOrUpdateIndexAsync to capture the index being sent
         SearchIndex? capturedIndex = null;
         mockIndexClient.CreateOrUpdateIndexAsync(Arg.Do<SearchIndex>(x => capturedIndex = x), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => Response.FromValue(callInfo.Arg<SearchIndex>(), Substitute.For<Response>()));
-        
+
         // Act
         await service.CreateIndex(azureSearchIndex, cancellationToken);
-        
+
         // Assert
         Assert.That(capturedIndex, Is.Not.Null);
         Assert.That(capturedIndex!.Suggesters.Count, Is.EqualTo(1));
@@ -161,7 +161,7 @@ internal class AzureSearchIndexClientServiceTests
         var cancellationToken = CancellationToken.None;
         var indexName = "test-index";
         var suggesterName = "test-suggester";
-        
+
         // Create a strategy that returns a semantic ranking configuration with a suggester
         var mockStrategy = Substitute.For<IAzureSearchIndexingStrategy>();
         var suggester = new SearchSuggester(suggesterName, "field1");
@@ -169,8 +169,8 @@ internal class AzureSearchIndexClientServiceTests
         var semanticConfig = new SemanticRankingConfiguration(semanticSearch);
         semanticConfig.Suggesters.Add(suggester);
         mockStrategy.CreateSemanticRankingConfigurationOrNull().Returns(semanticConfig);
-        mockStrategy.GetSearchFields().Returns(new List<SearchField> { new SearchField("field1", SearchFieldDataType.String) { IsKey = true } });
-        
+        mockStrategy.GetSearchFields().Returns([new SearchField("field1", SearchFieldDataType.String) { IsKey = true }]);
+
         // Create index
         var azureSearchIndex = new AzureSearchIndex(
             new Admin.AzureSearchConfigurationModel
@@ -182,12 +182,12 @@ internal class AzureSearchIndexClientServiceTests
             },
             StrategyStorage.Strategies
         );
-        
+
         // Register the index and mock service provider to return strategy
         AzureSearchIndexStore.Instance.SetIndices([]);
         AzureSearchIndexStore.Instance.AddIndex(azureSearchIndex);
         mockServiceProvider.GetService(Arg.Any<Type>()).Returns(mockStrategy);
-        
+
         // Mock GetIndexAsync to return an existing index with the suggester already present
         var existingIndex = new SearchIndex(indexName);
         existingIndex.Fields.Add(new SearchField("field1", SearchFieldDataType.String) { IsKey = true });
@@ -195,12 +195,12 @@ internal class AzureSearchIndexClientServiceTests
         existingIndex.SemanticSearch = semanticSearch;
         mockIndexClient.GetIndexAsync(indexName, cancellationToken)
             .Returns(Response.FromValue(existingIndex, Substitute.For<Response>()));
-        
+
         // Mock CreateOrUpdateIndexAsync to capture the index being sent
         SearchIndex? capturedIndex = null;
         mockIndexClient.CreateOrUpdateIndexAsync(Arg.Do<SearchIndex>(x => capturedIndex = x), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(callInfo => Response.FromValue(callInfo.Arg<SearchIndex>(), Substitute.For<Response>()));
-        
+
         // Act - Edit the index (simulating a second save)
         var configModel = new Admin.AzureSearchConfigurationModel
         {
@@ -210,7 +210,7 @@ internal class AzureSearchIndexClientServiceTests
             LanguageNames = ["en"]
         };
         await service.EditIndex(azureSearchIndex, configModel, cancellationToken);
-        
+
         // Assert - Check that suggester was not duplicated
         Assert.That(capturedIndex, Is.Not.Null);
         Assert.That(capturedIndex!.Suggesters.Count, Is.EqualTo(1), "Suggester should not be duplicated on edit");
