@@ -145,6 +145,7 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
                 // Only add suggester if it doesn't already exist to avoid duplicates
                 if (!definition.Suggesters.Any(s => s.Name == suggester.Name))
                 {
+                    definition.Suggesters.Remove(definition.Suggesters.FirstOrDefault(s => s.Name == suggester.Name));
                     definition.Suggesters.Add(suggester);
                 }
             }

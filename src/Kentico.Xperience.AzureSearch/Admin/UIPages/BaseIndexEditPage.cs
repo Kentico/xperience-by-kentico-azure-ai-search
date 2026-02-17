@@ -130,7 +130,7 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
             }
             catch (Exception ex) when (ex is InvalidOperationException or ArgumentNullException)
             {
-                eventLogService.LogError(nameof(BaseIndexEditPage), nameof(EditIndex), $"Failed to edit Azure Search index. Local storage and Azure Search storage will be rolled back.{ex.Message}");
+                eventLogService.LogException(nameof(BaseIndexEditPage), nameof(EditIndex), ex, $"Failed to edit Azure Search index. Local storage and Azure Search storage will be rolled back.{ex.Message}");
             }
 
             // Rollback local storage if adding to the index store fails.
@@ -147,7 +147,7 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
         }
         catch (Exception ex) when (ex is ArgumentNullException or InvalidOperationException)
         {
-            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(CreateIndex), $"Failed to rollback index edit. Manual cleanup may be required. Please check the Azure AI Search in Azure portal and delete the index if necessary. {ex.Message}");
+            eventLogService.LogException(nameof(BaseIndexEditPage), nameof(CreateIndex), ex, $"Failed to rollback index edit. Manual cleanup may be required. Please check the Azure AI Search in Azure portal and delete the index if necessary. {ex.Message}");
         }
 
         return new ModificationResponse(ModificationResult.Failure);
@@ -168,12 +168,12 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
         }
         catch (OperationCanceledException ex)
         {
-            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(CreateIndex), $"Index creation operation was cancelled: {ex.Message}");
+            eventLogService.LogException(nameof(BaseIndexEditPage), nameof(CreateIndex), ex, $"Index creation operation was cancelled: {ex.Message}");
             return new ModificationResponse(ModificationResult.Failure);
         }
         catch (Exception ex) when (ex is InvalidOperationException or ArgumentNullException or Azure.RequestFailedException)
         {
-            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(CreateIndex), $"Failed to create Azure Search index: {ex.Message}");
+            eventLogService.LogException(nameof(BaseIndexEditPage), nameof(CreateIndex), ex, $"Failed to create Azure Search index: {ex.Message}");
             return new ModificationResponse(ModificationResult.Failure);
         }
 
@@ -189,7 +189,7 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
             catch (Exception ex) when (ex is InvalidOperationException or ArgumentNullException)
             {
                 // We do not return yet, as we still need to rollback the index creation in Azure.
-                eventLogService.LogError(nameof(BaseIndexEditPage), nameof(CreateIndex), $"Failed to create Azure Search index locally. Local storage and Azure Search storage will be rolled back. {ex.Message}");
+                eventLogService.LogException(nameof(BaseIndexEditPage), nameof(CreateIndex), ex, $"Failed to create Azure Search index locally. Local storage and Azure Search storage will be rolled back. {ex.Message}");
             }
 
             // Rollback local storage if adding to the index store fails.
@@ -206,7 +206,7 @@ internal abstract class BaseIndexEditPage : ModelEditPage<AzureSearchConfigurati
         }
         catch (Exception ex) when (ex is ArgumentNullException or Azure.RequestFailedException)
         {
-            eventLogService.LogError(nameof(BaseIndexEditPage), nameof(CreateIndex), $"Failed to rollback index creation. Manual cleanup may be required. Please check the Azure AI Search in Azure portal and delete the index if necessary. {ex.Message}");
+            eventLogService.LogException(nameof(BaseIndexEditPage), nameof(CreateIndex), ex, $"Failed to rollback index creation. Manual cleanup may be required. Please check the Azure AI Search in Azure portal and delete the index if necessary. {ex.Message}");
         }
 
         return new ModificationResponse(ModificationResult.Failure);
