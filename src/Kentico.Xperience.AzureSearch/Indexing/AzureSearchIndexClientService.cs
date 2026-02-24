@@ -142,6 +142,13 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
         {
             foreach (var suggester in semanticSearchConfiguration.Suggesters)
             {
+                // Sync suggesters by name: replace existing entry to apply updated configuration
+                var existingSuggester = definition.Suggesters.FirstOrDefault(s => s.Name == suggester.Name);
+                if (existingSuggester is not null)
+                {
+                    definition.Suggesters.Remove(existingSuggester);
+                }
+
                 definition.Suggesters.Add(suggester);
             }
 

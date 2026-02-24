@@ -83,7 +83,7 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
         }
         catch (Exception ex)
         {
-            EventLogService.LogError(nameof(BaseIndexAliasEditPage), nameof(ProcessEditAlias), $"Exception during alias edit: {ex.Message}");
+            EventLogService.LogException(nameof(BaseIndexAliasEditPage), nameof(ProcessEditAlias), ex, $"Exception during alias edit: {ex.Message}");
             return new ModificationResponse(ModificationResult.Failure, [$"Failed to update Azure Search alias. See error log for more details."]);
         }
     }
@@ -112,7 +112,7 @@ internal abstract class BaseIndexAliasEditPage : ModelEditPage<AzureSearchAliasC
         }
         catch (Exception ex)
         {
-            EventLogService.LogError(nameof(BaseIndexAliasEditPage), nameof(ProcessCreateAlias), $"Exception during alias creation: {ex.Message}");
+            EventLogService.LogException(nameof(BaseIndexAliasEditPage), nameof(ProcessCreateAlias), ex, $"Exception during alias creation: {ex.Message}");
             return new ModificationResponse(ModificationResult.Failure, [$"Failed to create Azure Search alias. See error log for more details."]);
         }
     }
