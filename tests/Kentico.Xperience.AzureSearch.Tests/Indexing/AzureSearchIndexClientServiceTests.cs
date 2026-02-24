@@ -13,7 +13,7 @@ namespace Kentico.Xperience.AzureSearch.Tests.Indexing;
 internal class AzureSearchIndexClientServiceTests
 {
     private const string TEST_FIELD_NAME = "field1";
-    
+
     private SearchIndexClient mockIndexClient;
     private IServiceProvider mockServiceProvider;
     private AzureSearchIndexClientService service;
