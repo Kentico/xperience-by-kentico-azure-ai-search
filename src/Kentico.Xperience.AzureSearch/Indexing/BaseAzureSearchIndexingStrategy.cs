@@ -39,6 +39,9 @@ public class BaseAzureSearchIndexingStrategy<TSearchModel> : IAzureSearchIndexin
     public virtual SemanticRankingConfiguration? CreateSemanticRankingConfigurationOrNull() => null;
 
     /// <inheritdoc />
+    public virtual VectorSearch? CreateVectorEmbeddingConfigurationOrNull() => null;
+
+    /// <inheritdoc />
     public IList<SearchField> GetSearchFields() => fieldBuilder.Build(typeof(TSearchModel));
 
     /// <inheritdoc />
