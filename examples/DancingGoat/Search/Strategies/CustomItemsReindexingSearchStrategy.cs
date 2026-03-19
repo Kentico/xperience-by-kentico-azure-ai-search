@@ -1,4 +1,4 @@
-﻿using CMS.ContentEngine;
+using CMS.ContentEngine;
 using CMS.Websites;
 
 using DancingGoat.Models;
@@ -9,23 +9,33 @@ using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace DancingGoat.Search.Strategies;
 
+/// <summary>
+/// Indexing strategy that indexes web page items (<see cref="ArticlePage"/>, <see cref="HomePage"/>) into the search index.
+/// </summary>
+/// <remarks>
+/// This strategy indexes only web page items; <see cref="MapToAzureSearchModelOrNull"/> returns null for reusable content.
+/// For each page it crawls the page URL, sanitizes the HTML, and builds a <see cref="DancingGoatSearchModel"/> with title and content.
+/// <see cref="FindItemsToReindex(IndexEventWebPageItemModel)"/> is overridden so that when an <see cref="ArticlePage"/> is modified,
+/// other ArticlePages linked via <see cref="ArticlePage.ArticlePageTeaser"/> can be returned for reindexing so related pages stay in sync.
+/// HomePage uses the first <see cref="Banner"/> header as the search title.
+/// </remarks>
 public class CustomItemsReindexingSearchStrategy : BaseAzureSearchIndexingStrategy<DancingGoatSearchModel>
 {
     private readonly IContentQueryExecutor queryExecutor;
-    private readonly IWebPageQueryResultMapper webPageMapper;
+    private readonly IContentQueryModelTypeMapper queryMapper;
     private readonly StrategyHelper strategyHelper;
     private readonly WebScraperHtmlSanitizer htmlSanitizer;
     private readonly WebCrawlerService webCrawler;
 
     public CustomItemsReindexingSearchStrategy(
-        IWebPageQueryResultMapper webPageMapper,
+        IContentQueryModelTypeMapper queryMapper,
         IContentQueryExecutor queryExecutor,
         StrategyHelper strategyHelper,
         WebScraperHtmlSanitizer htmlSanitizer,
         WebCrawlerService webCrawler
     )
     {
-        this.webPageMapper = webPageMapper;
+        this.queryMapper = queryMapper;
         this.queryExecutor = queryExecutor;
         this.strategyHelper = strategyHelper;
         this.htmlSanitizer = htmlSanitizer;
@@ -55,7 +65,7 @@ public class CustomItemsReindexingSearchStrategy : BaseAzureSearchIndexingStrate
                             .Linking(nameof(ArticlePage.ArticlePageTeaser), new[] { changedItem.ItemID }))
                 .InLanguage(changedItem.LanguageName);
 
-            var result = await queryExecutor.GetWebPageResult(query, webPageMapper.Map<ArticlePage>);
+            var result = await queryExecutor.GetWebPageResult(query, queryMapper.Map<ArticlePage>);
 
             foreach (var articlePage in result)
             {

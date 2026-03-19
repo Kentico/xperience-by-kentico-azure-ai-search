@@ -1,4 +1,5 @@
-﻿using CMS.Core;
+﻿using CMS.ContentEngine;
+using CMS.Core;
 using CMS.Websites;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -56,6 +57,8 @@ internal class DefaultAzureSearchTaskLogger : IAzureSearchTaskLogger
 
     public async Task HandleReusableItemEvent(IndexEventReusableItemModel reusableItem, string eventName)
     {
+        var taskType = GetTaskType(eventName);
+
         foreach (var azureSearchIndex in AzureSearchIndexStore.Instance.GetAllIndices())
         {
             if (!reusableItem.IsIndexedByIndex(eventLogService, azureSearchIndex.IndexName, eventName))
@@ -66,9 +69,24 @@ internal class DefaultAzureSearchTaskLogger : IAzureSearchTaskLogger
             var strategy = serviceProvider.GetRequiredStrategy(azureSearchIndex);
             var toReindex = await strategy.FindItemsToReindex(reusableItem);
 
-            foreach (var item in toReindex)
+            if (toReindex is not null)
             {
-                LogIndexTask(new AzureSearchQueueItem(item, AzureSearchTaskType.UPDATE, azureSearchIndex.IndexName));
+                foreach (var item in toReindex)
+                {
+                    if (taskType == AzureSearchTaskType.DELETE)
+                    {
+                        LogIndexTask(new AzureSearchQueueItem(item, AzureSearchTaskType.DELETE, azureSearchIndex.IndexName));
+                    }
+                    else
+                    {
+                        LogIndexTask(new AzureSearchQueueItem(item, AzureSearchTaskType.UPDATE, azureSearchIndex.IndexName));
+                    }
+                }
+            }
+
+            if (taskType == AzureSearchTaskType.DELETE)
+            {
+                LogIndexTask(new AzureSearchQueueItem(reusableItem, AzureSearchTaskType.DELETE, azureSearchIndex.IndexName));
             }
         }
     }
@@ -91,13 +109,16 @@ internal class DefaultAzureSearchTaskLogger : IAzureSearchTaskLogger
 
     private static AzureSearchTaskType GetTaskType(string eventName)
     {
-        if (eventName.Equals(WebPageEvents.Publish.Name, StringComparison.OrdinalIgnoreCase))
+        if (eventName.Equals(WebPageEvents.Publish.Name, StringComparison.OrdinalIgnoreCase)
+            || eventName.Equals(ContentItemEvents.Publish.Name, StringComparison.OrdinalIgnoreCase))
         {
             return AzureSearchTaskType.UPDATE;
         }
 
         if (eventName.Equals(WebPageEvents.Delete.Name, StringComparison.OrdinalIgnoreCase) ||
-            eventName.Equals(WebPageEvents.Unpublish.Name, StringComparison.OrdinalIgnoreCase))
+            eventName.Equals(WebPageEvents.Unpublish.Name, StringComparison.OrdinalIgnoreCase) ||
+            eventName.Equals(ContentItemEvents.Delete.Name, StringComparison.OrdinalIgnoreCase) ||
+            eventName.Equals(ContentItemEvents.Unpublish.Name, StringComparison.OrdinalIgnoreCase))
         {
             return AzureSearchTaskType.DELETE;
         }

@@ -1,4 +1,4 @@
-﻿using CMS.ContentEngine;
+using CMS.ContentEngine;
 using CMS.Websites;
 
 using DancingGoat.Models;
@@ -9,9 +9,19 @@ using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace DancingGoat.Search;
 
+/// <summary>
+/// Indexing strategy that indexes reusable content items (e.g. <see cref="Banner"/>) into the search index.
+/// </summary>
+/// <remarks>
+/// This strategy does not index web page items. When a supported reusable item is indexed, it finds the web page
+/// that references the item (e.g. the <see cref="HomePage"/> that displays the banner via <see cref="HomePage.HomePageBanner"/>),
+/// retrieves that page's URL, crawls the page HTML, and builds a <see cref="DancingGoatSearchModel"/> with the crawled
+/// content and the reusable item's title. Search results for reusable content therefore point to the page URL where
+/// the content is shown.
+/// </remarks>
 public class ReusableContentItemsIndexingStrategy : BaseAzureSearchIndexingStrategy<DancingGoatSearchModel>
 {
-    private readonly IWebPageQueryResultMapper webPageMapper;
+    private readonly IContentQueryModelTypeMapper queryMapper;
     private readonly IContentQueryExecutor queryExecutor;
     private readonly IWebPageUrlRetriever urlRetriever;
     private readonly WebScraperHtmlSanitizer htmlSanitizer;
@@ -21,7 +31,7 @@ public class ReusableContentItemsIndexingStrategy : BaseAzureSearchIndexingStrat
     public const string CRAWLER_CONTENT_FIELD_NAME = "Content";
 
     public ReusableContentItemsIndexingStrategy(
-        IWebPageQueryResultMapper webPageMapper,
+        IContentQueryModelTypeMapper queryMapper,
         IContentQueryExecutor queryExecutor,
         IWebPageUrlRetriever urlRetriever,
         WebScraperHtmlSanitizer htmlSanitizer,
@@ -29,7 +39,7 @@ public class ReusableContentItemsIndexingStrategy : BaseAzureSearchIndexingStrat
     )
     {
         this.urlRetriever = urlRetriever;
-        this.webPageMapper = webPageMapper;
+        this.queryMapper = queryMapper;
         this.queryExecutor = queryExecutor;
         this.htmlSanitizer = htmlSanitizer;
         this.webCrawler = webCrawler;
@@ -57,7 +67,7 @@ public class ReusableContentItemsIndexingStrategy : BaseAzureSearchIndexingStrat
                         .Linking(nameof(HomePage.HomePageBanner), new[] { indexedItem.ItemID }))
             .InLanguage(indexedItem.LanguageName);
 
-            var associatedWebPageItem = (await queryExecutor.GetWebPageResult(query, webPageMapper.Map<HomePage>)).First();
+            var associatedWebPageItem = (await queryExecutor.GetWebPageResult(query, queryMapper.Map<HomePage>)).First();
             string url = string.Empty;
             try
             {

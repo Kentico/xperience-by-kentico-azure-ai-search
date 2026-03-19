@@ -1,4 +1,4 @@
-﻿using DancingGoat.Models;
+using DancingGoat.Models;
 using DancingGoat.Search.Models;
 using DancingGoat.Search.Services;
 
@@ -6,6 +6,14 @@ using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace DancingGoat.Search;
 
+/// <summary>
+/// Simple indexing strategy that indexes web page items (<see cref="ArticlePage"/>, <see cref="HomePage"/>) with title only (no page crawling).
+/// </summary>
+/// <remarks>
+/// This strategy indexes only web page items into <see cref="DancingGoatSimpleSearchModel"/> and does not crawl page content.
+/// For <see cref="ArticlePage"/> it uses <see cref="ArticlePage.ArticleTitle"/>; for <see cref="HomePage"/> it uses the first <see cref="Banner"/> header.
+/// Use this for lightweight indexes where full-text content is not required.
+/// </remarks>
 public class DancingGoatSimpleSearchStrategy : BaseAzureSearchIndexingStrategy<DancingGoatSimpleSearchModel>
 {
     private readonly StrategyHelper strategyHelper;

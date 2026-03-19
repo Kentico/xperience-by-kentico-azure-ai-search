@@ -1,4 +1,6 @@
-﻿using DancingGoat.Models;
+using CMS.ContentEngine;
+
+using DancingGoat.Models;
 using DancingGoat.Search.Models;
 using DancingGoat.Search.Services;
 
@@ -6,21 +8,36 @@ using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace DancingGoat.Search;
 
+/// <summary>
+/// Indexing strategy that indexes web page items (<see cref="ArticlePage"/>, <see cref="HomePage"/>) into the search index.
+/// </summary>
+/// <remarks>
+/// This strategy indexes only web page items; <see cref="BaseAzureSearchIndexingStrategy{TSearchModel}.MapToAzureSearchModelOrNull"/> returns null for reusable content.
+/// For each page it crawls the page URL, sanitizes the HTML, and builds a <see cref="DancingGoatSearchModel"/> with title and content.
+/// ArticlePage uses <see cref="ArticlePage.ArticleTitle"/> and crawled content; HomePage uses the first <see cref="Banner"/> header and crawled content.
+/// Uses the base implementation of <c>FindItemsToReindex</c> (reindex only the changed page) and no Semantic Ranking.
+/// </remarks>
 public class DancingGoatSearchStrategy : BaseAzureSearchIndexingStrategy<DancingGoatSearchModel>
 {
     private readonly WebScraperHtmlSanitizer htmlSanitizer;
     private readonly WebCrawlerService webCrawler;
     private readonly StrategyHelper strategyHelper;
+    private readonly IContentQueryExecutor queryExecutor;
+    private readonly IContentQueryModelTypeMapper queryMapper;
 
     public DancingGoatSearchStrategy(
         WebScraperHtmlSanitizer htmlSanitizer,
         WebCrawlerService webCrawler,
-        StrategyHelper strategyHelper
+        StrategyHelper strategyHelper,
+        IContentQueryExecutor queryExecutor,
+        IContentQueryModelTypeMapper queryMapper
     )
     {
         this.htmlSanitizer = htmlSanitizer;
         this.webCrawler = webCrawler;
         this.strategyHelper = strategyHelper;
+        this.queryExecutor = queryExecutor;
+        this.queryMapper = queryMapper;
     }
 
     public override async Task<IAzureSearchModel> MapToAzureSearchModelOrNull(IIndexEventItemModel item)

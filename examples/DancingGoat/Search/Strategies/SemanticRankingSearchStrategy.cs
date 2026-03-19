@@ -1,4 +1,4 @@
-﻿using Azure.Search.Documents.Indexes.Models;
+using Azure.Search.Documents.Indexes.Models;
 
 using DancingGoat.Models;
 using DancingGoat.Search.Models;
@@ -8,6 +8,14 @@ using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace DancingGoat.Search;
 
+/// <summary>
+/// Indexing strategy that indexes web page items (<see cref="ArticlePage"/>, <see cref="HomePage"/>) with Semantic Ranking and suggesters enabled.
+/// </summary>
+/// <remarks>
+/// Same indexing behavior as <see cref="DancingGoatSearchStrategy"/> (crawls pages, sanitizes HTML, builds <see cref="DancingGoatSearchModel"/> with title and content).
+/// Overrides <see cref="BaseAzureSearchIndexingStrategy{TSearchModel}.CreateSemanticRankingConfigurationOrNull"/> to add a semantic configuration
+/// for <see cref="DancingGoatSearchModel.Title"/> and <see cref="DancingGoatSearchModel.Content"/>, and a suggester for search-as-you-type.
+/// </remarks>
 public class SemanticRankingSearchStrategy : BaseAzureSearchIndexingStrategy<DancingGoatSearchModel>
 {
     private readonly WebScraperHtmlSanitizer htmlSanitizer;
