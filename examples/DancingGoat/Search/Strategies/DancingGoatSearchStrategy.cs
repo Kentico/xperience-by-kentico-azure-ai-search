@@ -1,5 +1,3 @@
-using CMS.ContentEngine;
-
 using DancingGoat.Models;
 using DancingGoat.Search.Models;
 using DancingGoat.Search.Services;
