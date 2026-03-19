@@ -22,22 +22,16 @@ public class DancingGoatSearchStrategy : BaseAzureSearchIndexingStrategy<Dancing
     private readonly WebScraperHtmlSanitizer htmlSanitizer;
     private readonly WebCrawlerService webCrawler;
     private readonly StrategyHelper strategyHelper;
-    private readonly IContentQueryExecutor queryExecutor;
-    private readonly IContentQueryModelTypeMapper queryMapper;
 
     public DancingGoatSearchStrategy(
         WebScraperHtmlSanitizer htmlSanitizer,
         WebCrawlerService webCrawler,
-        StrategyHelper strategyHelper,
-        IContentQueryExecutor queryExecutor,
-        IContentQueryModelTypeMapper queryMapper
+        StrategyHelper strategyHelper
     )
     {
         this.htmlSanitizer = htmlSanitizer;
         this.webCrawler = webCrawler;
         this.strategyHelper = strategyHelper;
-        this.queryExecutor = queryExecutor;
-        this.queryMapper = queryMapper;
     }
 
     public override async Task<IAzureSearchModel> MapToAzureSearchModelOrNull(IIndexEventItemModel item)
