@@ -1,4 +1,4 @@
-﻿using DancingGoat.Models;
+using DancingGoat.Models;
 using DancingGoat.Search.Models;
 using DancingGoat.Search.Services;
 
@@ -6,6 +6,15 @@ using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace DancingGoat.Search;
 
+/// <summary>
+/// Indexing strategy that indexes web page items (<see cref="ArticlePage"/>, <see cref="HomePage"/>) into the search index.
+/// </summary>
+/// <remarks>
+/// This strategy indexes only web page items; <see cref="BaseAzureSearchIndexingStrategy{TSearchModel}.MapToAzureSearchModelOrNull"/> returns null for reusable content.
+/// For each page it crawls the page URL, sanitizes the HTML, and builds a <see cref="DancingGoatSearchModel"/> with title and content.
+/// ArticlePage uses <see cref="ArticlePage.ArticleTitle"/> and crawled content; HomePage uses the first <see cref="Banner"/> header and crawled content.
+/// Uses the base implementation of <c>FindItemsToReindex</c> (reindex only the changed page) and no Semantic Ranking.
+/// </remarks>
 public class DancingGoatSearchStrategy : BaseAzureSearchIndexingStrategy<DancingGoatSearchModel>
 {
     private readonly WebScraperHtmlSanitizer htmlSanitizer;

@@ -1,4 +1,4 @@
-﻿using Azure.Search.Documents;
+using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
 using Azure.Search.Documents.Models;
@@ -30,10 +30,16 @@ public class BaseAzureSearchIndexingStrategy<TSearchModel> : IAzureSearchIndexin
     }
 
     /// <inheritdoc />
-    public virtual async Task<IEnumerable<IIndexEventItemModel>> FindItemsToReindex(IndexEventWebPageItemModel changedItem) => await Task.FromResult(new List<IIndexEventItemModel>() { changedItem });
+    public virtual Task<IEnumerable<IIndexEventItemModel>> FindItemsToReindex(IndexEventWebPageItemModel changedItem) => Task.FromResult<IEnumerable<IIndexEventItemModel>>([changedItem]);
 
     /// <inheritdoc />
-    public virtual async Task<IEnumerable<IIndexEventItemModel>> FindItemsToReindex(IndexEventReusableItemModel changedItem) => await Task.FromResult(new List<IIndexEventItemModel>());
+    /// <remarks>
+    /// Default implementation returns the reusable content item itself so it is indexed directly.
+    /// If you index the reusable content indirectly via web page items that reference it, override this method
+    /// to return those web page items (<see cref="IndexEventWebPageItemModel"/>) so they get reindexed when the reusable content item changes.
+    /// See docs/Custom-index-strategy.md and docs/Managing-Indexes.md for more information.
+    /// </remarks>
+    public virtual Task<IEnumerable<IIndexEventItemModel>> FindItemsToReindex(IndexEventReusableItemModel changedItem) => Task.FromResult<IEnumerable<IIndexEventItemModel>>([changedItem]);
 
     /// <inheritdoc />
     public virtual SemanticRankingConfiguration? CreateSemanticRankingConfigurationOrNull() => null;

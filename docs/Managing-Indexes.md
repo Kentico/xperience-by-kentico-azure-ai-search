@@ -38,6 +38,5 @@ or clicking an existing path in the table at the top of the index configuration 
 
 ## Indexing reusable content items
 
-All reusable content item modifications will trigger an event to generate a `IndexEventReusableItemModel` for your custom index strategy class to process, as long as the content item has a language variant matching one of the languages selected for the index. You can use this to index reusable content items in addition to web page items but returning the reusable content item content as a `IIndexEventItemModel` from the strategy `FindItemsToReindex` method.
+All reusable content item modifications will trigger an event to generate a `IndexEventReusableItemModel` for your custom index strategy class to process, as long as the content item is of a content type selected in the search index and has a language variant matching one of the languages selected for the index. You can use this to index reusable content items in addition to web page items by returning the reusable content item as a `IIndexEventItemModel` from the strategy's `FindItemsToReindex` method.
 
-> Note: There currently no UI to allow administrators to configure which types of reusable content items trigger indexing. This could be added in a future update.
