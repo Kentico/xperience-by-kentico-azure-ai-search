@@ -213,6 +213,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
                     var webpages = await executor.GetWebPageResult(queryBuilder,
                         container => container,
+                        new ContentQueryExecutionOptions { IncludeSecuredItems = true },
                         cancellationToken: cancellationToken ?? default);
 
                     foreach (var page in webpages)
