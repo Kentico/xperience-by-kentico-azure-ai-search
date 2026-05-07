@@ -16,7 +16,7 @@ public class StrategyHelper
         this.queryExecutor = queryExecutor;
     }
 
-    public async Task<T?> GetPage<T>(Guid id, string channelName, string languageName, string contentTypeName)
+    public async Task<T?> GetPage<T>(Guid id, string channelName, string languageName, string contentTypeName, bool includeSecuredItems = false)
         where T : IWebPageFieldsSource, new()
     {
         var query = new ContentItemQueryBuilder()
@@ -29,7 +29,10 @@ public class StrategyHelper
                         .TopN(1))
             .InLanguage(languageName);
 
-        var result = await queryExecutor.GetWebPageResult(query, queryTypeMapper.Map<T>);
+        var result = await queryExecutor.GetWebPageResult(
+            query,
+            queryTypeMapper.Map<T>,
+            new ContentQueryExecutionOptions { IncludeSecuredItems = includeSecuredItems });
 
         return result.FirstOrDefault();
     }
