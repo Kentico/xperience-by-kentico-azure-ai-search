@@ -37,7 +37,8 @@ public class DancingGoatSimpleSearchStrategy : BaseAzureSearchIndexingStrategy<D
                 indexedPage.ItemGuid,
                 indexedPage.WebsiteChannelName,
                 indexedPage.LanguageName,
-                ArticlePage.CONTENT_TYPE_NAME);
+                ArticlePage.CONTENT_TYPE_NAME,
+                includeSecuredItems: true);
 
             if (page is null)
             {
