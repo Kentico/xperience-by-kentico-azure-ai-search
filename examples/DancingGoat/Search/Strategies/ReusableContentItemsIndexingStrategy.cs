@@ -67,7 +67,11 @@ public class ReusableContentItemsIndexingStrategy : BaseAzureSearchIndexingStrat
                         .Linking(nameof(HomePage.HomePageBanner), new[] { indexedItem.ItemID }))
             .InLanguage(indexedItem.LanguageName);
 
-            var associatedWebPageItem = (await queryExecutor.GetWebPageResult(query, queryMapper.Map<HomePage>)).First();
+            var associatedWebPageItem = (await queryExecutor.GetWebPageResult(
+                    query,
+                    queryMapper.Map<HomePage>,
+                    new ContentQueryExecutionOptions { IncludeSecuredItems = true }
+                )).First();
             string url = string.Empty;
             try
             {
