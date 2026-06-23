@@ -34,6 +34,12 @@ public interface IAzureSearchIndexingStrategy
     SemanticRankingConfiguration? CreateSemanticRankingConfigurationOrNull();
 
     /// <summary>
+    /// Called when creating a SearchIndex to optionally add Vector Embedding Configuration
+    /// </summary>
+    /// <returns><see cref="VectorSearch"/></returns>
+    VectorSearch? CreateVectorEmbeddingConfigurationOrNull();
+
+    /// <summary>
     /// Called when creating the Azure Search index. Returned fields are combined with properties from <see cref="BaseAzureSearchModel"/>.
     /// </summary>
     /// <returns>The search fields for the index.</returns>
