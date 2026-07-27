@@ -16,7 +16,8 @@ public sealed class AzureSearchQueryClientService : IAzureSearchQueryClientServi
     /// Initializes a new instance of the <see cref="AzureSearchQueryClientService"/> class.
     /// </summary>
     /// <param name="settings">The settings for the Azure Search query client.</param>
-    public AzureSearchQueryClientService(AzureSearchQueryClientOptions settings) : this(settings, new SearchClientOptions())
+    public AzureSearchQueryClientService(AzureSearchQueryClientOptions settings)
+        : this(settings, new SearchClientOptions())
     {
     }
 
@@ -28,6 +29,9 @@ public sealed class AzureSearchQueryClientService : IAzureSearchQueryClientServi
     /// <param name="clientOptions">The client options for the Azure Search query client.</param>
     public AzureSearchQueryClientService(AzureSearchQueryClientOptions settings, SearchClientOptions clientOptions)
     {
+        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(clientOptions);
+
         this.settings = settings;
         this.clientOptions = clientOptions;
     }
@@ -38,5 +42,13 @@ public sealed class AzureSearchQueryClientService : IAzureSearchQueryClientServi
     /// </summary>
     /// <param name="indexName"></param>
     /// <returns>Initialized <see cref="SearchClient"/></returns>
-    public SearchClient CreateSearchClientForQueries(string indexName) => new(new Uri(settings.ServiceEndpoint), indexName, new AzureKeyCredential(settings.QueryApiKey), clientOptions);
+    public SearchClient CreateSearchClientForQueries(string indexName)
+    {
+        if (string.IsNullOrEmpty(indexName))
+        {
+            throw new ArgumentNullException(nameof(indexName));
+        }
+
+        return new SearchClient(new Uri(settings.ServiceEndpoint), indexName, new AzureKeyCredential(settings.QueryApiKey), clientOptions);
+    }
 }

@@ -20,7 +20,7 @@ public interface IAzureSearchBuilder
     /// <typeparam name="TSearchModel">The custom type of <see cref="IAzureSearchModel"/> used to create and use an index.</typeparam>
     /// <param name="strategyName">Used internally <typeparamref name="TStrategy" /> to enable dynamic assignment of strategies to search indexes. Names must be unique.</param>
     /// <exception cref="ArgumentException">
-    ///     Thrown if an strategy has already been registered with the given <paramref name="strategyName"/>.
+    ///     Thrown if a strategy has already been registered with the given <paramref name="strategyName"/>.
     /// </exception>
     /// <returns>Azure Search builder for chaining.</returns>
     IAzureSearchBuilder RegisterStrategy<TStrategy, TSearchModel>(string strategyName)
