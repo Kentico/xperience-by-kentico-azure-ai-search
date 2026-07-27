@@ -2,6 +2,9 @@ using Azure.Search.Documents;
 
 using CMS.Tests;
 
+using Kentico.Xperience.AzureSearch.Indexing;
+
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Kentico.Xperience.AzureSearch.Tests;
@@ -13,7 +16,69 @@ namespace Kentico.Xperience.AzureSearch.Tests;
 [Category.Unit]
 internal class AzureSearchBuilderTests
 {
+    private static readonly Dictionary<string, string> inMemorySettings = new()
+        {
+            {$"{AzureSearchOptions.CMS_AZURE_SEARCH_SECTION_NAME}:{nameof(AzureSearchOptions.SearchServiceEndPoint)}", "https://test.search.windows.net"},
+            {$"{AzureSearchOptions.CMS_AZURE_SEARCH_SECTION_NAME}:{nameof(AzureSearchOptions.SearchServiceAdminApiKey)}", "test-admin-key"},
+            {$"{AzureSearchOptions.CMS_AZURE_SEARCH_SECTION_NAME}:{nameof(AzureSearchOptions.SearchServiceQueryApiKey)}", "test-query-key"}
+        };
+
+
     private static AzureSearchBuilder CreateBuilder() => new(new ServiceCollection());
+
+
+    [Test]
+    public void RegisterStrategy_WithAdditionalPropertiesWithoutAttributes_ShouldNotThrow()
+    {
+        // Arrange
+        var serviceCollection = new ServiceCollection();
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(inMemorySettings!)
+            .Build();
+
+        // Act & Assert
+        Assert.That(() => serviceCollection.AddKenticoAzureSearch(builder =>
+            builder.RegisterStrategy<TestSearchModelWithAdditionalPropertiesStrategy, TestSearchModelWithAdditionalProperties>("TestStrategyWithAdditionalProps"),
+            configuration),
+            Throws.Nothing);
+    }
+
+
+    [Test]
+    public void RegisterStrategy_WithoutKeyField_ShouldThrow()
+    {
+        // Arrange
+        var serviceCollection = new ServiceCollection();
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(inMemorySettings!)
+            .Build();
+
+        // Act
+        var exception = Assert.Throws<InvalidOperationException>(() => serviceCollection.AddKenticoAzureSearch(builder =>
+            builder.RegisterStrategy<InvalidTestSearchModelStrategy, InvalidTestSearchModel>("InvalidTestStrategy"), configuration));
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message,
+                Does.Contain("Exactly one field in your index must serve as the document key (IsKey = true). It must be a string, and it must uniquely identify each document. It's also required to have IsHidden = false."));
+        });
+    }
+
+
+    [Test]
+    public void RegisterStrategy_ReturnsSameBuilderInstance()
+    {
+        // Arrange
+        var builder = CreateBuilder();
+
+        // Act
+        var result = builder.RegisterStrategy<TestSearchModelWithAdditionalPropertiesStrategy, TestSearchModelWithAdditionalProperties>("TestStrategyChaining");
+
+        // Assert
+        Assert.That(result, Is.SameAs(builder));
+    }
 
 
     [Test]
