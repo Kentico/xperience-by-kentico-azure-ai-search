@@ -49,42 +49,39 @@ public static class AzureSearchStartupExtensions
 
         serviceCollection.AddAzureSearchServicesInternal(configuration, builder);
 
-        if (builder.IncludeDefaultStrategy)
-        {
-            serviceCollection.AddTransient<BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>>();
-            builder.RegisterStrategy<BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>, BaseAzureSearchModel>("Default");
-        }
+        serviceCollection.AddTransient<BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>>();
+        builder.RegisterStrategy<BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>, BaseAzureSearchModel>("Default");
 
         return serviceCollection;
     }
 
 
-    private static IServiceCollection AddAzureSearchServicesInternal(this IServiceCollection services, IConfiguration configuration, AzureSearchBuilder? builder = null) =>
-        services
-            .Configure<AzureSearchOptions>(configuration.GetSection(AzureSearchOptions.CMS_AZURE_SEARCH_SECTION_NAME))
-            .AddSingleton<AzureSearchModuleInstaller>()
-            .AddSingleton(x =>
-            {
-                var options = x.GetRequiredService<IOptions<AzureSearchOptions>>();
+    private static IServiceCollection AddAzureSearchServicesInternal(this IServiceCollection services, IConfiguration configuration, AzureSearchBuilder? builder = null)
+    {
+        var clientOptions = new SearchClientOptions();
+        builder?.ConfigureClientOptions(clientOptions);
 
-                var clientOptions = new SearchClientOptions();
-                builder?.ConfigureClientOptions(clientOptions);
+        services.Configure<AzureSearchOptions>(configuration.GetSection(AzureSearchOptions.CMS_AZURE_SEARCH_SECTION_NAME))
+                .AddSingleton<AzureSearchModuleInstaller>()
+                .AddSingleton(x =>
+                {
+                    var options = x.GetRequiredService<IOptions<AzureSearchOptions>>();
 
-                return new SearchIndexClient(new Uri(options.Value.SearchServiceEndPoint), new AzureKeyCredential(options.Value.SearchServiceAdminApiKey), clientOptions);
-            })
-            .AddSingleton<IAzureSearchQueryClientService>(x =>
-            {
-                var options = x.GetRequiredService<IOptions<AzureSearchOptions>>();
+                    return new SearchIndexClient(new Uri(options.Value.SearchServiceEndPoint), new AzureKeyCredential(options.Value.SearchServiceAdminApiKey), clientOptions);
+                })
+                .AddSingleton<IAzureSearchQueryClientService>(x =>
+                {
+                    var options = x.GetRequiredService<IOptions<AzureSearchOptions>>();
 
-                var clientOptions = new SearchClientOptions();
-                builder?.ConfigureClientOptions(clientOptions);
+                    return new AzureSearchQueryClientService(new AzureSearchQueryClientOptions(options.Value.SearchServiceEndPoint, options.Value.SearchServiceQueryApiKey), clientOptions);
+                })
+                .AddSingleton<IAzureSearchClient, DefaultAzureSearchClient>()
+                .AddSingleton<IAzureSearchTaskLogger, DefaultAzureSearchTaskLogger>()
+                .AddSingleton<IAzureSearchTaskProcessor, DefaultAzureSearchTaskProcessor>()
+                .AddSingleton<IAzureSearchConfigurationStorageService, DefaultAzureSearchConfigurationStorageService>()
+                .AddSingleton<IAzureSearchIndexClientService, AzureSearchIndexClientService>()
+                .AddSingleton<IAzureSearchIndexAliasService, AzureSearchIndexAliasService>();
 
-                return new AzureSearchQueryClientService(new AzureSearchQueryClientOptions(options.Value.SearchServiceEndPoint, options.Value.SearchServiceQueryApiKey), clientOptions);
-            })
-            .AddSingleton<IAzureSearchClient, DefaultAzureSearchClient>()
-            .AddSingleton<IAzureSearchTaskLogger, DefaultAzureSearchTaskLogger>()
-            .AddSingleton<IAzureSearchTaskProcessor, DefaultAzureSearchTaskProcessor>()
-            .AddSingleton<IAzureSearchConfigurationStorageService, DefaultAzureSearchConfigurationStorageService>()
-            .AddSingleton<IAzureSearchIndexClientService, AzureSearchIndexClientService>()
-            .AddSingleton<IAzureSearchIndexAliasService, AzureSearchIndexAliasService>();
+        return services;
+    }
 }

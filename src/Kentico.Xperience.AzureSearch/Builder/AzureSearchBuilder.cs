@@ -10,30 +10,12 @@ namespace Microsoft.Extensions.DependencyInjection;
 /// <summary>
 /// Builder for configuring and registering Azure Search strategies and models.
 /// </summary>
-internal class AzureSearchBuilder : IAzureSearchBuilder
+internal class AzureSearchBuilder(IServiceCollection serviceCollection) : IAzureSearchBuilder
 {
-    private readonly IServiceCollection serviceCollection;
-
     private Action<SearchClientOptions>? configureAction;
 
 
     private const string ErrorMessage = "Exactly one field in your index must serve as the document key (IsKey = true). It must be a string, and it must uniquely identify each document. It's also required to have IsHidden = false.";
-
-    /// <summary>
-    /// If true, the <see cref="BaseAzureSearchIndexingStrategy{BaseAzureSearchModel}" /> will be available as an explicitly selectable indexing strategy
-    /// within the Admin UI.
-    /// </summary>
-    public bool IncludeDefaultStrategy { get; }
-
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AzureSearchBuilder"/> class.
-    /// </summary>
-    public AzureSearchBuilder(IServiceCollection serviceCollection, bool includeDefaultStrategy = true)
-    {
-        this.serviceCollection = serviceCollection;
-        IncludeDefaultStrategy = includeDefaultStrategy;
-    }
 
 
     /// <summary>

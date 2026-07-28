@@ -82,17 +82,6 @@ internal class AzureSearchBuilderTests
 
 
     [Test]
-    public void IncludeDefaultStrategy_ByDefault_IsTrue()
-    {
-        // Arrange
-        var builder = CreateBuilder();
-
-        // Act & Assert
-        Assert.That(builder.IncludeDefaultStrategy, Is.True);
-    }
-
-
-    [Test]
     public void RegisterSearchClientConfiguration_ReturnsSameBuilderInstance()
     {
         // Arrange
