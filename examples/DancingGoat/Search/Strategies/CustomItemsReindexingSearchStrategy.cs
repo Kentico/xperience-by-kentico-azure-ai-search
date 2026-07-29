@@ -7,8 +7,6 @@ using DancingGoat.Search.Services;
 
 using Kentico.Xperience.AzureSearch.Indexing;
 
-using Microsoft.IdentityModel.Tokens;
-
 namespace DancingGoat.Search.Strategies;
 
 public class CustomItemsReindexingSearchStrategy : BaseAzureSearchIndexingStrategy<DancingGoatSearchModel>
@@ -122,7 +120,7 @@ public class CustomItemsReindexingSearchStrategy : BaseAzureSearchIndexingStrate
                 return null;
             }
 
-            if (page.HomePageBanner.IsNullOrEmpty())
+            if (page.HomePageBanner is null || !page.HomePageBanner.Any())
             {
                 return null;
             }

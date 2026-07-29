@@ -4,7 +4,6 @@ using CMS.Commerce;
 
 using DancingGoat.Commerce;
 
-#pragma warning disable KXE0002 // Commerce feature is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 namespace DancingGoat.Helpers;
 
 internal static class ShoppingCartDataModelExtensions
@@ -21,4 +20,3 @@ internal static class ShoppingCartDataModelExtensions
     /// </summary>
     public static void StoreShoppingCartDataModel(this ShoppingCartInfo shoppingCart, ShoppingCartDataModel shoppingCartData) => shoppingCart.ShoppingCartData = JsonSerializer.Serialize(shoppingCartData);
 }
-#pragma warning restore KXE0002 // Commerce feature is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

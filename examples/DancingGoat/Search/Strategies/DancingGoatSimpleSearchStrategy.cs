@@ -4,8 +4,6 @@ using DancingGoat.Search.Services;
 
 using Kentico.Xperience.AzureSearch.Indexing;
 
-using Microsoft.IdentityModel.Tokens;
-
 namespace DancingGoat.Search;
 
 public class DancingGoatSimpleSearchStrategy : BaseAzureSearchIndexingStrategy<DancingGoatSimpleSearchModel>
@@ -53,7 +51,7 @@ public class DancingGoatSimpleSearchStrategy : BaseAzureSearchIndexingStrategy<D
                 return null;
             }
 
-            if (page.HomePageBanner.IsNullOrEmpty())
+            if (page.HomePageBanner is null || !page.HomePageBanner.Any())
             {
                 return null;
             }
