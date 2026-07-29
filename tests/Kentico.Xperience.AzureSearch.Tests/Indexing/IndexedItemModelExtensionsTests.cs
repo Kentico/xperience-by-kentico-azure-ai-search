@@ -1,5 +1,4 @@
 ﻿using CMS.Core;
-using CMS.EventLog;
 using CMS.Tests;
 
 using FluentAssertions;
@@ -46,7 +45,7 @@ public class Tests : UnitTests
     [Test]
     public void IsIndexedByIndex_Will_Return_False_When_The_Index_Doesnt_Exist()
     {
-        var log = Substitute.For<EventLogService>();
+        var log = Substitute.For<IEventLogService>();
 
         var sut = GetDefaultIndexEventWebPageItemModel();
 
@@ -56,7 +55,7 @@ public class Tests : UnitTests
     [Test]
     public void IsIndexedByIndex_Will_Return_False_When_The_Matching_Index_Has_No_Matching_ContentTypes()
     {
-        var log = Substitute.For<EventLogService>();
+        var log = Substitute.For<IEventLogService>();
 
         IEnumerable<AzureSearchIndexIncludedPath> paths = [new("/path") { ContentTypes = [new("contentType", "contentType")], Identifier = "1" }];
 
@@ -81,7 +80,7 @@ public class Tests : UnitTests
     [Test]
     public void IsIndexedByIndex_Will_Return_False_When_The_Matching_Index_Has_No_Matching_Paths()
     {
-        var log = Substitute.For<EventLogService>();
+        var log = Substitute.For<IEventLogService>();
         List<AzureSearchIndexContentType> contentTypes = [new("contentType", "contentType")];
 
         IEnumerable<AzureSearchIndexIncludedPath> exactPaths = [new("/path") { ContentTypes = [new("contentType", "contentType")], Identifier = "1" }];
@@ -122,7 +121,7 @@ public class Tests : UnitTests
     [Test]
     public void IsIndexedByIndex_Will_Return_True_When_The_Matching_Index_Has_An_Exact_Path_Match()
     {
-        var log = Substitute.For<EventLogService>();
+        var log = Substitute.For<IEventLogService>();
         List<AzureSearchIndexContentType> contentTypes = [new("contentType", "contentType")];
 
         IEnumerable<AzureSearchIndexIncludedPath> exactPaths = [new("/path/abc/def") { ContentTypes = contentTypes, Identifier = "1" }];
@@ -165,7 +164,7 @@ public class Tests : UnitTests
     [TearDown]
     public void TearDown() => AzureSearchIndexStore.Instance.SetIndices([]);
 
-    private IndexEventWebPageItemModel GetDefaultIndexEventWebPageItemModel()
+    private static IndexEventWebPageItemModel GetDefaultIndexEventWebPageItemModel()
     {
         var fixture = new Fixture();
         var sut = fixture.Create<IndexEventWebPageItemModel>();
