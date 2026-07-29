@@ -1451,7 +1451,7 @@
       },
       "Kentico.Xperience.Core": {
         "type": "CentralTransitive",
-        "requested": "[31.0.0, )",
+        "requested": "[31.7.0, )",
         "resolved": "31.7.0",
         "contentHash": "yIN4JUvfz41lYbRThiVzRGuT5HVA1+TmB6yGLN/qttELeSrobDxtyXXAnS+HqI/rHjeeDQhAAIt2x488zffQzA==",
         "dependencies": {
