@@ -92,7 +92,6 @@ internal static class IndexedItemModelExtensions
         }
 
         var azureSearchIndex = AzureSearchIndexStore.Instance.GetIndex(indexName);
-
         if (azureSearchIndex is null)
         {
             log.LogError(nameof(IndexedItemModelExtensions), nameof(IsIndexedByIndex), $"Error loading registered AzureSearch index '{indexName}' for event [{eventName}].");
@@ -100,6 +99,17 @@ internal static class IndexedItemModelExtensions
             return false;
         }
 
-        return azureSearchIndex.LanguageNames.Exists(x => x == item.LanguageName);
+        bool matchesContentType = azureSearchIndex.IncludedReusableContentTypes.Exists(x => string.Equals(x, item.ContentTypeName, StringComparison.OrdinalIgnoreCase));
+        if (!matchesContentType)
+        {
+            return false;
+        }
+
+        if (azureSearchIndex.LanguageNames.Exists(x => string.Equals(x, item.LanguageName)))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

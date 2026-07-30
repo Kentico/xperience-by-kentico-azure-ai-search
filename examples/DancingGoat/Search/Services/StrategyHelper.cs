@@ -5,18 +5,18 @@ namespace DancingGoat.Search.Services;
 
 public class StrategyHelper
 {
-    private readonly IWebPageQueryResultMapper webPageMapper;
+    private readonly IContentQueryModelTypeMapper queryTypeMapper;
     private readonly IContentQueryExecutor queryExecutor;
 
     public const string INDEXED_WEBSITECHANNEL_NAME = "DancingGoatPages";
 
-    public StrategyHelper(IWebPageQueryResultMapper webPageMapper, IContentQueryExecutor queryExecutor)
+    public StrategyHelper(IContentQueryModelTypeMapper queryTypeMapper, IContentQueryExecutor queryExecutor)
     {
-        this.webPageMapper = webPageMapper;
+        this.queryTypeMapper = queryTypeMapper;
         this.queryExecutor = queryExecutor;
     }
 
-    public async Task<T?> GetPage<T>(Guid id, string channelName, string languageName, string contentTypeName)
+    public async Task<T?> GetPage<T>(Guid id, string channelName, string languageName, string contentTypeName, bool includeSecuredItems = false)
         where T : IWebPageFieldsSource, new()
     {
         var query = new ContentItemQueryBuilder()
@@ -29,7 +29,10 @@ public class StrategyHelper
                         .TopN(1))
             .InLanguage(languageName);
 
-        var result = await queryExecutor.GetWebPageResult(query, webPageMapper.Map<T>);
+        var result = await queryExecutor.GetWebPageResult(
+            query,
+            queryTypeMapper.Map<T>,
+            new ContentQueryExecutionOptions { IncludeSecuredItems = includeSecuredItems });
 
         return result.FirstOrDefault();
     }

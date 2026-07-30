@@ -213,6 +213,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
                     var webpages = await executor.GetWebPageResult(queryBuilder,
                         container => container,
+                        new ContentQueryExecutionOptions { IncludeSecuredItems = true },
                         cancellationToken: cancellationToken ?? default);
 
                     foreach (var page in webpages)
@@ -236,7 +237,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
                 queryBuilder.InLanguage(language);
 
-                var reusableItems = await executor.GetResult(queryBuilder, result => result, cancellationToken: cancellationToken ?? default);
+                var reusableItems = await executor.GetResult(queryBuilder, result => result, new ContentQueryExecutionOptions { IncludeSecuredItems = true }, cancellationToken: cancellationToken ?? default);
 
                 foreach (var reusableItem in reusableItems)
                 {

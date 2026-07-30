@@ -14,12 +14,13 @@ public class Tests : UnitTests
 {
     private const string DEFAULT_LANGUAGE_NAME = "en-US";
 
+    [TearDown]
+    public void TearDown() => AzureSearchIndexStore.Instance.SetIndices([]);
+
     [TestCase("")]
     [TestCase(null)]
     [TestCase("   ")]
-    public void IsIndexedByIndex_Will_Throw_When_IndexName_Is_Is_Invalid(
-        string? indexName
-    )
+    public void IsIndexedByIndex_Will_Throw_When_IndexName_Is_Is_Invalid(string? indexName)
     {
         var fixture = new Fixture();
 
@@ -161,13 +162,91 @@ public class Tests : UnitTests
         sut.IsIndexedByIndex(log, index2.IndexName, "event").Should().BeTrue();
     }
 
-    [TearDown]
-    public void TearDown() => AzureSearchIndexStore.Instance.SetIndices([]);
+    [Test]
+    public void IsIndexedByIndex_ReusableItem_Will_Return_False_When_The_Matching_Index_Has_No_Matching_IncludedReusableContentTypes()
+    {
+        var log = Substitute.For<IEventLogService>();
+
+        var index = new AzureSearchIndex(new AzureSearchConfigurationModel
+        {
+            ChannelName = "channel",
+            Id = 1,
+            IndexName = "index1",
+            LanguageNames = [DEFAULT_LANGUAGE_NAME],
+            ReusableContentTypeNames = ["contentType"],
+            RebuildHook = "/rebuild",
+            StrategyName = "strategy"
+        }, new() { { "strategy", typeof(BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>) } });
+        AzureSearchIndexStore.Instance.AddIndex(index);
+
+        var sut = GetDefaultIndexEventReusableItemModel();
+        sut.ContentTypeName = "differentContentType";
+
+        sut.IsIndexedByIndex(log, index.IndexName, "event").Should().BeFalse();
+    }
+
+    [Test]
+    public void IsIndexedByIndex_ReusableItem_Will_Return_False_When_The_Matching_Index_Has_No_Matching_Language()
+    {
+        var log = Substitute.For<IEventLogService>();
+
+        var index = new AzureSearchIndex(new AzureSearchConfigurationModel
+        {
+            ChannelName = "channel",
+            Id = 1,
+            IndexName = "index1",
+            LanguageNames = [DEFAULT_LANGUAGE_NAME],
+            ReusableContentTypeNames = ["contentType"],
+            RebuildHook = "/rebuild",
+            StrategyName = "strategy"
+        }, new() { { "strategy", typeof(BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>) } });
+        AzureSearchIndexStore.Instance.AddIndex(index);
+
+        var sut = GetDefaultIndexEventReusableItemModel();
+        sut.ContentTypeName = "contentType";
+        sut.LanguageName = "es-ES";
+
+        sut.IsIndexedByIndex(log, index.IndexName, "event").Should().BeFalse();
+    }
+
+    [Test]
+    public void IsIndexedByIndex_ReusableItem_Will_Return_True_When_The_Matching_Index_Has_A_Matching_IncludedReusableContentType_And_Language()
+    {
+        var log = Substitute.For<IEventLogService>();
+
+        var index = new AzureSearchIndex(new AzureSearchConfigurationModel
+        {
+            ChannelName = "channel",
+            Id = 1,
+            IndexName = "index1",
+            LanguageNames = [DEFAULT_LANGUAGE_NAME],
+            ReusableContentTypeNames = ["contentType"],
+            RebuildHook = "/rebuild",
+            StrategyName = "strategy"
+        }, new() { { "strategy", typeof(BaseAzureSearchIndexingStrategy<BaseAzureSearchModel>) } });
+        AzureSearchIndexStore.Instance.AddIndex(index);
+
+        var sut = GetDefaultIndexEventReusableItemModel();
+        sut.ContentTypeName = "contentType";
+        sut.LanguageName = DEFAULT_LANGUAGE_NAME;
+
+        sut.IsIndexedByIndex(log, index.IndexName, "event").Should().BeTrue();
+    }
 
     private static IndexEventWebPageItemModel GetDefaultIndexEventWebPageItemModel()
     {
         var fixture = new Fixture();
         var sut = fixture.Create<IndexEventWebPageItemModel>();
+
+        sut.LanguageName = DEFAULT_LANGUAGE_NAME;
+
+        return sut;
+    }
+
+    private IndexEventReusableItemModel GetDefaultIndexEventReusableItemModel()
+    {
+        var fixture = new Fixture();
+        var sut = fixture.Create<IndexEventReusableItemModel>();
 
         sut.LanguageName = DEFAULT_LANGUAGE_NAME;
 

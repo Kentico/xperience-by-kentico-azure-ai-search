@@ -157,7 +157,7 @@ public sealed class DancingGoatShoppingCartController : Controller
     {
         var shoppingCart = await currentShoppingCartRetriever.Get();
 
-        shoppingCart ??= await currentShoppingCartCreator.Create();
+        shoppingCart ??= await currentShoppingCartCreator.Create(CancellationToken.None);
 
         return shoppingCart;
     }

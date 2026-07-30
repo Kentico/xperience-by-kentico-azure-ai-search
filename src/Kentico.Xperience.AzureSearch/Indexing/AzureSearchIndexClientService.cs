@@ -114,6 +114,8 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
     {
         index = AddSemanticSearchConfigurationIfAny(index, strategy);
 
+        index = AddVectorEmbeddingConfigurationIfAny(index, strategy);
+
         AzureSearchIndexingEvents.BeforeCreatingOrUpdatingIndex.Execute?.Invoke(this, new OnBeforeCreatingOrUpdatingIndexEventArgs(index));
 
         return (await indexClient.CreateOrUpdateIndexAsync(index, onlyIfUnchanged: true, cancellationToken: cancellationToken)).Value;
@@ -142,10 +144,29 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
         {
             foreach (var suggester in semanticSearchConfiguration.Suggesters)
             {
+                // Sync suggesters by name: replace existing entry to apply updated configuration
+                var existingSuggester = definition.Suggesters.FirstOrDefault(s => s.Name == suggester.Name);
+                if (existingSuggester is not null)
+                {
+                    definition.Suggesters.Remove(existingSuggester);
+                }
+
                 definition.Suggesters.Add(suggester);
             }
 
             definition.SemanticSearch = semanticSearchConfiguration.SemanticSearch;
+        }
+
+        return definition;
+    }
+
+    private static SearchIndex AddVectorEmbeddingConfigurationIfAny(SearchIndex definition, IAzureSearchIndexingStrategy strategy)
+    {
+        var vectorEmbeddingSearchConfiguration = strategy.CreateVectorEmbeddingConfigurationOrNull();
+
+        if (vectorEmbeddingSearchConfiguration is not null)
+        {
+            definition.VectorSearch = vectorEmbeddingSearchConfiguration;
         }
 
         return definition;
