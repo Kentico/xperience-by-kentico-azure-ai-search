@@ -31,6 +31,8 @@ internal class AzureSearchIndexAliasService : IAzureSearchIndexAliasService
             throw new ArgumentNullException(nameof(oldAliasName));
         }
 
+        ArgumentNullException.ThrowIfNull(newAlias);
+
         await DeleteAlias(oldAliasName, cancellationToken);
         await indexClient.CreateOrUpdateAliasAsync(newAlias, cancellationToken: cancellationToken);
     }
