@@ -1260,20 +1260,19 @@
       "kentico.xperience.azuresearch": {
         "type": "Project",
         "dependencies": {
-          "Azure.Search.Documents": "[11.6.0-beta.2, )",
+          "Azure.Search.Documents": "[12.0.0, )",
           "Kentico.Xperience.Admin": "[31.7.0, )",
           "Kentico.Xperience.WebApp": "[31.7.0, )"
         }
       },
       "Azure.Search.Documents": {
         "type": "CentralTransitive",
-        "requested": "[11.6.0-beta.2, )",
-        "resolved": "11.6.0-beta.2",
-        "contentHash": "3JtvPPsqnjffUaJGWNIswISnSCbw79sLPtmk02fftpn/vohA/1SgmMCdeksE01++LbiSpCt7HvIH0aGx/ueeDg==",
+        "requested": "[12.0.0, )",
+        "resolved": "12.0.0",
+        "contentHash": "HziwTmbadPNT/Q0Bau3n7ubQQJde5AWGi2LpzA30JwDasJiY5ogyrp7pALpvUy5HYcgSMRrRdLtahgTT5TPyrA==",
         "dependencies": {
-          "Azure.Core": "1.37.0",
-          "System.Text.Json": "4.7.2",
-          "System.Threading.Channels": "4.7.1"
+          "Azure.Core": "1.54.0",
+          "System.Threading.Channels": "10.0.3"
         }
       },
       "Kentico.Xperience.Core": {
