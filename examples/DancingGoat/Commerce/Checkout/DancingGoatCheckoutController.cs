@@ -244,6 +244,6 @@ public sealed class DancingGoatCheckoutController : Controller
     /// <summary>
     /// Retrieves an authenticated live site user.
     /// </summary>
-    /// <seealso cref="MemberInfo"/>"/>
+    /// <seealso cref="MemberInfo"/>
     private async Task<ApplicationUser> GetAuthenticatedUser() => await userManager.GetUserAsync(User);
 }
