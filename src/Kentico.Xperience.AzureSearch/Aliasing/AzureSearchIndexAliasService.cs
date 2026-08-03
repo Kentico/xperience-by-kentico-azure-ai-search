@@ -20,7 +20,7 @@ internal class AzureSearchIndexAliasService : IAzureSearchIndexAliasService
     {
         ArgumentNullException.ThrowIfNull(alias);
 
-        await indexClient.CreateOrUpdateAliasAsync(alias.Name, alias, cancellationToken: cancellationToken);
+        await indexClient.CreateOrUpdateAliasAsync(alias, cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
@@ -31,8 +31,10 @@ internal class AzureSearchIndexAliasService : IAzureSearchIndexAliasService
             throw new ArgumentNullException(nameof(oldAliasName));
         }
 
+        ArgumentNullException.ThrowIfNull(newAlias);
+
         await DeleteAlias(oldAliasName, cancellationToken);
-        await indexClient.CreateOrUpdateAliasAsync(newAlias.Name, newAlias, cancellationToken: cancellationToken);
+        await indexClient.CreateOrUpdateAliasAsync(newAlias, cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
@@ -43,6 +45,6 @@ internal class AzureSearchIndexAliasService : IAzureSearchIndexAliasService
             throw new ArgumentNullException(nameof(aliasName));
         }
 
-        await indexClient.DeleteAliasAsync(aliasName, cancellationToken);
+        await indexClient.DeleteAliasAsync(aliasName, cancellationToken: cancellationToken);
     }
 }

@@ -233,7 +233,7 @@ public class Tests : UnitTests
         sut.IsIndexedByIndex(log, index.IndexName, "event").Should().BeTrue();
     }
 
-    private IndexEventWebPageItemModel GetDefaultIndexEventWebPageItemModel()
+    private static IndexEventWebPageItemModel GetDefaultIndexEventWebPageItemModel()
     {
         var fixture = new Fixture();
         var sut = fixture.Create<IndexEventWebPageItemModel>();

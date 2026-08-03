@@ -49,9 +49,7 @@ builder.Services.AddKentico(features =>
     features.UseEmailMarketing();
     features.UseEmailStatisticsLogging();
     features.UseActivityTracking();
-#pragma warning disable KXE0002 // Commerce feature is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
     features.UseCommerce();
-#pragma warning restore KXE0002 // Commerce feature is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 });
 
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
