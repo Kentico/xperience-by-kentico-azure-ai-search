@@ -4,7 +4,6 @@ using CMS.DataEngine;
 
 using DancingGoat.Models;
 
-#pragma warning disable KXE0002 // Commerce feature is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 namespace DancingGoat.Commerce;
 
 /// <summary>
@@ -99,7 +98,7 @@ public sealed class OrderService
             OrderAddressCountryID = customerDto.AddressCountryId,
             OrderAddressStateID = customerDto.AddressStateId,
             OrderAddressOrderID = order.OrderID,
-            OrderAddressType = OrderAddressType.Billing,
+            OrderAddressType = OrderAddressType.Billing
         };
         await orderAddressInfoProvider.SetAsync(orderAddress);
 
@@ -196,4 +195,3 @@ public sealed class OrderService
               .Column(nameof(OrderStatusInfo.OrderStatusID))
               .GetScalarResultAsync<int>(cancellationToken: cancellationToken);
 }
-#pragma warning restore KXE0002 // Commerce feature is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

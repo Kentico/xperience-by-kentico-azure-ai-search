@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Localization;
 
-#pragma warning disable KXE0002 // Commerce feature is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 [assembly: RegisterWebPageRoute(Checkout.CONTENT_TYPE_NAME, typeof(DancingGoatCheckoutController), WebsiteChannelNames = new[] { DancingGoatConstants.WEBSITE_CHANNEL_NAME })]
 
 namespace DancingGoat.Commerce;
@@ -245,8 +244,6 @@ public sealed class DancingGoatCheckoutController : Controller
     /// <summary>
     /// Retrieves an authenticated live site user.
     /// </summary>
-    /// <seealso cref="MemberInfo"/>"/>
+    /// <seealso cref="MemberInfo"/>
     private async Task<ApplicationUser> GetAuthenticatedUser() => await userManager.GetUserAsync(User);
 }
-
-#pragma warning restore KXE0002 // Commerce feature is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

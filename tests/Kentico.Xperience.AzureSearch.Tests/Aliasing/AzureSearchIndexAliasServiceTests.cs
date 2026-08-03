@@ -1,3 +1,4 @@
+using Azure;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
 
@@ -25,7 +26,7 @@ internal class AzureSearchIndexAliasServiceTests
 
         await service.CreateAlias(alias, cancellationToken);
 
-        await mockIndexClient.Received(1).CreateOrUpdateAliasAsync(MockDataProvider.ALIAS_NAME, alias, cancellationToken: cancellationToken);
+        await mockIndexClient.Received(1).CreateOrUpdateAliasAsync(alias, cancellationToken: cancellationToken);
     }
 
 
@@ -51,8 +52,8 @@ internal class AzureSearchIndexAliasServiceTests
 
         await service.EditAlias(MockDataProvider.ALIAS_NAME, newAlias, cancellationToken);
 
-        await mockIndexClient.Received(1).DeleteAliasAsync(MockDataProvider.ALIAS_NAME, cancellationToken);
-        await mockIndexClient.Received(1).CreateOrUpdateAliasAsync(MockDataProvider.NEW_ALIAS_NAME, newAlias, cancellationToken: cancellationToken);
+        await mockIndexClient.Received(1).DeleteAliasAsync(MockDataProvider.ALIAS_NAME, Arg.Any<MatchConditions>(), cancellationToken);
+        await mockIndexClient.Received(1).CreateOrUpdateAliasAsync(newAlias, cancellationToken: cancellationToken);
     }
 
 
@@ -91,7 +92,7 @@ internal class AzureSearchIndexAliasServiceTests
 
         await service.DeleteAlias(MockDataProvider.ALIAS_NAME, cancellationToken);
 
-        await mockIndexClient.Received(1).DeleteAliasAsync(MockDataProvider.ALIAS_NAME, cancellationToken);
+        await mockIndexClient.Received(1).DeleteAliasAsync(MockDataProvider.ALIAS_NAME, Arg.Any<MatchConditions>(), cancellationToken);
     }
 
 

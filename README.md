@@ -12,6 +12,7 @@ This integration enables you to create [AzureSearch](https://azure.microsoft.com
 
 | Xperience Version | Library Version |
 | ----------------- | --------------- |
+| >= 31.7.0         | >= 10.0.0       |
 | >= 31.0.0         | >= 8.0.0        |
 | >= 30.6.0         | >= 5.3.0        |
 | >= 30.5.1         | >= 5.2.0        |
