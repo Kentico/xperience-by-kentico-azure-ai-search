@@ -38,6 +38,35 @@ See [Search index querying](Search-index-querying.md)
 
 See [Adding scoring profiles](Adding-Scoring-Profiles.md)
 
+## Configuring the Azure Search client (resolving SNAT port exhaustion)
+
+The integration creates Azure Search clients using the default [`SearchClientOptions`](https://learn.microsoft.com/en-us/dotnet/api/azure.search.documents.searchclientoptions). Under heavy indexing or querying load, applications can run into [SNAT (Source Network Address Translation) port exhaustion](https://learn.microsoft.com/en-us/azure/app-service/troubleshoot-intermittent-outbound-connection-errors), which manifests as intermittent connection timeouts or `SocketException` errors. This is commonly caused by aggressive retry policies opening too many outbound connections.
+
+You can customize the `SearchClientOptions` used by the integration through the `RegisterSearchClientConfiguration` method on the builder. Use it to tune the retry and timeout policies to be more resilient against transient failures such as SNAT port exhaustion.
+
+```csharp
+// Program.cs
+using Azure;
+using Azure.Core;
+
+services.AddKenticoAzureSearch(builder =>
+{
+    builder.RegisterStrategy<GlobalAzureSearchStrategy, GlobalSearchModel>("DefaultStrategy");
+
+    // Customize the SearchClientOptions to reduce the risk of SNAT port exhaustion
+    builder.RegisterSearchClientConfiguration(options =>
+    {
+        options.Retry.Mode = RetryMode.Exponential;
+        options.Retry.MaxRetries = 3;
+        options.Retry.Delay = TimeSpan.FromSeconds(1);
+        options.Retry.MaxDelay = TimeSpan.FromSeconds(10);
+        options.Retry.NetworkTimeout = TimeSpan.FromSeconds(30);
+    });
+}, configuration);
+```
+
+> The configuration delegate can only be registered once. Attempting to register it more than once throws an `InvalidOperationException`.
+
 ## Disable indexing
 
 You can disable indexing. This might be useful if there are any problems with differing Kentico version between this integration
