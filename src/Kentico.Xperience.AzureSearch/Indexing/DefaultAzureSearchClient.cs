@@ -46,6 +46,9 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
     private readonly IEventLogService eventLogService;
 
 
+    private readonly IAzureSearchIndexNameResolver indexNameResolver;
+
+
     public DefaultAzureSearchClient(
         IAzureSearchIndexClientService azureSearchIndexClientService,
         IContentQueryExecutor executor,
@@ -55,7 +58,8 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         IConversionService conversionService,
         IProgressiveCache cache,
         SearchIndexClient searchIndexClient,
-        IEventLogService eventLogService)
+        IEventLogService eventLogService,
+        IAzureSearchIndexNameResolver indexNameResolver)
     {
         this.azureSearchIndexClientService = azureSearchIndexClientService;
         this.executor = executor;
@@ -66,6 +70,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         this.cache = cache;
         this.searchIndexClient = searchIndexClient;
         this.eventLogService = eventLogService;
+        this.indexNameResolver = indexNameResolver;
     }
 
 
@@ -95,9 +100,9 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
         var stats = new List<AzureSearchIndexStatisticsViewModel>();
 
-        await foreach (var indexName in existingIndexNamesInAzure)
+        await foreach (string azureIndexName in existingIndexNamesInAzure)
         {
-            if (indices.Any(x => x.IndexName == indexName))
+            if (indexNameResolver.TryGetName(azureIndexName, out string? indexName) && indices.Any(x => x.IndexName == indexName))
             {
                 try
                 {
@@ -140,7 +145,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
             throw new ArgumentNullException(nameof(indexName));
         }
 
-        await searchIndexClient.DeleteIndexAsync(indexName, cancellationToken);
+        await searchIndexClient.DeleteIndexAsync(indexNameResolver.GetAzureName(indexName), cancellationToken);
     }
 
 

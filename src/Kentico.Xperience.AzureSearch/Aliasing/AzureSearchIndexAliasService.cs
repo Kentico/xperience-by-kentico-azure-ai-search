@@ -1,5 +1,10 @@
-﻿using Azure.Search.Documents.Indexes;
+﻿using System.Net;
+
+using Azure;
+using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
+
+using Kentico.Xperience.AzureSearch.Indexing;
 
 namespace Kentico.Xperience.AzureSearch.Aliasing;
 
@@ -9,18 +14,23 @@ namespace Kentico.Xperience.AzureSearch.Aliasing;
 internal class AzureSearchIndexAliasService : IAzureSearchIndexAliasService
 {
     private readonly SearchIndexClient indexClient;
+    private readonly IAzureSearchIndexNameResolver indexNameResolver;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AzureSearchIndexAliasService"/> class.
     /// </summary>
-    public AzureSearchIndexAliasService(SearchIndexClient indexClient) => this.indexClient = indexClient;
+    public AzureSearchIndexAliasService(SearchIndexClient indexClient, IAzureSearchIndexNameResolver indexNameResolver)
+    {
+        this.indexClient = indexClient;
+        this.indexNameResolver = indexNameResolver;
+    }
 
     /// <inheritdoc />
     public async Task CreateAlias(SearchAlias alias, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(alias);
 
-        await indexClient.CreateOrUpdateAliasAsync(alias, cancellationToken: cancellationToken);
+        await indexClient.CreateOrUpdateAliasAsync(ToAzureAlias(alias), cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
@@ -33,8 +43,17 @@ internal class AzureSearchIndexAliasService : IAzureSearchIndexAliasService
 
         ArgumentNullException.ThrowIfNull(newAlias);
 
-        await DeleteAlias(oldAliasName, cancellationToken);
-        await indexClient.CreateOrUpdateAliasAsync(newAlias, cancellationToken: cancellationToken);
+        try
+        {
+            await DeleteAlias(oldAliasName, cancellationToken);
+        }
+        catch (RequestFailedException ex) when (ex.Status == (int)HttpStatusCode.NotFound)
+        {
+            // The old alias may not exist in Azure AI Search, e.g. after the index name prefix was changed.
+            // Continue so that re-saving the alias creates it under the current prefix.
+        }
+
+        await indexClient.CreateOrUpdateAliasAsync(ToAzureAlias(newAlias), cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
@@ -45,6 +64,16 @@ internal class AzureSearchIndexAliasService : IAzureSearchIndexAliasService
             throw new ArgumentNullException(nameof(aliasName));
         }
 
-        await indexClient.DeleteAliasAsync(aliasName, cancellationToken: cancellationToken);
+        await indexClient.DeleteAliasAsync(indexNameResolver.GetAzureName(aliasName), cancellationToken: cancellationToken);
+    }
+
+    private SearchAlias ToAzureAlias(SearchAlias alias)
+    {
+        if (string.IsNullOrEmpty(indexNameResolver.IndexNamePrefix))
+        {
+            return alias;
+        }
+
+        return new SearchAlias(indexNameResolver.GetAzureName(alias.Name), alias.Indexes.Select(indexNameResolver.GetAzureName));
     }
 }
