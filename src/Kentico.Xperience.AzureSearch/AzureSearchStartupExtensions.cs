@@ -8,6 +8,7 @@ using Kentico.Xperience.AzureSearch.Indexing;
 using Kentico.Xperience.AzureSearch.Search;
 
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -61,8 +62,11 @@ public static class AzureSearchStartupExtensions
         var clientOptions = new SearchClientOptions();
         builder?.ConfigureClientOptions(clientOptions);
 
-        services.Configure<AzureSearchOptions>(configuration.GetSection(AzureSearchOptions.CMS_AZURE_SEARCH_SECTION_NAME))
-                .AddSingleton<AzureSearchModuleInstaller>()
+        services.Configure<AzureSearchOptions>(configuration.GetSection(AzureSearchOptions.CMS_AZURE_SEARCH_SECTION_NAME));
+        services.AddOptions<AzureSearchOptions>().ValidateOnStart();
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<AzureSearchOptions>, AzureSearchOptionsValidator>());
+
+        services.AddSingleton<AzureSearchModuleInstaller>()
                 .AddSingleton(x =>
                 {
                     var options = x.GetRequiredService<IOptions<AzureSearchOptions>>();

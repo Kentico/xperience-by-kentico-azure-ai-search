@@ -1,4 +1,7 @@
-﻿using Azure.Search.Documents.Indexes;
+﻿using System.Net;
+
+using Azure;
+using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
 
 using Kentico.Xperience.AzureSearch.Indexing;
@@ -40,7 +43,16 @@ internal class AzureSearchIndexAliasService : IAzureSearchIndexAliasService
 
         ArgumentNullException.ThrowIfNull(newAlias);
 
-        await DeleteAlias(oldAliasName, cancellationToken);
+        try
+        {
+            await DeleteAlias(oldAliasName, cancellationToken);
+        }
+        catch (RequestFailedException ex) when (ex.Status == (int)HttpStatusCode.NotFound)
+        {
+            // The old alias may not exist in Azure AI Search, e.g. after the index name prefix was changed.
+            // Continue so that re-saving the alias creates it under the current prefix.
+        }
+
         await indexClient.CreateOrUpdateAliasAsync(ToAzureAlias(newAlias), cancellationToken: cancellationToken);
     }
 

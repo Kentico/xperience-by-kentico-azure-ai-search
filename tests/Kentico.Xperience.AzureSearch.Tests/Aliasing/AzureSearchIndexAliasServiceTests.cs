@@ -154,6 +154,38 @@ internal class AzureSearchIndexAliasServiceTests
 
 
     [Test]
+    public async Task EditAlias_OldAliasNotFound_CreatesNewAlias()
+    {
+        var mockIndexClient = Substitute.For<SearchIndexClient>();
+        mockIndexClient.DeleteAliasAsync(PREFIX + MockDataProvider.ALIAS_NAME, Arg.Any<MatchConditions>(), Arg.Any<CancellationToken>())
+            .Returns<Task<Response>>(_ => throw new RequestFailedException(404, "Not found"));
+        var service = new AzureSearchIndexAliasService(mockIndexClient, new AzureSearchIndexNameResolver(PREFIX));
+        var newAlias = new SearchAlias(MockDataProvider.ALIAS_NAME, [TEST_INDEX_NAME]);
+
+        await service.EditAlias(MockDataProvider.ALIAS_NAME, newAlias, CancellationToken.None);
+
+        await mockIndexClient.Received(1).CreateOrUpdateAliasAsync(
+            Arg.Is<SearchAlias>(a => a.Name == PREFIX + MockDataProvider.ALIAS_NAME),
+            cancellationToken: CancellationToken.None);
+    }
+
+
+    [Test]
+    public void EditAlias_DeleteFailsWithOtherError_Throws()
+    {
+        var mockIndexClient = Substitute.For<SearchIndexClient>();
+        mockIndexClient.DeleteAliasAsync(Arg.Any<string>(), Arg.Any<MatchConditions>(), Arg.Any<CancellationToken>())
+            .Returns<Task<Response>>(_ => throw new RequestFailedException(500, "Server error"));
+        var service = new AzureSearchIndexAliasService(mockIndexClient, new AzureSearchIndexNameResolver(PREFIX));
+        var newAlias = new SearchAlias(MockDataProvider.ALIAS_NAME, [TEST_INDEX_NAME]);
+
+        Assert.ThrowsAsync<RequestFailedException>(async () =>
+            await service.EditAlias(MockDataProvider.ALIAS_NAME, newAlias, CancellationToken.None));
+        mockIndexClient.DidNotReceiveWithAnyArgs().CreateOrUpdateAliasAsync(default!, default, default);
+    }
+
+
+    [Test]
     public async Task DeleteAlias_WithPrefix_DeletesPrefixedAlias()
     {
         var mockIndexClient = Substitute.For<SearchIndexClient>();

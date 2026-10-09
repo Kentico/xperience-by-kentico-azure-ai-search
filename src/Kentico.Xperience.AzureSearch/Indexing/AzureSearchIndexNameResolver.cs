@@ -27,18 +27,35 @@ public sealed partial class AzureSearchIndexNameResolver : IAzureSearchIndexName
     {
         IndexNamePrefix = indexNamePrefix?.Trim() ?? string.Empty;
 
-        if (IndexNamePrefix.Length > 0 && !PrefixRegex().IsMatch(IndexNamePrefix))
+        string? error = GetPrefixValidationError(IndexNamePrefix);
+        if (error is not null)
         {
-            throw new ArgumentException(
-                $"The configured Azure Search index name prefix '{IndexNamePrefix}' is invalid. " +
-                "The prefix can only contain lowercase letters, digits or dashes and must start with a lowercase letter or digit.",
-                nameof(indexNamePrefix));
+            throw new ArgumentException(error, nameof(indexNamePrefix));
+        }
+    }
+
+
+    /// <summary>
+    /// Validates the index name prefix.
+    /// </summary>
+    /// <param name="indexNamePrefix">Prefix to validate. Null or empty value means no prefix.</param>
+    /// <returns>Error message when the prefix is invalid, otherwise <see langword="null"/>.</returns>
+    internal static string? GetPrefixValidationError(string? indexNamePrefix)
+    {
+        string prefix = indexNamePrefix?.Trim() ?? string.Empty;
+
+        if (prefix.Length > 0 && !PrefixRegex().IsMatch(prefix))
+        {
+            return $"The configured Azure Search index name prefix '{prefix}' is invalid. " +
+                "The prefix can only contain lowercase letters, digits or dashes and must start with a lowercase letter or digit.";
         }
 
-        if (IndexNamePrefix.Length >= MAX_NAME_LENGTH)
+        if (prefix.Length >= MAX_NAME_LENGTH)
         {
-            throw new ArgumentException($"The configured Azure Search index name prefix must be shorter than {MAX_NAME_LENGTH} characters.", nameof(indexNamePrefix));
+            return $"The configured Azure Search index name prefix must be shorter than {MAX_NAME_LENGTH} characters.";
         }
+
+        return null;
     }
 
 

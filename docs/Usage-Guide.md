@@ -105,13 +105,13 @@ With the configuration above, an index named `products` in the administration UI
 - The prefix is applied only to names sent to Azure AI Search (indexes and aliases). The database, administration UI and indexing strategies keep working with the unprefixed (logical) names.
 - `IAzureSearchQueryClientService.CreateSearchClientForQueries` applies the prefix automatically, so querying code uses the logical index or alias name.
 - The administration UI index statistics only list indexes that match the configured prefix.
-- The prefix may contain only lowercase letters, digits and dashes and must start with a letter or digit. An invalid prefix throws an `ArgumentException` on startup.
+- The prefix may contain only lowercase letters, digits and dashes and must start with a letter or digit. An invalid prefix fails the options validation on application startup with an `OptionsValidationException`.
 - The prefixed name must not exceed 128 characters (Azure AI Search limit). Longer names throw an `InvalidOperationException`.
 - `OnBeforeCreatingOrUpdatingIndex` receives the `SearchIndex` with the prefixed name.
 - `IAzureSearchIndexNameResolver` can be injected to convert between logical and Azure names in custom code.
 
-> Changing the prefix of an existing environment does not rename or move existing indexes. Rebuild all indexes and re-save all aliases after the change
-> and manually delete the indexes and aliases with the old names from the Azure AI Search service.
+> Changing the prefix of an existing environment does not rename or move existing indexes. Rebuild all indexes and re-save (edit) all aliases after the change
+> so they are created under the new prefix, and manually delete the indexes and aliases with the old names from the Azure AI Search service.
 
 ## Upgrades and Uninstalling
 
