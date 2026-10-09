@@ -47,7 +47,12 @@ dotnet add package Kentico.Xperience.AzureSearch
        
        // Opotionally add delay between indexing items.
        // This is useful if there are a lot of pages and items on your web which when crawled would increase the performance requirements.
-       "IndexItemDelay" :  0
+       "IndexItemDelay" :  0,
+
+       // Optionally prefix all index and alias names in Azure AI Search (e.g. "dev-", "uat-", "prod-").
+       // Allows sharing a single Azure AI Search service between multiple environments.
+       // See docs/Usage-Guide.md#share-an-azure-ai-search-service-between-environments
+       "IndexNamePrefix": ""
    }
    ```
 

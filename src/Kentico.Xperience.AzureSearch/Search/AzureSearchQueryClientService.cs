@@ -1,6 +1,8 @@
 using Azure;
 using Azure.Search.Documents;
 
+using Kentico.Xperience.AzureSearch.Indexing;
+
 namespace Kentico.Xperience.AzureSearch.Search;
 
 /// <inheritdoc />
@@ -40,12 +42,14 @@ public sealed class AzureSearchQueryClientService : IAzureSearchQueryClientServi
     /// <summary>
     /// Gets user settings from appsettings.json and initializes <see cref="SearchClient"/>
     /// </summary>
-    /// <param name="indexName">The name of the Azure Search index.</param>
+    /// <param name="indexName">The name of the index or alias as stored in Xperience. The configured <see cref="AzureSearchQueryClientOptions.IndexNamePrefix"/> is applied automatically.</param>
     /// <returns>Initialized <see cref="SearchClient"/></returns>
     public SearchClient CreateSearchClientForQueries(string indexName)
     {
         ArgumentException.ThrowIfNullOrEmpty(indexName);
 
-        return new SearchClient(new Uri(settings.ServiceEndpoint), indexName, new AzureKeyCredential(settings.QueryApiKey), clientOptions);
+        string azureIndexName = new AzureSearchIndexNameResolver(settings.IndexNamePrefix).GetAzureName(indexName);
+
+        return new SearchClient(new Uri(settings.ServiceEndpoint), azureIndexName, new AzureKeyCredential(settings.QueryApiKey), clientOptions);
     }
 }

@@ -102,4 +102,16 @@ internal class AzureSearchQueryClientServiceTests
 
         Assert.That(result.IndexName, Is.EqualTo(MockDataProvider.DEFAULT_INDEX));
     }
+
+
+    [Test]
+    public void CreateSearchClientForQueries_WithIndexNamePrefix_InitializesWithPrefixedIndexName()
+    {
+        var settings = new AzureSearchQueryClientOptions(MockDataProvider.SERVICE_ENDPOINT, MockDataProvider.QUERY_API_KEY, "dev-");
+        var service = new AzureSearchQueryClientService(settings);
+
+        var result = service.CreateSearchClientForQueries(MockDataProvider.ALIAS_NAME);
+
+        Assert.That(result.IndexName, Is.EqualTo("dev-" + MockDataProvider.ALIAS_NAME));
+    }
 }

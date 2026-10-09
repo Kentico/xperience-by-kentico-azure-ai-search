@@ -17,11 +17,16 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
     private readonly IServiceProvider serviceProvider;
 
 
+    private readonly IAzureSearchIndexNameResolver indexNameResolver;
+
+
     public AzureSearchIndexClientService(SearchIndexClient indexClient,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        IAzureSearchIndexNameResolver indexNameResolver)
     {
         this.indexClient = indexClient;
         this.serviceProvider = serviceProvider;
+        this.indexNameResolver = indexNameResolver;
     }
 
 
@@ -31,9 +36,11 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
         // Ensure the index exists locally.
         AzureSearchIndexStore.Instance.GetRequiredIndex(indexName);
 
-        // Ensure the index exists in Azure. .
-        await indexClient.GetIndexAsync(indexName, cancellationToken);
-        return indexClient.GetSearchClient(indexName);
+        string azureIndexName = indexNameResolver.GetAzureName(indexName);
+
+        // Ensure the index exists in Azure.
+        await indexClient.GetIndexAsync(azureIndexName, cancellationToken);
+        return indexClient.GetSearchClient(azureIndexName);
     }
 
 
@@ -54,7 +61,7 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
             return await CreateIndexInternal(newSearchFields, newStrategy, newIndex.IndexName, cancellationToken);
         }
 
-        var existingIndex = await GetIndexIfExists(newIndex.IndexName, cancellationToken);
+        var existingIndex = await GetIndexIfExists(indexNameResolver.GetAzureName(newIndex.IndexName), cancellationToken);
         if (existingIndex is null)
         {
             // Index was deleted outside of the application - recreate it
@@ -91,7 +98,7 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
             throw new ArgumentException("Value must not be null or empty", nameof(indexName));
         }
 
-        if (await GetIndexIfExists(indexName, cancellationToken) is SearchIndex index)
+        if (await GetIndexIfExists(indexNameResolver.GetAzureName(indexName), cancellationToken) is SearchIndex index)
         {
             await indexClient.DeleteIndexAsync(index, onlyIfUnchanged: onlyIfUnchanged, cancellationToken: cancellationToken);
             return true;
@@ -103,7 +110,7 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
 
     private async Task<SearchIndex> CreateIndexInternal(IList<SearchField>? searchFields, IAzureSearchIndexingStrategy strategy, string indexName, CancellationToken cancellationToken)
     {
-        var definition = new SearchIndex(indexName, searchFields);
+        var definition = new SearchIndex(indexNameResolver.GetAzureName(indexName), searchFields);
 
         await CreateOrUpdateIndexInternal(definition, strategy, cancellationToken);
         return definition;
