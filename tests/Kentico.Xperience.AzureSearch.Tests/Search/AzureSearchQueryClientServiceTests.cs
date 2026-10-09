@@ -2,6 +2,7 @@ using Azure.Search.Documents;
 
 using CMS.Tests;
 
+using Kentico.Xperience.AzureSearch.Indexing;
 using Kentico.Xperience.AzureSearch.Search;
 using Kentico.Xperience.AzureSearch.Tests.Base;
 
@@ -105,13 +106,24 @@ internal class AzureSearchQueryClientServiceTests
 
 
     [Test]
-    public void CreateSearchClientForQueries_WithIndexNamePrefix_InitializesWithPrefixedIndexName()
+    public void CreateSearchClientForQueries_WithIndexNameResolver_UsesResolvedIndexName()
     {
-        var settings = new AzureSearchQueryClientOptions(MockDataProvider.SERVICE_ENDPOINT, MockDataProvider.QUERY_API_KEY, "dev-");
-        var service = new AzureSearchQueryClientService(settings);
+        var settings = new AzureSearchQueryClientOptions(MockDataProvider.SERVICE_ENDPOINT, MockDataProvider.QUERY_API_KEY);
+        var resolver = Substitute.For<IAzureSearchIndexNameResolver>();
+        resolver.GetAzureName(MockDataProvider.ALIAS_NAME).Returns("dev-" + MockDataProvider.ALIAS_NAME);
+        var service = new AzureSearchQueryClientService(settings, new SearchClientOptions(), resolver);
 
         var result = service.CreateSearchClientForQueries(MockDataProvider.ALIAS_NAME);
 
         Assert.That(result.IndexName, Is.EqualTo("dev-" + MockDataProvider.ALIAS_NAME));
+    }
+
+
+    [Test]
+    public void Constructor_WithNullIndexNameResolver_Throws()
+    {
+        var settings = new AzureSearchQueryClientOptions(MockDataProvider.SERVICE_ENDPOINT, MockDataProvider.QUERY_API_KEY);
+
+        Assert.That(() => new AzureSearchQueryClientService(settings, new SearchClientOptions(), null!), Throws.ArgumentNullException);
     }
 }
