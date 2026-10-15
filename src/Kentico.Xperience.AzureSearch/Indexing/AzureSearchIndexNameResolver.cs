@@ -6,12 +6,12 @@ namespace Kentico.Xperience.AzureSearch.Indexing;
 /// <summary>
 /// Default implementation of <see cref="IAzureSearchIndexNameResolver"/>.
 /// </summary>
-public sealed partial class AzureSearchIndexNameResolver : IAzureSearchIndexNameResolver
+internal sealed partial class AzureSearchIndexNameResolver : IAzureSearchIndexNameResolver
 {
     /// <summary>
     /// Maximum length of an index or alias name allowed by Azure AI Search.
     /// </summary>
-    public const int MAX_NAME_LENGTH = 128;
+    internal const int MAX_NAME_LENGTH = 128;
 
 
     /// <inheritdoc />

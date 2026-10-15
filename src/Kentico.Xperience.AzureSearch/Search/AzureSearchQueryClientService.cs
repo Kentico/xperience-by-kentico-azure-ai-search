@@ -17,10 +17,20 @@ public sealed class AzureSearchQueryClientService : IAzureSearchQueryClientServi
     private readonly IAzureSearchIndexNameResolver indexNameResolver;
 
 
+    private const string OBSOLETE_CONSTRUCTOR_MESSAGE =
+        "This constructor ignores the configured CMSAzureSearch:IndexNamePrefix and queries unprefixed index and alias names. " +
+        "Resolve IAzureSearchQueryClientService from the dependency injection container or use the constructor accepting IAzureSearchIndexNameResolver.";
+
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AzureSearchQueryClientService"/> class.
     /// </summary>
+    /// <remarks>
+    /// Index and alias names are used without a prefix, the configured <see cref="AzureSearchOptions.IndexNamePrefix"/> is ignored.
+    /// Use <see cref="AzureSearchQueryClientService(AzureSearchQueryClientOptions, SearchClientOptions, IAzureSearchIndexNameResolver)"/> instead.
+    /// </remarks>
     /// <param name="settings">The settings for the Azure Search query client.</param>
+    [Obsolete(OBSOLETE_CONSTRUCTOR_MESSAGE)]
     public AzureSearchQueryClientService(AzureSearchQueryClientOptions settings)
         : this(settings, new SearchClientOptions())
     {
@@ -29,10 +39,14 @@ public sealed class AzureSearchQueryClientService : IAzureSearchQueryClientServi
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AzureSearchQueryClientService"/> class with specified settings and client options.
-    /// Index and alias names are used without a prefix.
     /// </summary>
+    /// <remarks>
+    /// Index and alias names are used without a prefix, the configured <see cref="AzureSearchOptions.IndexNamePrefix"/> is ignored.
+    /// Use <see cref="AzureSearchQueryClientService(AzureSearchQueryClientOptions, SearchClientOptions, IAzureSearchIndexNameResolver)"/> instead.
+    /// </remarks>
     /// <param name="settings">The settings for the Azure Search query client.</param>
     /// <param name="clientOptions">The client options for the Azure Search query client.</param>
+    [Obsolete(OBSOLETE_CONSTRUCTOR_MESSAGE)]
     public AzureSearchQueryClientService(AzureSearchQueryClientOptions settings, SearchClientOptions clientOptions)
         : this(settings, clientOptions, new AzureSearchIndexNameResolver(null))
     {

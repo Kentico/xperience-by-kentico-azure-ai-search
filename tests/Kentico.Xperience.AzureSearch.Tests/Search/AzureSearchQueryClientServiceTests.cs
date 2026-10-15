@@ -8,6 +8,9 @@ using Kentico.Xperience.AzureSearch.Tests.Base;
 
 namespace Kentico.Xperience.AzureSearch.Tests.Search;
 
+// Obsolete constructors are still covered to verify backward compatibility.
+#pragma warning disable CS0618
+
 /// <summary>
 /// Tests for the <see cref="AzureSearchQueryClientService"/> class.
 /// </summary>
