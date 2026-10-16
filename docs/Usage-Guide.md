@@ -121,7 +121,7 @@ The `-` separator between the prefix and the name is added automatically.
 Changing the prefix of an existing environment does not rename or move existing indexes. After the change:
 
 1. **Rebuild all indexes** in the administration UI. This step is required: until an index is rebuilt, it does not exist under the new prefix,
-   so incremental indexing skips the changed content and logs an error with the `INDEX_NOT_FOUND` event code to the event log.
+   so incremental indexing skips the changed content and logs an error with the `AZURE_SEARCH_INDEX_NOT_FOUND` event code to the event log.
 2. Re-save (edit) all aliases so they are created under the new prefix.
 3. Manually delete the indexes and aliases with the old names from the Azure AI Search service.
 
