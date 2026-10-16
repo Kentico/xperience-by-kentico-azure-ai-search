@@ -26,7 +26,7 @@ internal class AzureSearchIndexNameResolverTests
     [Test]
     public void GetAzureName_WithPrefix_ReturnsPrefixedName()
     {
-        var resolver = new AzureSearchIndexNameResolver("dev-");
+        var resolver = new AzureSearchIndexNameResolver("dev");
 
         Assert.That(resolver.GetAzureName("my-index"), Is.EqualTo("dev-my-index"));
     }
@@ -35,7 +35,7 @@ internal class AzureSearchIndexNameResolverTests
     [Test]
     public void GetAzureName_WithPrefixSurroundedByWhitespace_TrimsPrefix()
     {
-        var resolver = new AzureSearchIndexNameResolver(" uat- ");
+        var resolver = new AzureSearchIndexNameResolver(" uat ");
 
         Assert.That(resolver.GetAzureName("my-index"), Is.EqualTo("uat-my-index"));
     }
@@ -45,7 +45,7 @@ internal class AzureSearchIndexNameResolverTests
     [TestCase("")]
     public void GetAzureName_WithEmptyName_ThrowsArgumentException(string? name)
     {
-        var resolver = new AzureSearchIndexNameResolver("dev-");
+        var resolver = new AzureSearchIndexNameResolver("dev");
 
         Assert.Throws(Is.InstanceOf<ArgumentException>(), () => resolver.GetAzureName(name!));
     }
@@ -54,13 +54,15 @@ internal class AzureSearchIndexNameResolverTests
     [Test]
     public void GetAzureName_WithTooLongResult_ThrowsInvalidOperationException()
     {
-        var resolver = new AzureSearchIndexNameResolver("dev-");
+        var resolver = new AzureSearchIndexNameResolver("dev");
 
         Assert.Throws<InvalidOperationException>(() => resolver.GetAzureName(new string('a', AzureSearchIndexNameResolver.MAX_NAME_LENGTH)));
     }
 
 
-    [TestCase("Dev-")]
+    [TestCase("Dev")]
+    [TestCase("dev-")]
+    [TestCase("dev-eu")]
     [TestCase("-dev")]
     [TestCase("dev_")]
     [TestCase("dev.")]
@@ -71,13 +73,31 @@ internal class AzureSearchIndexNameResolverTests
 
     [Test]
     public void Constructor_WithTooLongPrefix_ThrowsArgumentException() =>
-        Assert.Throws<ArgumentException>(() => new AzureSearchIndexNameResolver(new string('a', AzureSearchIndexNameResolver.MAX_NAME_LENGTH)));
+        Assert.Throws<ArgumentException>(() => new AzureSearchIndexNameResolver(new string('a', AzureSearchIndexNameResolver.MAX_PREFIX_LENGTH + 1)));
+
+
+    [Test]
+    public void GetAzureName_WithMaxLengthPrefix_ReturnsNameOfMaxLength()
+    {
+        var resolver = new AzureSearchIndexNameResolver(new string('a', AzureSearchIndexNameResolver.MAX_PREFIX_LENGTH));
+
+        Assert.That(resolver.GetAzureName("b"), Has.Length.EqualTo(AzureSearchIndexNameResolver.MAX_NAME_LENGTH));
+    }
+
+
+    [Test]
+    public void Constructor_WithPrefixContainingDash_ErrorHintsAtNewFormat()
+    {
+        var exception = Assert.Throws<ArgumentException>(() => new AzureSearchIndexNameResolver("dev-"));
+
+        Assert.That(exception!.Message, Does.Contain("use 'dev' instead of 'dev-'"));
+    }
 
 
     [Test]
     public void TryGetName_WithMatchingPrefix_ReturnsNameWithoutPrefix()
     {
-        var resolver = new AzureSearchIndexNameResolver("dev-");
+        var resolver = new AzureSearchIndexNameResolver("dev");
 
         bool result = resolver.TryGetName("dev-my-index", out string? name);
 
@@ -91,11 +111,13 @@ internal class AzureSearchIndexNameResolverTests
 
     [TestCase("uat-my-index")]
     [TestCase("my-index")]
+    [TestCase("devmy-index")]
+    [TestCase("dev")]
     [TestCase("dev-")]
     [TestCase("")]
     public void TryGetName_WithNonMatchingPrefix_ReturnsFalse(string azureName)
     {
-        var resolver = new AzureSearchIndexNameResolver("dev-");
+        var resolver = new AzureSearchIndexNameResolver("dev");
 
         bool result = resolver.TryGetName(azureName, out string? name);
 

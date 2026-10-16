@@ -184,6 +184,11 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
             return result.Value.Results.Count(model => model.Succeeded);
         }
+        catch (AzureSearchIndexNotFoundException ex)
+        {
+            LogIndexNotFound(ex);
+            return 0;
+        }
         catch (Exception ex) when (ex is Azure.RequestFailedException or InvalidOperationException or ArgumentNullException)
         {
             eventLogService.LogException(nameof(DefaultAzureSearchClient), nameof(DeleteRecordsInternal), ex, $"Failed to delete records from Azure Search index '{indexName}': {ex.Message}");
@@ -325,12 +330,21 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
             return upsertedCount;
         }
+        catch (AzureSearchIndexNotFoundException ex)
+        {
+            LogIndexNotFound(ex);
+            return upsertedCount;
+        }
         catch (Exception ex) when (ex is Azure.RequestFailedException or InvalidOperationException or ArgumentNullException)
         {
             eventLogService.LogException(nameof(DefaultAzureSearchClient), nameof(UpsertRecordsInternal), ex, $"Failed to upsert records to Azure Search index '{indexName}': {ex.Message}");
             return upsertedCount;
         }
     }
+
+
+    private void LogIndexNotFound(AzureSearchIndexNotFoundException ex) =>
+        eventLogService.LogError(nameof(DefaultAzureSearchClient), AzureSearchIndexNotFoundException.EVENT_CODE, ex.Message);
 
 
     private Task<IEnumerable<ContentLanguageInfo>> GetAllLanguages() =>

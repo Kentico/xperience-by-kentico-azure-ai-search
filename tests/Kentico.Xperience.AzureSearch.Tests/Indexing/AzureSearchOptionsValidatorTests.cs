@@ -13,8 +13,8 @@ internal class AzureSearchOptionsValidatorTests
 {
     [TestCase(null)]
     [TestCase("")]
-    [TestCase("dev-")]
-    [TestCase("prod01-")]
+    [TestCase("dev")]
+    [TestCase("prod01")]
     public void Validate_ValidPrefix_Succeeds(string? prefix)
     {
         var result = new AzureSearchOptionsValidator().Validate(null, new AzureSearchOptions { IndexNamePrefix = prefix! });
@@ -23,7 +23,8 @@ internal class AzureSearchOptionsValidatorTests
     }
 
 
-    [TestCase("DEV-")]
+    [TestCase("DEV")]
+    [TestCase("dev-")]
     [TestCase("-dev")]
     [TestCase("dev_")]
     public void Validate_InvalidPrefix_Fails(string prefix)
@@ -41,7 +42,7 @@ internal class AzureSearchOptionsValidatorTests
     [Test]
     public void Validate_TooLongPrefix_Fails()
     {
-        var result = new AzureSearchOptionsValidator().Validate(null, new AzureSearchOptions { IndexNamePrefix = new string('a', AzureSearchIndexNameResolver.MAX_NAME_LENGTH) });
+        var result = new AzureSearchOptionsValidator().Validate(null, new AzureSearchOptions { IndexNamePrefix = new string('a', AzureSearchIndexNameResolver.MAX_PREFIX_LENGTH + 1) });
 
         Assert.That(result.Failed, Is.True);
     }
@@ -51,7 +52,7 @@ internal class AzureSearchOptionsValidatorTests
     public void StartupValidation_InvalidPrefix_Throws()
     {
         var services = new ServiceCollection();
-        services.Configure<AzureSearchOptions>(o => o.IndexNamePrefix = "DEV-");
+        services.Configure<AzureSearchOptions>(o => o.IndexNamePrefix = "dev-");
         services.AddOptions<AzureSearchOptions>().ValidateOnStart();
         services.AddSingleton<IValidateOptions<AzureSearchOptions>, AzureSearchOptionsValidator>();
 

@@ -96,23 +96,34 @@ Set the `IndexNamePrefix` option per environment (e.g. in `appsettings.{Environm
        "SearchServiceEndPoint": "<your application url>",
        "SearchServiceAdminApiKey": "<your application admin key>",
        "SearchServiceQueryApiKey": "<your application query key>",
-       "IndexNamePrefix": "dev-"
+       "IndexNamePrefix": "dev"
    }
    ```
 
 With the configuration above, an index named `products` in the administration UI is created in Azure AI Search as `dev-products`.
+The `-` separator between the prefix and the name is added automatically.
 
 - The prefix is applied only to names sent to Azure AI Search (indexes and aliases). The database, administration UI and indexing strategies keep working with the unprefixed (logical) names.
 - `IAzureSearchQueryClientService.CreateSearchClientForQueries` applies the prefix automatically, so querying code uses the logical index or alias name.
   Resolve `IAzureSearchQueryClientService` from the dependency injection container. The obsolete `AzureSearchQueryClientService` constructors without an `IAzureSearchIndexNameResolver` parameter ignore the prefix.
 - The administration UI index statistics only list indexes that match the configured prefix.
-- The prefix may contain only lowercase letters, digits and dashes and must start with a letter or digit. An invalid prefix fails the options validation on application startup with an `OptionsValidationException`.
-- The prefixed name must not exceed 128 characters (Azure AI Search limit). Longer names throw an `InvalidOperationException`.
+- The prefix may contain only lowercase letters and digits (e.g. `dev`, not `dev-`). Because the prefix cannot contain a dash, distinct prefixes never produce the same Azure name.
+  An invalid prefix fails the options validation on application startup with an `OptionsValidationException`.
+- The prefixed name (including the separator) must not exceed 128 characters (Azure AI Search limit). Longer names throw an `InvalidOperationException`.
 - `OnBeforeCreatingOrUpdatingIndex` receives the `SearchIndex` with the prefixed name.
 - `IAzureSearchIndexNameResolver` can be injected to convert between logical and Azure names in custom code.
 
-> Changing the prefix of an existing environment does not rename or move existing indexes. Rebuild all indexes and re-save (edit) all aliases after the change
-> so they are created under the new prefix, and manually delete the indexes and aliases with the old names from the Azure AI Search service.
+> Mixing an environment without a prefix and environments with a prefix on the same Azure AI Search service is not recommended, because the environments are not isolated.
+> For example, an unprefixed index named `dev-products` is the same Azure index as the index `products` with the prefix `dev`. Configure a distinct prefix for every environment sharing the service.
+
+### Changing the prefix
+
+Changing the prefix of an existing environment does not rename or move existing indexes. After the change:
+
+1. **Rebuild all indexes** in the administration UI. This step is required: until an index is rebuilt, it does not exist under the new prefix,
+   so incremental indexing skips the changed content and logs an error with the `INDEX_NOT_FOUND` event code to the event log.
+2. Re-save (edit) all aliases so they are created under the new prefix.
+3. Manually delete the indexes and aliases with the old names from the Azure AI Search service.
 
 ## Upgrades and Uninstalling
 

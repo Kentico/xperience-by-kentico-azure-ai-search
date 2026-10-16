@@ -15,7 +15,8 @@ namespace Kentico.Xperience.AzureSearch.Tests.Aliasing;
 internal class AzureSearchIndexAliasServiceTests
 {
     private const string TEST_INDEX_NAME = "test-index";
-    private const string PREFIX = "dev-";
+    private const string PREFIX = "dev";
+    private const string AZURE_PREFIX = PREFIX + "-";
 
 
     [Test]
@@ -132,7 +133,7 @@ internal class AzureSearchIndexAliasServiceTests
         await service.CreateAlias(alias, CancellationToken.None);
 
         await mockIndexClient.Received(1).CreateOrUpdateAliasAsync(
-            Arg.Is<SearchAlias>(a => a.Name == PREFIX + MockDataProvider.ALIAS_NAME && a.Indexes.Single() == PREFIX + TEST_INDEX_NAME),
+            Arg.Is<SearchAlias>(a => a.Name == AZURE_PREFIX + MockDataProvider.ALIAS_NAME && a.Indexes.Single() == AZURE_PREFIX + TEST_INDEX_NAME),
             cancellationToken: CancellationToken.None);
     }
 
@@ -146,9 +147,9 @@ internal class AzureSearchIndexAliasServiceTests
 
         await service.EditAlias(MockDataProvider.ALIAS_NAME, newAlias, CancellationToken.None);
 
-        await mockIndexClient.Received(1).DeleteAliasAsync(PREFIX + MockDataProvider.ALIAS_NAME, Arg.Any<MatchConditions>(), CancellationToken.None);
+        await mockIndexClient.Received(1).DeleteAliasAsync(AZURE_PREFIX + MockDataProvider.ALIAS_NAME, Arg.Any<MatchConditions>(), CancellationToken.None);
         await mockIndexClient.Received(1).CreateOrUpdateAliasAsync(
-            Arg.Is<SearchAlias>(a => a.Name == PREFIX + MockDataProvider.NEW_ALIAS_NAME && a.Indexes.Single() == PREFIX + TEST_INDEX_NAME),
+            Arg.Is<SearchAlias>(a => a.Name == AZURE_PREFIX + MockDataProvider.NEW_ALIAS_NAME && a.Indexes.Single() == AZURE_PREFIX + TEST_INDEX_NAME),
             cancellationToken: CancellationToken.None);
     }
 
@@ -157,7 +158,7 @@ internal class AzureSearchIndexAliasServiceTests
     public async Task EditAlias_OldAliasNotFound_CreatesNewAlias()
     {
         var mockIndexClient = Substitute.For<SearchIndexClient>();
-        mockIndexClient.DeleteAliasAsync(PREFIX + MockDataProvider.ALIAS_NAME, Arg.Any<MatchConditions>(), Arg.Any<CancellationToken>())
+        mockIndexClient.DeleteAliasAsync(AZURE_PREFIX + MockDataProvider.ALIAS_NAME, Arg.Any<MatchConditions>(), Arg.Any<CancellationToken>())
             .Returns<Task<Response>>(_ => throw new RequestFailedException(404, "Not found"));
         var service = new AzureSearchIndexAliasService(mockIndexClient, new AzureSearchIndexNameResolver(PREFIX));
         var newAlias = new SearchAlias(MockDataProvider.ALIAS_NAME, [TEST_INDEX_NAME]);
@@ -165,7 +166,7 @@ internal class AzureSearchIndexAliasServiceTests
         await service.EditAlias(MockDataProvider.ALIAS_NAME, newAlias, CancellationToken.None);
 
         await mockIndexClient.Received(1).CreateOrUpdateAliasAsync(
-            Arg.Is<SearchAlias>(a => a.Name == PREFIX + MockDataProvider.ALIAS_NAME),
+            Arg.Is<SearchAlias>(a => a.Name == AZURE_PREFIX + MockDataProvider.ALIAS_NAME),
             cancellationToken: CancellationToken.None);
     }
 
@@ -193,6 +194,6 @@ internal class AzureSearchIndexAliasServiceTests
 
         await service.DeleteAlias(MockDataProvider.ALIAS_NAME, CancellationToken.None);
 
-        await mockIndexClient.Received(1).DeleteAliasAsync(PREFIX + MockDataProvider.ALIAS_NAME, Arg.Any<MatchConditions>(), CancellationToken.None);
+        await mockIndexClient.Received(1).DeleteAliasAsync(AZURE_PREFIX + MockDataProvider.ALIAS_NAME, Arg.Any<MatchConditions>(), CancellationToken.None);
     }
 }

@@ -14,6 +14,18 @@ internal sealed partial class AzureSearchIndexNameResolver : IAzureSearchIndexNa
     internal const int MAX_NAME_LENGTH = 128;
 
 
+    /// <summary>
+    /// Separator inserted between the prefix and the name.
+    /// </summary>
+    internal const char SEPARATOR = '-';
+
+
+    /// <summary>
+    /// Maximum length of the prefix, leaving room for the <see cref="SEPARATOR"/> and at least one character of the name.
+    /// </summary>
+    internal const int MAX_PREFIX_LENGTH = MAX_NAME_LENGTH - 2;
+
+
     /// <inheritdoc />
     public string IndexNamePrefix { get; }
 
@@ -47,12 +59,12 @@ internal sealed partial class AzureSearchIndexNameResolver : IAzureSearchIndexNa
         if (prefix.Length > 0 && !PrefixRegex().IsMatch(prefix))
         {
             return $"The configured Azure Search index name prefix '{prefix}' is invalid. " +
-                "The prefix can only contain lowercase letters, digits or dashes and must start with a lowercase letter or digit.";
+                $"The prefix can only contain lowercase letters and digits. The '{SEPARATOR}' separator is added automatically, e.g. use 'dev' instead of 'dev{SEPARATOR}'.";
         }
 
-        if (prefix.Length >= MAX_NAME_LENGTH)
+        if (prefix.Length > MAX_PREFIX_LENGTH)
         {
-            return $"The configured Azure Search index name prefix must be shorter than {MAX_NAME_LENGTH} characters.";
+            return $"The configured Azure Search index name prefix must not be longer than {MAX_PREFIX_LENGTH} characters.";
         }
 
         return null;
@@ -69,12 +81,12 @@ internal sealed partial class AzureSearchIndexNameResolver : IAzureSearchIndexNa
             return name;
         }
 
-        string azureName = IndexNamePrefix + name;
+        string azureName = $"{IndexNamePrefix}{SEPARATOR}{name}";
 
         if (azureName.Length > MAX_NAME_LENGTH)
         {
             throw new InvalidOperationException(
-                $"The name '{azureName}' (prefix '{IndexNamePrefix}' + '{name}') exceeds the maximum length of {MAX_NAME_LENGTH} characters allowed by Azure AI Search.");
+                $"The name '{azureName}' (prefix '{IndexNamePrefix}' + '{SEPARATOR}' + '{name}') exceeds the maximum length of {MAX_NAME_LENGTH} characters allowed by Azure AI Search.");
         }
 
         return azureName;
@@ -96,9 +108,13 @@ internal sealed partial class AzureSearchIndexNameResolver : IAzureSearchIndexNa
             return true;
         }
 
-        if (azureName.Length > IndexNamePrefix.Length && azureName.StartsWith(IndexNamePrefix, StringComparison.Ordinal))
+        int prefixLength = IndexNamePrefix.Length + 1;
+
+        if (azureName.Length > prefixLength
+            && azureName.StartsWith(IndexNamePrefix, StringComparison.Ordinal)
+            && azureName[IndexNamePrefix.Length] == SEPARATOR)
         {
-            name = azureName[IndexNamePrefix.Length..];
+            name = azureName[prefixLength..];
             return true;
         }
 
@@ -107,6 +123,6 @@ internal sealed partial class AzureSearchIndexNameResolver : IAzureSearchIndexNa
     }
 
 
-    [GeneratedRegex("^[a-z0-9][a-z0-9-]*$")]
+    [GeneratedRegex("^[a-z0-9]+$")]
     private static partial Regex PrefixRegex();
 }

@@ -39,7 +39,15 @@ internal class AzureSearchIndexClientService : IAzureSearchIndexClientService
         string azureIndexName = indexNameResolver.GetAzureName(indexName);
 
         // Ensure the index exists in Azure.
-        await indexClient.GetIndexAsync(azureIndexName, cancellationToken);
+        try
+        {
+            await indexClient.GetIndexAsync(azureIndexName, cancellationToken);
+        }
+        catch (RequestFailedException ex) when (ex.Status == 404)
+        {
+            throw new AzureSearchIndexNotFoundException(indexName, azureIndexName, ex);
+        }
+
         return indexClient.GetSearchClient(azureIndexName);
     }
 
