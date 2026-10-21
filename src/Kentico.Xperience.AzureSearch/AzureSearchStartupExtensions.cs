@@ -61,19 +61,32 @@ public static class AzureSearchStartupExtensions
         var clientOptions = new SearchClientOptions();
         builder?.ConfigureClientOptions(clientOptions);
 
-        services.Configure<AzureSearchOptions>(configuration.GetSection(AzureSearchOptions.CMS_AZURE_SEARCH_SECTION_NAME))
-                .AddSingleton<AzureSearchModuleInstaller>()
+        services.AddSingleton<IValidateOptions<AzureSearchOptions>, AzureSearchOptionsValidator>()
+                .AddOptions<AzureSearchOptions>()
+                .Bind(configuration.GetSection(AzureSearchOptions.CMS_AZURE_SEARCH_SECTION_NAME))
+                .ValidateOnStart();
+
+        services.AddSingleton<AzureSearchModuleInstaller>()
                 .AddSingleton(x =>
                 {
                     var options = x.GetRequiredService<IOptions<AzureSearchOptions>>();
 
                     return new SearchIndexClient(new Uri(options.Value.SearchServiceEndPoint), new AzureKeyCredential(options.Value.SearchServiceAdminApiKey), clientOptions);
                 })
+                .AddSingleton<IAzureSearchIndexNameResolver>(x =>
+                {
+                    var options = x.GetRequiredService<IOptions<AzureSearchOptions>>();
+
+                    return new AzureSearchIndexNameResolver(options.Value.IndexNamePrefix);
+                })
                 .AddSingleton<IAzureSearchQueryClientService>(x =>
                 {
                     var options = x.GetRequiredService<IOptions<AzureSearchOptions>>();
 
-                    return new AzureSearchQueryClientService(new AzureSearchQueryClientOptions(options.Value.SearchServiceEndPoint, options.Value.SearchServiceQueryApiKey), clientOptions);
+                    return new AzureSearchQueryClientService(
+                        new AzureSearchQueryClientOptions(options.Value.SearchServiceEndPoint, options.Value.SearchServiceQueryApiKey),
+                        clientOptions,
+                        x.GetRequiredService<IAzureSearchIndexNameResolver>());
                 })
                 .AddSingleton<IAzureSearchClient, DefaultAzureSearchClient>()
                 .AddSingleton<IAzureSearchTaskLogger, DefaultAzureSearchTaskLogger>()

@@ -20,6 +20,9 @@ public class ExampleSearchModel : BaseAzureSearchModel
 
 Execute a search with custom Azure `SearchOptions` using the `IAzureSearchQueryClientService`. Specify Search options and select data which will be retrieved from the Azure Index.
 
+> Pass the index (or alias) name as defined in the administration UI. If `CMSAzureSearch:IndexNamePrefix` is configured, the prefix is applied automatically.
+> See [Share an Azure AI Search service between environments](Usage-Guide.md#share-an-azure-ai-search-service-between-environments).
+
 ```csharp
 public class ExampleSearchService
 {

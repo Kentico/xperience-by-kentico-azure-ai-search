@@ -17,6 +17,7 @@ internal interface IAzureSearchIndexClientService
     /// <param name="cancellationToken">The cancellation token for the task.</param>
     /// <exception cref="InvalidOperationException">Thrown when the index with the given <paramref name="indexName"/> doesn't exist.</exception>
     /// <exception cref="Azure.RequestFailedException">Thrown when a failure is returned by the Search service.</exception>
+    /// <exception cref="AzureSearchIndexNotFoundException">Thrown when the index does not exist in the Search service.</exception>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="indexName"/> is null or empty.</exception>
     /// <returns>The initialized <see cref="SearchClient" />.</returns>
     Task<SearchClient> InitializeIndexClient(string indexName, CancellationToken cancellationToken);

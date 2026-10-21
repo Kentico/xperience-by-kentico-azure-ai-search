@@ -119,6 +119,7 @@ For local development of the Admin UI:
 - Azure Search configuration goes in `appsettings.json` under `CMSAzureSearch`
 - Required settings: `SearchServiceEndPoint`, `SearchServiceAdminApiKey`, `SearchServiceQueryApiKey`
 - Optional: `IndexItemDelay` for throttling indexing operations
+- Optional: `IndexNamePrefix` to prefix index and alias names in Azure AI Search (share one service between environments)
 
 ### Testing Approach
 

@@ -2,10 +2,14 @@ using Azure.Search.Documents;
 
 using CMS.Tests;
 
+using Kentico.Xperience.AzureSearch.Indexing;
 using Kentico.Xperience.AzureSearch.Search;
 using Kentico.Xperience.AzureSearch.Tests.Base;
 
 namespace Kentico.Xperience.AzureSearch.Tests.Search;
+
+// Obsolete constructors are still covered to verify backward compatibility.
+#pragma warning disable CS0618
 
 /// <summary>
 /// Tests for the <see cref="AzureSearchQueryClientService"/> class.
@@ -101,5 +105,28 @@ internal class AzureSearchQueryClientServiceTests
         var result = service.CreateSearchClientForQueries(MockDataProvider.DEFAULT_INDEX);
 
         Assert.That(result.IndexName, Is.EqualTo(MockDataProvider.DEFAULT_INDEX));
+    }
+
+
+    [Test]
+    public void CreateSearchClientForQueries_WithIndexNameResolver_UsesResolvedIndexName()
+    {
+        var settings = new AzureSearchQueryClientOptions(MockDataProvider.SERVICE_ENDPOINT, MockDataProvider.QUERY_API_KEY);
+        var resolver = Substitute.For<IAzureSearchIndexNameResolver>();
+        resolver.GetAzureName(MockDataProvider.ALIAS_NAME).Returns("dev-" + MockDataProvider.ALIAS_NAME);
+        var service = new AzureSearchQueryClientService(settings, new SearchClientOptions(), resolver);
+
+        var result = service.CreateSearchClientForQueries(MockDataProvider.ALIAS_NAME);
+
+        Assert.That(result.IndexName, Is.EqualTo("dev-" + MockDataProvider.ALIAS_NAME));
+    }
+
+
+    [Test]
+    public void Constructor_WithNullIndexNameResolver_Throws()
+    {
+        var settings = new AzureSearchQueryClientOptions(MockDataProvider.SERVICE_ENDPOINT, MockDataProvider.QUERY_API_KEY);
+
+        Assert.That(() => new AzureSearchQueryClientService(settings, new SearchClientOptions(), null!), Throws.ArgumentNullException);
     }
 }

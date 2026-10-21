@@ -47,4 +47,13 @@ public sealed class AzureSearchOptions
     /// Optional delay between indexing individual <see cref="IIndexEventItemModel"/>s.
     /// </summary>
     public int IndexItemDelay { get; set; }
+
+    /// <summary>
+    /// Optional prefix applied to the names of all indexes and aliases created in the Azure AI Search service
+    /// (e.g., <c>dev</c>, <c>uat</c>, <c>prod</c>). Allows sharing a single Azure AI Search service between multiple environments.
+    /// The prefix and the name are joined with a <c>-</c> separator, which is added automatically (e.g., <c>dev-products</c>).
+    /// Index and alias names stored in Xperience (and displayed in the administration) are not affected.
+    /// The prefix can only contain lowercase letters and digits.
+    /// </summary>
+    public string IndexNamePrefix { get; set; } = string.Empty;
 }

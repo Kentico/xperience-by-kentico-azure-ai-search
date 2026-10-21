@@ -5,6 +5,7 @@ using Azure.Search.Documents.Indexes.Models;
 using CMS.Tests;
 
 using Kentico.Xperience.AzureSearch.Indexing;
+using Kentico.Xperience.AzureSearch.Tests.Base;
 
 namespace Kentico.Xperience.AzureSearch.Tests.Indexing;
 
@@ -24,7 +25,7 @@ internal class AzureSearchIndexClientServiceTests
     {
         mockIndexClient = Substitute.For<SearchIndexClient>();
         mockServiceProvider = Substitute.For<IServiceProvider>();
-        service = new AzureSearchIndexClientService(mockIndexClient, mockServiceProvider);
+        service = new AzureSearchIndexClientService(mockIndexClient, mockServiceProvider, new AzureSearchIndexNameResolver(null));
     }
 
 
@@ -105,6 +106,109 @@ internal class AzureSearchIndexClientServiceTests
 
     [TearDown]
     public void TearDown() => AzureSearchIndexStore.Instance.SetIndices([]);
+
+
+    [Test]
+    public async Task TryDeleteIndexIfExists_WithPrefix_DeletesPrefixedIndex()
+    {
+        var prefixedService = new AzureSearchIndexClientService(mockIndexClient, mockServiceProvider, new AzureSearchIndexNameResolver("dev"));
+        var cancellationToken = CancellationToken.None;
+
+        var mockIndex = new SearchIndex("dev-test-index");
+        mockIndexClient.GetIndexAsync("dev-test-index", cancellationToken).Returns(Response.FromValue(mockIndex, Substitute.For<Response>()));
+
+        var result = await prefixedService.TryDeleteIndexIfExists("test-index", onlyIfUnchanged: false, cancellationToken);
+
+        Assert.That(result, Is.True);
+        await mockIndexClient.Received(1).GetIndexAsync("dev-test-index", cancellationToken);
+        await mockIndexClient.DidNotReceive().GetIndexAsync("test-index", Arg.Any<CancellationToken>());
+        await mockIndexClient.Received(1).DeleteIndexAsync(mockIndex, false, cancellationToken);
+    }
+
+
+    [Test]
+    public async Task InitializeIndexClient_WithPrefix_UsesPrefixedIndexName()
+    {
+        var prefixedService = new AzureSearchIndexClientService(mockIndexClient, mockServiceProvider, new AzureSearchIndexNameResolver("dev"));
+        AzureSearchIndexStore.Instance.SetIndices([]);
+        AzureSearchIndexStore.Instance.AddIndex(MockDataProvider.Index);
+
+        await prefixedService.InitializeIndexClient(MockDataProvider.DEFAULT_INDEX, CancellationToken.None);
+
+        await mockIndexClient.Received(1).GetIndexAsync("dev-" + MockDataProvider.DEFAULT_INDEX, CancellationToken.None);
+        mockIndexClient.Received(1).GetSearchClient("dev-" + MockDataProvider.DEFAULT_INDEX);
+    }
+
+
+    [Test]
+    public void InitializeIndexClient_IndexMissingInAzure_ThrowsIndexNotFoundException()
+    {
+        var prefixedService = new AzureSearchIndexClientService(mockIndexClient, mockServiceProvider, new AzureSearchIndexNameResolver("dev"));
+        AzureSearchIndexStore.Instance.SetIndices([]);
+        AzureSearchIndexStore.Instance.AddIndex(MockDataProvider.Index);
+        mockIndexClient.GetIndexAsync("dev-" + MockDataProvider.DEFAULT_INDEX, CancellationToken.None)
+            .Returns<Response<SearchIndex>>(_ => throw new RequestFailedException(404, "Not Found"));
+
+        var exception = Assert.ThrowsAsync<AzureSearchIndexNotFoundException>(async () =>
+            await prefixedService.InitializeIndexClient(MockDataProvider.DEFAULT_INDEX, CancellationToken.None));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(exception!.Status, Is.EqualTo(404));
+            Assert.That(exception.Message, Does.Contain($"'dev-{MockDataProvider.DEFAULT_INDEX}'"));
+            Assert.That(exception.Message, Does.Contain($"'{MockDataProvider.DEFAULT_INDEX}'"));
+            Assert.That(exception.Message, Does.Contain("Rebuild the index"));
+        });
+    }
+
+
+    [Test]
+    public void InitializeIndexClient_GetIndexFailsWithOtherError_ThrowsOriginalException()
+    {
+        AzureSearchIndexStore.Instance.SetIndices([]);
+        AzureSearchIndexStore.Instance.AddIndex(MockDataProvider.Index);
+        mockIndexClient.GetIndexAsync(MockDataProvider.DEFAULT_INDEX, CancellationToken.None)
+            .Returns<Response<SearchIndex>>(_ => throw new RequestFailedException(403, "Forbidden"));
+
+        var exception = Assert.ThrowsAsync<RequestFailedException>(async () =>
+            await service.InitializeIndexClient(MockDataProvider.DEFAULT_INDEX, CancellationToken.None));
+
+        Assert.That(exception, Is.Not.InstanceOf<AzureSearchIndexNotFoundException>());
+    }
+
+
+    [Test]
+    public async Task CreateIndex_WithPrefix_CreatesPrefixedIndex()
+    {
+        var prefixedService = new AzureSearchIndexClientService(mockIndexClient, mockServiceProvider, new AzureSearchIndexNameResolver("dev"));
+        var mockStrategy = Substitute.For<IAzureSearchIndexingStrategy>();
+        mockStrategy.GetSearchFields().Returns([new SearchField(TEST_FIELD_NAME, SearchFieldDataType.String) { IsKey = true }]);
+        mockServiceProvider.GetService(Arg.Any<Type>()).Returns(mockStrategy);
+
+        var azureSearchIndex = new AzureSearchIndex(
+            new Admin.AzureSearchConfigurationModel
+            {
+                IndexName = "test-index",
+                ChannelName = "test",
+                StrategyName = "TestStrategy",
+                LanguageNames = ["en"]
+            },
+            StrategyStorage.Strategies
+        );
+
+        SearchIndex? capturedIndex = null;
+        mockIndexClient.CreateOrUpdateIndexAsync(Arg.Do<SearchIndex>(x => capturedIndex = x), Arg.Any<bool>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo => Response.FromValue(callInfo.Arg<SearchIndex>(), Substitute.For<Response>()));
+
+        var result = await prefixedService.CreateIndex(azureSearchIndex, CancellationToken.None);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(capturedIndex!.Name, Is.EqualTo("dev-test-index"));
+            Assert.That(result.Name, Is.EqualTo("dev-test-index"));
+            Assert.That(azureSearchIndex.IndexName, Is.EqualTo("test-index"));
+        });
+    }
 
 
     [Test]

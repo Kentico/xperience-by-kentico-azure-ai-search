@@ -46,6 +46,9 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
     private readonly IEventLogService eventLogService;
 
 
+    private readonly IAzureSearchIndexNameResolver indexNameResolver;
+
+
     public DefaultAzureSearchClient(
         IAzureSearchIndexClientService azureSearchIndexClientService,
         IContentQueryExecutor executor,
@@ -55,7 +58,8 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         IConversionService conversionService,
         IProgressiveCache cache,
         SearchIndexClient searchIndexClient,
-        IEventLogService eventLogService)
+        IEventLogService eventLogService,
+        IAzureSearchIndexNameResolver indexNameResolver)
     {
         this.azureSearchIndexClientService = azureSearchIndexClientService;
         this.executor = executor;
@@ -66,6 +70,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
         this.cache = cache;
         this.searchIndexClient = searchIndexClient;
         this.eventLogService = eventLogService;
+        this.indexNameResolver = indexNameResolver;
     }
 
 
@@ -95,9 +100,9 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
         var stats = new List<AzureSearchIndexStatisticsViewModel>();
 
-        await foreach (var indexName in existingIndexNamesInAzure)
+        await foreach (string azureIndexName in existingIndexNamesInAzure)
         {
-            if (indices.Any(x => x.IndexName == indexName))
+            if (indexNameResolver.TryGetName(azureIndexName, out string? indexName) && indices.Any(x => x.IndexName == indexName))
             {
                 try
                 {
@@ -140,7 +145,7 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
             throw new ArgumentNullException(nameof(indexName));
         }
 
-        await searchIndexClient.DeleteIndexAsync(indexName, cancellationToken);
+        await searchIndexClient.DeleteIndexAsync(indexNameResolver.GetAzureName(indexName), cancellationToken);
     }
 
 
@@ -178,6 +183,11 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
             var result = await searchClient.IndexDocumentsAsync(batch, cancellationToken: cancellationToken);
 
             return result.Value.Results.Count(model => model.Succeeded);
+        }
+        catch (AzureSearchIndexNotFoundException ex)
+        {
+            LogIndexNotFound(ex);
+            return 0;
         }
         catch (Exception ex) when (ex is Azure.RequestFailedException or InvalidOperationException or ArgumentNullException)
         {
@@ -320,12 +330,21 @@ internal class DefaultAzureSearchClient : IAzureSearchClient
 
             return upsertedCount;
         }
+        catch (AzureSearchIndexNotFoundException ex)
+        {
+            LogIndexNotFound(ex);
+            return upsertedCount;
+        }
         catch (Exception ex) when (ex is Azure.RequestFailedException or InvalidOperationException or ArgumentNullException)
         {
             eventLogService.LogException(nameof(DefaultAzureSearchClient), nameof(UpsertRecordsInternal), ex, $"Failed to upsert records to Azure Search index '{indexName}': {ex.Message}");
             return upsertedCount;
         }
     }
+
+
+    private void LogIndexNotFound(AzureSearchIndexNotFoundException ex) =>
+        eventLogService.LogError(nameof(DefaultAzureSearchClient), AzureSearchIndexNotFoundException.EVENT_CODE, ex.Message);
 
 
     private Task<IEnumerable<ContentLanguageInfo>> GetAllLanguages() =>
